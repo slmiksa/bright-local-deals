@@ -1,4 +1,4 @@
-import { Home, Grid3X3, Plus, Star, User } from "lucide-react";
+import { Home, Grid3X3, Plus, Star } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const tabs = [
@@ -6,7 +6,6 @@ const tabs = [
   { icon: Grid3X3, label: "التصنيفات", id: "categories", path: "/categories" },
   { icon: Plus, label: "أضف", id: "add", accent: true, path: "/add" },
   { icon: Star, label: "المميزة", id: "featured", path: "/featured" },
-  { icon: User, label: "حسابي", id: "account", path: "/account" },
 ];
 
 const BottomTabBar = () => {

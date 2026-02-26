@@ -106,3 +106,10 @@
     mask-image: linear-gradient(to left, transparent, black 16px);
   }
 }
+
+/* Disable zoom */
+html {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: contain;
+}
