@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { createPortal } from "react-dom";
 
@@ -11,71 +11,164 @@ interface ImageLightboxProps {
 const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps) => {
   const [current, setCurrent] = useState(initialIndex);
 
+  const handleClose = useCallback(() => {
+    document.body.style.overflow = "";
+    onClose();
+  }, [onClose]);
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = ""; };
-  }, []);
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, [handleClose]);
 
   const prev = () => setCurrent((c) => (c > 0 ? c - 1 : images.length - 1));
   const next = () => setCurrent((c) => (c < images.length - 1 ? c + 1 : 0));
 
-  const content = (
+  return createPortal(
     <div
-      className="fixed inset-0 bg-black/95 flex items-center justify-center"
-      style={{ zIndex: 99999 }}
-      onClick={onClose}
+      onClick={handleClose}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 2147483647,
+        backgroundColor: "rgba(0,0,0,0.95)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
     >
+      {/* Close button */}
       <button
-        onClick={onClose}
-        className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center active:bg-white/30 transition-colors"
+        onClick={handleClose}
+        style={{
+          position: "absolute",
+          top: 16,
+          left: 16,
+          width: 40,
+          height: 40,
+          borderRadius: "50%",
+          backgroundColor: "rgba(255,255,255,0.15)",
+          border: "none",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+        }}
       >
-        <X className="w-5 h-5 text-white" />
+        <X style={{ width: 20, height: 20, color: "white" }} />
       </button>
 
+      {/* Image */}
       <img
         src={images[current]}
         alt={`صورة ${current + 1}`}
-        className="max-w-[90%] max-h-[75vh] object-contain rounded-xl select-none"
         onClick={(e) => e.stopPropagation()}
         draggable={false}
+        style={{
+          maxWidth: "90%",
+          maxHeight: "75vh",
+          objectFit: "contain",
+          borderRadius: 12,
+          userSelect: "none",
+        }}
       />
 
       {images.length > 1 && (
         <>
           <button
             onClick={(e) => { e.stopPropagation(); next(); }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center active:bg-white/30 transition-colors"
+            style={{
+              position: "absolute",
+              right: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              backgroundColor: "rgba(255,255,255,0.15)",
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
           >
-            <ChevronRight className="w-5 h-5 text-white" />
+            <ChevronRight style={{ width: 20, height: 20, color: "white" }} />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); prev(); }}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center active:bg-white/30 transition-colors"
+            style={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              backgroundColor: "rgba(255,255,255,0.15)",
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
           >
-            <ChevronLeft className="w-5 h-5 text-white" />
+            <ChevronLeft style={{ width: 20, height: 20, color: "white" }} />
           </button>
 
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5">
+          <div
+            style={{
+              position: "absolute",
+              bottom: 32,
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              gap: 6,
+            }}
+          >
             {images.map((_, i) => (
               <button
                 key={i}
                 onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
-                className={`h-2 rounded-full transition-all ${
-                  i === current ? "w-6 bg-white" : "w-2 bg-white/40"
-                }`}
+                style={{
+                  height: 8,
+                  width: i === current ? 24 : 8,
+                  borderRadius: 4,
+                  backgroundColor: i === current ? "white" : "rgba(255,255,255,0.4)",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
               />
             ))}
           </div>
         </>
       )}
 
-      <p className="absolute top-5 right-5 text-white/70 text-[13px] font-medium">
+      <p style={{
+        position: "absolute",
+        top: 20,
+        right: 20,
+        color: "rgba(255,255,255,0.7)",
+        fontSize: 13,
+        fontWeight: 500,
+        margin: 0,
+      }}>
         {current + 1} / {images.length}
       </p>
-    </div>
+    </div>,
+    document.body
   );
-
-  return createPortal(content, document.body);
 };
 
 export default ImageLightbox;
