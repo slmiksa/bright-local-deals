@@ -3,198 +3,226 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
   const [phase, setPhase] = useState(0);
+  const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase(1), 600);
-    const t2 = setTimeout(() => setPhase(2), 1600);
-    const t3 = setTimeout(() => setPhase(3), 3200);
-    const t4 = setTimeout(() => onFinish(), 5200);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+    const t1 = setTimeout(() => setPhase(1), 800);
+    const t2 = setTimeout(() => setPhase(2), 2000);
+    const t3 = setTimeout(() => setPhase(3), 3800);
+    const t4 = setTimeout(() => setExiting(true), 4800);
+    const t5 = setTimeout(() => onFinish(), 5600);
+    return () => { [t1, t2, t3, t4, t5].forEach(clearTimeout); };
   }, [onFinish]);
 
   return (
     <AnimatePresence>
-      {phase < 3 && (
+      {!exiting ? (
         <motion.div
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
-          style={{ background: "linear-gradient(135deg, hsl(158 45% 32%), hsl(158 45% 42%), hsl(180 40% 35%))" }}
-          exit={{ opacity: 0, scale: 1.1 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
+          style={{ background: "linear-gradient(160deg, hsl(158 50% 22%), hsl(158 45% 35%), hsl(170 40% 28%))" }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
         >
-          {/* Background particles */}
-          {[...Array(12)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 rounded-full"
-              style={{
-                background: "hsla(0,0%,100%,0.15)",
-                left: `${10 + (i * 7) % 80}%`,
-                top: `${15 + (i * 11) % 70}%`,
-              }}
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0.2, 0.5, 0.2],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: 2 + (i % 3),
-                repeat: Infinity,
-                delay: i * 0.2,
-              }}
-            />
-          ))}
+          {/* Subtle grid pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
+              backgroundSize: "24px 24px",
+            }}
+          />
 
-          {/* App Name - لمحة */}
+          {/* Glow behind logo */}
           <motion.div
-            className="text-center mb-6"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: [0, 1.2, 1], opacity: 1 }}
-            transition={{ duration: 0.7, type: "spring", stiffness: 150 }}
+            className="absolute w-64 h-64 rounded-full"
+            style={{ background: "radial-gradient(circle, hsla(158,50%,50%,0.25), transparent 70%)" }}
+            animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          />
+
+          {/* Logo container */}
+          <motion.div
+            className="relative z-10 flex flex-col items-center"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1
-              className="text-5xl font-black text-white mb-1"
-              style={{ textShadow: "0 4px 30px rgba(0,0,0,0.4)" }}
+            {/* Glasses icon */}
+            <motion.div
+              className="mb-4"
+              initial={{ scale: 0, rotate: -30 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ duration: 0.6, type: "spring", stiffness: 180, delay: 0.2 }}
+            >
+              <motion.div
+                className="w-20 h-20 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+                animate={{
+                  boxShadow: [
+                    "0 8px 32px rgba(0,0,0,0.3)",
+                    "0 12px 48px rgba(0,0,0,0.4)",
+                    "0 8px 32px rgba(0,0,0,0.3)",
+                  ],
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <motion.span
+                  className="text-4xl"
+                  animate={{ x: [0, 6, -6, 0] }}
+                  transition={{
+                    duration: 2.5,
+                    delay: 1,
+                    ease: "easeInOut",
+                    times: [0, 0.3, 0.7, 1],
+                  }}
+                >
+                  👓
+                </motion.span>
+              </motion.div>
+            </motion.div>
+
+            {/* App name */}
+            <motion.h1
+              className="text-[44px] font-black text-white tracking-tight"
+              style={{ textShadow: "0 4px 24px rgba(0,0,0,0.4)" }}
+              initial={{ scale: 0.3, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.5, type: "spring" }}
             >
               لمحة
-            </h1>
+            </motion.h1>
+
+            <motion.div
+              className="h-[2px] w-12 bg-white/30 rounded-full my-3"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 0.8, duration: 0.4 }}
+            />
           </motion.div>
 
-          {/* Glasses looking left and right */}
-          <motion.div
-            className="text-5xl mb-8"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          >
-            <motion.span
-              className="inline-block"
-              animate={{
-                rotateY: [0, 0, 180, 180, 0, 0],
-                x: [0, 15, 15, -15, -15, 0],
-              }}
-              transition={{
-                duration: 3,
-                delay: 0.8,
-                ease: "easeInOut",
-                times: [0, 0.2, 0.3, 0.6, 0.7, 1],
-              }}
-            >
-              👓
-            </motion.span>
-          </motion.div>
-
-          {/* Phone icon */}
-          <motion.div
-            className="relative"
-            initial={{ scale: 0, rotate: -20 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.5, delay: 0.5, type: "spring", stiffness: 200 }}
-          >
-            <div className="w-16 h-26 rounded-2xl border-[3px] border-white/90 flex items-center justify-center relative bg-white/10 backdrop-blur-sm p-6">
-              <div className="w-6 h-1 rounded-full bg-white/40 absolute top-2" />
-              <div className="text-xl">📱</div>
-              <div className="w-4 h-4 rounded-full bg-white/30 absolute bottom-2" />
-            </div>
-          </motion.div>
-
-          {/* Flying messages */}
+          {/* Animated message flow */}
           {phase >= 1 && (
-            <>
+            <motion.div
+              className="relative z-10 mt-4 h-28 w-full flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {/* Central phone */}
+              <motion.div
+                className="relative"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 200 }}
+              >
+                <div className="w-10 h-16 rounded-xl border-2 border-white/70 bg-white/10 backdrop-blur flex items-center justify-center">
+                  <span className="text-sm">📱</span>
+                </div>
+
+                {/* Pulse rings */}
+                {[0, 0.6, 1.2].map((delay, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute inset-0 rounded-xl border border-white/20"
+                    animate={{
+                      scale: [1, 2.5],
+                      opacity: [0.4, 0],
+                    }}
+                    transition={{ duration: 1.5, delay, repeat: Infinity, ease: "easeOut" }}
+                  />
+                ))}
+              </motion.div>
+
+              {/* Flying envelopes */}
               {[
-                { delay: 0, x: 120, y: -80, rotate: 15 },
-                { delay: 0.15, x: -110, y: -100, rotate: -20 },
-                { delay: 0.3, x: 90, y: -140, rotate: 10 },
-                { delay: 0.45, x: -80, y: -60, rotate: -10 },
-                { delay: 0.6, x: 140, y: -120, rotate: 25 },
-              ].map((msg, i) => (
+                { x: -80, y: -40, delay: 0.2, rotate: -15 },
+                { x: 85, y: -35, delay: 0.4, rotate: 12 },
+                { x: -60, y: 20, delay: 0.6, rotate: -8 },
+                { x: 75, y: 25, delay: 0.8, rotate: 18 },
+                { x: -100, y: -10, delay: 1.0, rotate: -22 },
+                { x: 110, y: -5, delay: 1.2, rotate: 10 },
+              ].map((env, i) => (
                 <motion.div
                   key={i}
-                  className="absolute text-3xl"
-                  style={{ top: "58%", left: "50%" }}
+                  className="absolute text-xl"
                   initial={{ x: 0, y: 0, scale: 0, opacity: 0 }}
                   animate={{
-                    x: msg.x,
-                    y: msg.y,
-                    scale: [0, 1.3, 1],
-                    opacity: [0, 1, 1, 0.6],
-                    rotate: msg.rotate,
+                    x: env.x,
+                    y: env.y,
+                    scale: [0, 1.2, 0.9],
+                    opacity: [0, 1, 0.7],
+                    rotate: env.rotate,
                   }}
-                  transition={{ duration: 0.8, delay: msg.delay, ease: "easeOut" }}
+                  transition={{ duration: 0.7, delay: env.delay, ease: "easeOut" }}
                 >
                   ✉️
                 </motion.div>
               ))}
 
+              {/* People */}
               {[
-                { delay: 0.5, x: 100, y: -160, emoji: "👤" },
-                { delay: 0.65, x: -90, y: -180, emoji: "👥" },
-                { delay: 0.8, x: 60, y: -200, emoji: "👤" },
+                { x: -90, y: -50, delay: 0.8, emoji: "👤" },
+                { x: 95, y: -45, delay: 1.0, emoji: "👤" },
+                { x: -70, y: 30, delay: 1.2, emoji: "👥" },
+                { x: 80, y: 35, delay: 1.4, emoji: "👤" },
               ].map((p, i) => (
                 <motion.div
                   key={`p-${i}`}
-                  className="absolute text-2xl"
-                  style={{ top: "58%", left: "50%" }}
-                  initial={{ x: p.x, y: p.y, scale: 0, opacity: 0 }}
-                  animate={{ scale: [0, 1.2, 1], opacity: 1 }}
-                  transition={{ duration: 0.4, delay: p.delay + 0.3 }}
+                  className="absolute text-lg"
+                  style={{ x: p.x, y: p.y }}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: [0, 1.3, 1], opacity: 1 }}
+                  transition={{ duration: 0.4, delay: p.delay }}
                 >
                   {p.emoji}
                 </motion.div>
               ))}
-            </>
+            </motion.div>
           )}
 
           {/* Tagline */}
           {phase >= 2 && (
             <motion.div
-              className="mt-10 text-center"
-              initial={{ opacity: 0, y: 30 }}
+              className="relative z-10 mt-6 text-center"
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              transition={{ duration: 0.6 }}
             >
-              <motion.h2
-                className="text-2xl font-bold text-white/90"
-                style={{ textShadow: "0 2px 15px rgba(0,0,0,0.3)" }}
-                initial={{ scale: 0.5 }}
-                animate={{ scale: [0.5, 1.1, 1] }}
-                transition={{ duration: 0.5 }}
+              <motion.p
+                className="text-xl font-bold text-white/90"
+                style={{ textShadow: "0 2px 12px rgba(0,0,0,0.3)" }}
+                initial={{ letterSpacing: "0.3em", opacity: 0 }}
+                animate={{ letterSpacing: "0.05em", opacity: 1 }}
+                transition={{ duration: 0.8 }}
               >
                 إعلانك يوصل
-              </motion.h2>
+              </motion.p>
               <motion.p
-                className="text-white/60 text-sm font-medium mt-1"
+                className="text-white/50 text-[13px] mt-1.5 font-medium"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.4 }}
               >
                 أوصل عرضك لكل الناس
               </motion.p>
             </motion.div>
           )}
 
-          {/* Ripple effect */}
-          {phase >= 1 && (
-            <>
-              {[0, 0.4, 0.8].map((delay, i) => (
-                <motion.div
-                  key={`r-${i}`}
-                  className="absolute rounded-full border-2 border-white/20"
-                  style={{ top: "58%", left: "calc(50% - 10px)" }}
-                  initial={{ width: 20, height: 20, opacity: 0.6 }}
-                  animate={{
-                    width: [20, 250],
-                    height: [20, 250],
-                    x: [-10, -125],
-                    y: [-10, -125],
-                    opacity: [0.5, 0],
-                  }}
-                  transition={{ duration: 1.5, delay, repeat: 1, ease: "easeOut" }}
-                />
-              ))}
-            </>
+          {/* Loading bar */}
+          {phase >= 2 && (
+            <motion.div
+              className="absolute bottom-16 w-32 h-1 bg-white/10 rounded-full overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <motion.div
+                className="h-full bg-white/50 rounded-full"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 2, ease: "easeInOut" }}
+              />
+            </motion.div>
           )}
         </motion.div>
-      )}
+      ) : null}
     </AnimatePresence>
   );
 };

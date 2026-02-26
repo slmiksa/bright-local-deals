@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Monitor, Coffee, Flower2, Sofa, UtensilsCrossed, Gem, ChevronLeft } from "lucide-react";
+import PullToRefresh from "@/components/PullToRefresh";
 
 const categories = [
   { icon: Monitor, label: "إلكترونيات", id: "electronics", color: "158 45% 42%" },
@@ -14,7 +15,7 @@ const CategoriesPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
+    <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
       <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
         <div className="px-5 py-3.5">
           <h1 className="text-lg font-bold text-foreground">التصنيفات</h1>
@@ -39,7 +40,7 @@ const CategoriesPage = () => {
           </button>
         ))}
       </div>
-    </div>
+    </PullToRefresh>
   );
 };
 
