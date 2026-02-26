@@ -19,7 +19,11 @@ import BottomTabBar from "./components/BottomTabBar";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    if (sessionStorage.getItem("lamha_opened")) return false;
+    sessionStorage.setItem("lamha_opened", "1");
+    return true;
+  });
   const handleSplashFinish = useCallback(() => setShowSplash(false), []);
 
   return (
