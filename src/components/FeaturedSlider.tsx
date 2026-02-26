@@ -1,47 +1,34 @@
 import { useRef, useState } from "react";
 import { Phone } from "lucide-react";
-import featuredCoffee from "@/assets/featured-coffee.jpg";
-import featuredElectronics from "@/assets/featured-electronics.jpg";
-import featuredPerfume from "@/assets/featured-perfume.jpg";
-
-const slides = [
-  {
-    id: 1,
-    image: featuredCoffee,
-    title: "أجواء قهوة استثنائية",
-    subtitle: "كافيه الديوان",
-    cta: "اتصل الآن",
-  },
-  {
-    id: 2,
-    image: featuredElectronics,
-    title: "أحدث الأجهزة بأفضل سعر",
-    subtitle: "متجر التقنية",
-    cta: "اطلب الآن",
-  },
-  {
-    id: 3,
-    image: featuredPerfume,
-    title: "عطور فاخرة بتوقيع عربي",
-    subtitle: "دار العود",
-    cta: "شاهد العرض",
-  },
-];
+import { useNavigate } from "react-router-dom";
+import { getFeaturedAds } from "@/data/ads";
+import { useCity } from "@/contexts/CityContext";
 
 const FeaturedSlider = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const navigate = useNavigate();
+  const { city } = useCity();
+  const featured = getFeaturedAds(city);
+
+  const slides = featured.slice(0, 5).map((ad) => ({
+    id: ad.id,
+    image: ad.image,
+    title: ad.offer,
+    subtitle: ad.shopName,
+    cta: "شاهد التفاصيل",
+  }));
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
     const el = scrollRef.current;
     const scrollRight = el.scrollWidth - el.clientWidth - el.scrollLeft;
-    // RTL: scrollRight is 0 at the start, max at the end
     const cardWidth = el.clientWidth * 0.78 + 12;
     const index = Math.round(scrollRight / cardWidth);
-    // Reverse because RTL
     setActiveIndex(slides.length - 1 - index);
   };
+
+  if (slides.length === 0) return null;
 
   return (
     <section className="pt-4">
@@ -52,9 +39,7 @@ const FeaturedSlider = () => {
             <div
               key={i}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === activeIndex
-                  ? "w-5 bg-primary"
-                  : "w-1.5 bg-muted-foreground/25"
+                i === activeIndex ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/25"
               }`}
             />
           ))}
@@ -69,22 +54,16 @@ const FeaturedSlider = () => {
         {slides.map((slide) => (
           <div
             key={slide.id}
-            className="snap-center shrink-0 w-[78%] rounded-2xl overflow-hidden shadow-slider relative aspect-[16/9]"
+            className="snap-center shrink-0 w-[78%] rounded-2xl overflow-hidden shadow-slider relative aspect-[16/9] cursor-pointer"
+            onClick={() => navigate(`/ad/${slide.id}`)}
           >
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
+            <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
             <div className="absolute bottom-0 right-0 left-0 p-4">
               <span className="inline-block text-[10px] font-bold bg-primary/90 text-primary-foreground px-2 py-0.5 rounded-md mb-2">
                 {slide.subtitle}
               </span>
-              <h3 className="text-primary-foreground text-[17px] font-bold mb-2.5 leading-snug">
-                {slide.title}
-              </h3>
+              <h3 className="text-primary-foreground text-[17px] font-bold mb-2.5 leading-snug">{slide.title}</h3>
               <button className="touch-target inline-flex items-center gap-1.5 bg-primary-foreground text-foreground px-4 py-2 rounded-xl font-bold text-[13px] shadow-card active:scale-95 transition-transform">
                 <Phone className="w-3.5 h-3.5" />
                 {slide.cta}
