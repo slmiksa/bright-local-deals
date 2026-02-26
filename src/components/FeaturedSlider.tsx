@@ -13,7 +13,7 @@ const FeaturedSlider = () => {
 
   const slides = featured.slice(0, 5).map((ad) => ({
     id: ad.id,
-    image: ad.image,
+    image: ad.images[0],
     title: ad.offer,
     subtitle: ad.shopName,
     cta: "شاهد التفاصيل",

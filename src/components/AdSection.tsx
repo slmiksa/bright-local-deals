@@ -1,14 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import AdCard from "./AdCard";
 import { ChevronLeft } from "lucide-react";
-
-interface Ad {
-  id: number;
-  image: string;
-  shopName: string;
-  offer: string;
-  featured?: boolean;
-}
+import { Ad } from "@/data/ads";
 
 interface AdSectionProps {
   id: string;
