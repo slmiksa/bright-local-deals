@@ -26,6 +26,13 @@ const TopBar = () => {
               </div>
             </div>
           </button>
+
+          {/* App Name Center */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center">
+            <span className="text-lg font-black text-foreground leading-none">لمحة</span>
+            <span className="text-[18px] leading-none mt-0.5">👓</span>
+          </div>
+
           <div className="flex items-center gap-2">
             <button className="touch-target flex items-center justify-center w-10 h-10 rounded-xl bg-secondary transition-colors active:bg-muted">
               <Bell className="w-[18px] h-[18px] text-foreground" />
