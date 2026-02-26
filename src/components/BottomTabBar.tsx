@@ -22,7 +22,7 @@ const BottomTabBar = () => {
   const active = getActiveTab();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-bottom max-w-[430px] mx-auto">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border safe-bottom max-w-[430px] mx-auto">
       <div className="flex items-center justify-around px-1 pt-1.5 pb-2">
         {tabs.map((tab) => {
           const isActive = active === tab.id;
