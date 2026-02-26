@@ -5,10 +5,10 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase(1), 400);
-    const t2 = setTimeout(() => setPhase(2), 1200);
-    const t3 = setTimeout(() => setPhase(3), 2200);
-    const t4 = setTimeout(() => onFinish(), 3200);
+    const t1 = setTimeout(() => setPhase(1), 600);
+    const t2 = setTimeout(() => setPhase(2), 1600);
+    const t3 = setTimeout(() => setPhase(3), 3200);
+    const t4 = setTimeout(() => onFinish(), 5200);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
   }, [onFinish]);
 
@@ -19,7 +19,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
           style={{ background: "linear-gradient(135deg, hsl(158 45% 32%), hsl(158 45% 42%), hsl(180 40% 35%))" }}
           exit={{ opacity: 0, scale: 1.1 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
         >
           {/* Background particles */}
           {[...Array(12)].map((_, i) => (
@@ -44,17 +44,56 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             />
           ))}
 
+          {/* App Name - لمحة */}
+          <motion.div
+            className="text-center mb-6"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: [0, 1.2, 1], opacity: 1 }}
+            transition={{ duration: 0.7, type: "spring", stiffness: 150 }}
+          >
+            <h1
+              className="text-5xl font-black text-white mb-1"
+              style={{ textShadow: "0 4px 30px rgba(0,0,0,0.4)" }}
+            >
+              لمحة
+            </h1>
+          </motion.div>
+
+          {/* Glasses looking left and right */}
+          <motion.div
+            className="text-5xl mb-8"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <motion.span
+              className="inline-block"
+              animate={{
+                rotateY: [0, 0, 180, 180, 0, 0],
+                x: [0, 15, 15, -15, -15, 0],
+              }}
+              transition={{
+                duration: 3,
+                delay: 0.8,
+                ease: "easeInOut",
+                times: [0, 0.2, 0.3, 0.6, 0.7, 1],
+              }}
+            >
+              👓
+            </motion.span>
+          </motion.div>
+
           {/* Phone icon */}
           <motion.div
             className="relative"
             initial={{ scale: 0, rotate: -20 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.5, type: "spring", stiffness: 200 }}
+            transition={{ duration: 0.5, delay: 0.5, type: "spring", stiffness: 200 }}
           >
-            <div className="w-20 h-32 rounded-2xl border-[3px] border-white/90 flex items-center justify-center relative bg-white/10 backdrop-blur-sm">
-              <div className="w-8 h-1 rounded-full bg-white/40 absolute top-2" />
-              <div className="text-2xl">📱</div>
-              <div className="w-5 h-5 rounded-full bg-white/30 absolute bottom-2" />
+            <div className="w-16 h-26 rounded-2xl border-[3px] border-white/90 flex items-center justify-center relative bg-white/10 backdrop-blur-sm p-6">
+              <div className="w-6 h-1 rounded-full bg-white/40 absolute top-2" />
+              <div className="text-xl">📱</div>
+              <div className="w-4 h-4 rounded-full bg-white/30 absolute bottom-2" />
             </div>
           </motion.div>
 
@@ -71,7 +110,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
                 <motion.div
                   key={i}
                   className="absolute text-3xl"
-                  style={{ top: "50%", left: "50%" }}
+                  style={{ top: "58%", left: "50%" }}
                   initial={{ x: 0, y: 0, scale: 0, opacity: 0 }}
                   animate={{
                     x: msg.x,
@@ -80,17 +119,12 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
                     opacity: [0, 1, 1, 0.6],
                     rotate: msg.rotate,
                   }}
-                  transition={{
-                    duration: 0.8,
-                    delay: msg.delay,
-                    ease: "easeOut",
-                  }}
+                  transition={{ duration: 0.8, delay: msg.delay, ease: "easeOut" }}
                 >
                   ✉️
                 </motion.div>
               ))}
 
-              {/* People receiving */}
               {[
                 { delay: 0.5, x: 100, y: -160, emoji: "👤" },
                 { delay: 0.65, x: -90, y: -180, emoji: "👥" },
@@ -99,7 +133,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
                 <motion.div
                   key={`p-${i}`}
                   className="absolute text-2xl"
-                  style={{ top: "50%", left: "50%" }}
+                  style={{ top: "58%", left: "50%" }}
                   initial={{ x: p.x, y: p.y, scale: 0, opacity: 0 }}
                   animate={{ scale: [0, 1.2, 1], opacity: 1 }}
                   transition={{ duration: 0.4, delay: p.delay + 0.3 }}
@@ -110,7 +144,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             </>
           )}
 
-          {/* Main text */}
+          {/* Tagline */}
           {phase >= 2 && (
             <motion.div
               className="mt-10 text-center"
@@ -118,17 +152,17 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
-              <motion.h1
-                className="text-3xl font-black text-white mb-2"
-                style={{ textShadow: "0 4px 20px rgba(0,0,0,0.3)" }}
+              <motion.h2
+                className="text-2xl font-bold text-white/90"
+                style={{ textShadow: "0 2px 15px rgba(0,0,0,0.3)" }}
                 initial={{ scale: 0.5 }}
                 animate={{ scale: [0.5, 1.1, 1] }}
                 transition={{ duration: 0.5 }}
               >
                 إعلانك يوصل
-              </motion.h1>
+              </motion.h2>
               <motion.p
-                className="text-white/70 text-sm font-medium"
+                className="text-white/60 text-sm font-medium mt-1"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
@@ -138,14 +172,14 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             </motion.div>
           )}
 
-          {/* Ripple effect from phone */}
+          {/* Ripple effect */}
           {phase >= 1 && (
             <>
               {[0, 0.4, 0.8].map((delay, i) => (
                 <motion.div
                   key={`r-${i}`}
                   className="absolute rounded-full border-2 border-white/20"
-                  style={{ top: "calc(50% - 16px)", left: "calc(50% - 10px)" }}
+                  style={{ top: "58%", left: "calc(50% - 10px)" }}
                   initial={{ width: 20, height: 20, opacity: 0.6 }}
                   animate={{
                     width: [20, 250],
@@ -154,12 +188,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
                     y: [-10, -125],
                     opacity: [0.5, 0],
                   }}
-                  transition={{
-                    duration: 1.5,
-                    delay,
-                    repeat: 1,
-                    ease: "easeOut",
-                  }}
+                  transition={{ duration: 1.5, delay, repeat: 1, ease: "easeOut" }}
                 />
               ))}
             </>
