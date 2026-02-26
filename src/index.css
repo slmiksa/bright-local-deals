@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,42 +6,43 @@
 
 @layer base {
   :root {
-    --background: 40 20% 97%;
-    --foreground: 220 20% 10%;
+    --background: 30 25% 96%;
+    --foreground: 225 25% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
+    --card-foreground: 225 25% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
+    --popover-foreground: 225 25% 12%;
 
-    --primary: 35 90% 52%;
+    --primary: 158 45% 42%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 15% 95%;
-    --secondary-foreground: 220 20% 10%;
+    --secondary: 30 20% 93%;
+    --secondary-foreground: 225 25% 12%;
 
-    --muted: 220 15% 95%;
-    --muted-foreground: 220 10% 50%;
+    --muted: 30 15% 92%;
+    --muted-foreground: 220 10% 55%;
 
-    --accent: 35 90% 52%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 30 20% 93%;
+    --accent-foreground: 225 25% 12%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 220 15% 90%;
-    --input: 220 15% 90%;
-    --ring: 35 90% 52%;
+    --border: 30 15% 89%;
+    --input: 30 15% 89%;
+    --ring: 158 45% 42%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    --gold: 42 80% 55%;
-    --gold-light: 42 80% 92%;
-    --gold-border: 42 60% 70%;
+    --gold: 40 75% 52%;
+    --gold-light: 40 60% 94%;
+    --gold-border: 40 50% 72%;
 
-    --shadow-card: 0 2px 12px -2px hsla(220, 20%, 10%, 0.06);
-    --shadow-elevated: 0 8px 30px -4px hsla(220, 20%, 10%, 0.1);
+    --shadow-card: 0 1px 3px 0 hsla(225, 25%, 12%, 0.04), 0 1px 2px -1px hsla(225, 25%, 12%, 0.04);
+    --shadow-elevated: 0 4px 20px -2px hsla(225, 25%, 12%, 0.08), 0 2px 6px -2px hsla(225, 25%, 12%, 0.04);
+    --shadow-slider: 0 8px 32px -4px hsla(225, 25%, 12%, 0.12);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -62,12 +63,14 @@
   html {
     direction: rtl;
     font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior-y: none;
   }
 }
 
@@ -78,8 +81,12 @@
   .shadow-elevated {
     box-shadow: var(--shadow-elevated);
   }
+  .shadow-slider {
+    box-shadow: var(--shadow-slider);
+  }
   .gold-border {
     border: 1.5px solid hsl(var(--gold-border));
+    background: linear-gradient(135deg, hsl(var(--gold-light)), hsl(var(--card)));
   }
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -87,5 +94,15 @@
   .touch-target {
     min-height: 44px;
     min-width: 44px;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .gradient-mask-left {
+    mask-image: linear-gradient(to left, transparent, black 16px);
   }
 }

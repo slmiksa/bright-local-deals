@@ -1,16 +1,26 @@
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, Bell } from "lucide-react";
 
 const TopBar = () => {
   return (
-    <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border px-4 py-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <MapPin className="w-5 h-5 text-primary" />
-          <span className="font-bold text-lg text-foreground">الرياض</span>
+    <header className="sticky top-0 z-50 bg-card border-b border-border">
+      <div className="px-5 py-3.5 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
+            <MapPin className="w-[18px] h-[18px] text-primary-foreground" />
+          </div>
+          <div>
+            <p className="text-[11px] text-muted-foreground font-medium leading-none mb-0.5">موقعك الحالي</p>
+            <h1 className="text-base font-bold text-foreground leading-tight">الرياض</h1>
+          </div>
         </div>
-        <button className="touch-target flex items-center justify-center w-11 h-11 rounded-full bg-secondary">
-          <Search className="w-5 h-5 text-muted-foreground" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button className="touch-target flex items-center justify-center w-10 h-10 rounded-xl bg-secondary transition-colors active:bg-muted">
+            <Bell className="w-[18px] h-[18px] text-foreground" />
+          </button>
+          <button className="touch-target flex items-center justify-center w-10 h-10 rounded-xl bg-secondary transition-colors active:bg-muted">
+            <Search className="w-[18px] h-[18px] text-foreground" />
+          </button>
+        </div>
       </div>
     </header>
   );
