@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRef } from "react";
 import { Phone } from "lucide-react";
 import featuredCoffee from "@/assets/featured-coffee.jpg";
 import featuredElectronics from "@/assets/featured-electronics.jpg";
@@ -30,64 +29,42 @@ const slides = [
 ];
 
 const FeaturedSlider = () => {
-  const [current, setCurrent] = useState(0);
-
-  const next = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % slides.length);
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(next, 4500);
-    return () => clearInterval(timer);
-  }, [next]);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="px-4 pt-4">
-      <div className="relative rounded-2xl overflow-hidden aspect-[16/9] shadow-elevated">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={slides[current].id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="absolute inset-0"
+    <section className="pt-4">
+      <div
+        ref={scrollRef}
+        className="flex gap-3 overflow-x-auto px-4 snap-x snap-mandatory"
+        style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
+      >
+        {slides.map((slide) => (
+          <div
+            key={slide.id}
+            className="snap-center shrink-0 w-[85%] rounded-2xl overflow-hidden shadow-elevated relative aspect-[16/9]"
           >
             <img
-              src={slides[current].image}
-              alt={slides[current].title}
+              src={slide.image}
+              alt={slide.title}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent" />
-            <div className="absolute bottom-0 right-0 left-0 p-5">
-              <p className="text-primary-foreground/80 text-sm font-medium mb-1">
-                {slides[current].subtitle}
+            <div className="absolute bottom-0 right-0 left-0 p-4">
+              <p className="text-primary-foreground/80 text-xs font-medium mb-0.5">
+                {slide.subtitle}
               </p>
-              <h2 className="text-primary-foreground text-xl font-bold mb-3">
-                {slides[current].title}
+              <h2 className="text-primary-foreground text-lg font-bold mb-2">
+                {slide.title}
               </h2>
-              <button className="touch-target inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-semibold text-sm">
+              <button className="touch-target inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl font-semibold text-sm">
                 <Phone className="w-4 h-4" />
-                {slides[current].cta}
+                {slide.cta}
               </button>
             </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Indicators */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                i === current
-                  ? "bg-primary-foreground w-5"
-                  : "bg-primary-foreground/40"
-              }`}
-            />
-          ))}
-        </div>
+          </div>
+        ))}
+        {/* spacer for last card padding */}
+        <div className="shrink-0 w-1" />
       </div>
     </section>
   );
