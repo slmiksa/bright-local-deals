@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import TopBar from "@/components/TopBar";
 import FeaturedSlider from "@/components/FeaturedSlider";
 import CategoriesRow from "@/components/CategoriesRow";
+import EventsSlider from "@/components/EventsSlider";
 import AdSection from "@/components/AdSection";
 import { getAdsByCity } from "@/data/ads";
 import { useCity } from "@/contexts/CityContext";
@@ -49,6 +50,7 @@ const Index = () => {
       )}
       <TopBar />
       <FeaturedSlider />
+      <EventsSlider />
       <CategoriesRow />
       {sections.map((section) => (
         <AdSection key={section.id} {...section} />
