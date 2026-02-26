@@ -1,30 +1,39 @@
 import { Home, Grid3X3, Plus, Star, User } from "lucide-react";
-import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const tabs = [
-  { icon: Home, label: "الرئيسية", id: "home" },
-  { icon: Grid3X3, label: "التصنيفات", id: "categories" },
-  { icon: Plus, label: "أضف", id: "add", accent: true },
-  { icon: Star, label: "المميزة", id: "featured" },
-  { icon: User, label: "حسابي", id: "account" },
+  { icon: Home, label: "الرئيسية", id: "home", path: "/" },
+  { icon: Grid3X3, label: "التصنيفات", id: "categories", path: "/categories" },
+  { icon: Plus, label: "أضف", id: "add", accent: true, path: "/add" },
+  { icon: Star, label: "المميزة", id: "featured", path: "/featured" },
+  { icon: User, label: "حسابي", id: "account", path: "/account" },
 ];
 
 const BottomTabBar = () => {
-  const [active, setActive] = useState("home");
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const getActiveTab = () => {
+    const path = location.pathname;
+    const tab = tabs.find((t) => t.path === path);
+    return tab?.id || "home";
+  };
+
+  const active = getActiveTab();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-bottom max-w-[430px] mx-auto">
       <div className="flex items-center justify-around px-1 pt-1.5 pb-2">
         {tabs.map((tab) => {
           const isActive = active === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => setActive(tab.id)}
+              onClick={() => navigate(tab.path)}
               className="touch-target flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform"
             >
               {tab.accent ? (
-                <div className="w-[52px] h-[52px] -mt-7 rounded-2xl bg-primary flex items-center justify-center shadow-elevated rotate-0">
+                <div className="w-[52px] h-[52px] -mt-7 rounded-2xl bg-primary flex items-center justify-center shadow-elevated">
                   <tab.icon className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
                 </div>
               ) : (

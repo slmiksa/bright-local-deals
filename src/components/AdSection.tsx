@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import AdCard from "./AdCard";
 import { ChevronLeft } from "lucide-react";
 
@@ -16,11 +17,16 @@ interface AdSectionProps {
 }
 
 const AdSection = ({ id, title, ads }: AdSectionProps) => {
+  const navigate = useNavigate();
+
   return (
     <section id={id} className="pt-7">
       <div className="flex items-center justify-between px-5 mb-3">
         <h2 className="font-bold text-base text-foreground">{title}</h2>
-        <button className="touch-target flex items-center gap-0.5 text-[13px] font-semibold text-primary active:opacity-70 transition-opacity">
+        <button
+          onClick={() => navigate(`/category/${id}`)}
+          className="touch-target flex items-center gap-0.5 text-[13px] font-semibold text-primary active:opacity-70 transition-opacity"
+        >
           عرض الكل
           <ChevronLeft className="w-4 h-4" />
         </button>
