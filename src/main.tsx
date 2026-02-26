@@ -1,9 +1,8 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import { initNativeApp } from "./lib/capacitor";
-
-// Initialize native platform features
-initNativeApp();
 
 createRoot(document.getElementById("root")!).render(<App />);
+
+// Initialize native features after render
+import("./lib/capacitor").then(({ initNativeApp }) => initNativeApp());
