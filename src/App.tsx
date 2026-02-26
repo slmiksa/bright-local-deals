@@ -10,6 +10,7 @@ import CategoriesPage from "./pages/CategoriesPage";
 import CategoryPage from "./pages/CategoryPage";
 import FeaturedPage from "./pages/FeaturedPage";
 import AddAdPage from "./pages/AddAdPage";
+import SupportPage from "./pages/SupportPage";
 import NotFound from "./pages/NotFound";
 import BottomTabBar from "./components/BottomTabBar";
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/category/:id" element={<CategoryPage />} />
             <Route path="/featured" element={<FeaturedPage />} />
             <Route path="/add" element={<AddAdPage />} />
+            <Route path="/support" element={<SupportPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomTabBar />
