@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import AdCard from "@/components/AdCard";
 import { allAds, categoryMap } from "@/data/ads";
 import { useCity } from "@/contexts/CityContext";
+import PullToRefresh from "@/components/PullToRefresh";
 
 const CategoryPage = () => {
   const { id } = useParams();
@@ -13,7 +14,7 @@ const CategoryPage = () => {
   const title = categoryMap[id || ""] || "القسم";
 
   return (
-    <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
+    <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
       <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
         <div className="px-4 py-3 flex items-center gap-3">
           <button
@@ -37,7 +38,7 @@ const CategoryPage = () => {
           <p className="text-muted-foreground">لا توجد إعلانات في {city} لهذا القسم</p>
         </div>
       )}
-    </div>
+    </PullToRefresh>
   );
 };
 
