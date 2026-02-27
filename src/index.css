@@ -71,8 +71,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior-y: none;
-    /* iOS safe areas */
-    padding-top: env(safe-area-inset-top, 0px);
   }
 }
 
