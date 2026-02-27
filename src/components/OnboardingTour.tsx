@@ -18,7 +18,7 @@ const steps: TourStep[] = [
     description: "اضغط هنا لتحديد مدينتك ومشاهدة الإعلانات القريبة منك",
     icon: <MapPin className="w-6 h-6" />,
     position: "top",
-    highlightArea: { top: "0px", left: "50%", width: "160px", height: "70px" },
+    highlightArea: { top: "6px", left: "72%", width: "180px", height: "58px" },
   },
   {
     target: "featured",
@@ -26,7 +26,7 @@ const steps: TourStep[] = [
     description: "تصفح أبرز الإعلانات والعروض المميزة في مدينتك",
     icon: <Star className="w-6 h-6" />,
     position: "center",
-    highlightArea: { top: "120px", left: "50%", width: "90%", height: "200px" },
+    highlightArea: { top: "75px", left: "50%", width: "92%", height: "220px" },
   },
   {
     target: "add",
@@ -34,7 +34,7 @@ const steps: TourStep[] = [
     description: "اضغط هنا لإضافة إعلانك الخاص والوصول لآلاف المستخدمين",
     icon: <Plus className="w-6 h-6" />,
     position: "bottom",
-    highlightArea: { top: "calc(100% - 80px)", left: "50%", width: "70px", height: "70px" },
+    highlightArea: { top: "calc(100% - 78px)", left: "50%", width: "64px", height: "64px" },
   },
 ];
 
@@ -93,9 +93,9 @@ const OnboardingTour = ({ onFinish }: { onFinish: () => void }) => {
           transition={{ duration: 0.35, delay: 0.1 }}
           className="absolute left-1/2 -translate-x-1/2 w-[85%] max-w-[360px]"
           style={{
-            ...(step.position === "top" && { top: "100px" }),
-            ...(step.position === "center" && { top: "350px" }),
-            ...(step.position === "bottom" && { bottom: "120px" }),
+            ...(step.position === "top" && { top: "90px" }),
+            ...(step.position === "center" && { top: "320px" }),
+            ...(step.position === "bottom" && { bottom: "110px" }),
           }}
           onClick={(e) => e.stopPropagation()}
         >
