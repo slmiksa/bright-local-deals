@@ -20,8 +20,8 @@ const AdDetail = () => {
           <p className="text-muted-foreground text-lg">الإعلان غير موجود</p>
           <button onClick={() => navigate("/")} className="mt-4 text-primary font-bold">العودة للرئيسية</button>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   const handleScroll = () => {
@@ -54,56 +54,56 @@ const AdDetail = () => {
           ref={scrollRef}
           onScroll={handleScroll}
           className="flex w-full h-full overflow-x-auto snap-x snap-mandatory hide-scrollbar"
-          dir="ltr"
-        >
-          {ad.images.map((img, i) => (
-            <img
-              key={i}
-              src={img}
-              alt={`${ad.shopName} ${i + 1}`}
-              className="w-full h-full object-cover shrink-0 snap-center cursor-pointer"
-              onClick={() => { setLightboxIndex(i); setLightboxOpen(true); }}
-            />
-          ))}
+          dir="ltr">
+
+          {ad.images.map((img, i) =>
+          <img
+            key={i}
+            src={img}
+            alt={`${ad.shopName} ${i + 1}`}
+            className="w-full h-full object-cover shrink-0 snap-center cursor-pointer"
+            onClick={() => {setLightboxIndex(i);setLightboxOpen(true);}} />
+
+          )}
         </div>
 
-        {ad.featured && (
-          <span className="absolute top-3 right-3 bg-gold text-primary-foreground text-[11px] font-bold px-3 py-1 rounded-xl shadow-elevated flex items-center gap-1 pointer-events-none">
+        {ad.featured &&
+        <span className="absolute top-3 right-3 bg-gold text-primary-foreground text-[11px] font-bold px-3 py-1 rounded-xl shadow-elevated flex items-center gap-1 pointer-events-none">
             <Star className="w-3 h-3" /> مميز
           </span>
-        )}
+        }
 
-        {ad.images.length > 1 && (
-          <>
+        {ad.images.length > 1 &&
+        <>
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 pointer-events-none">
-              {ad.images.map((_, i) => (
-                <div key={i} className={`h-1.5 rounded-full transition-all ${i === imgIndex ? "w-5 bg-primary-foreground" : "w-1.5 bg-primary-foreground/50"}`} />
-              ))}
+              {ad.images.map((_, i) =>
+            <div key={i} className={`h-1.5 rounded-full transition-all ${i === imgIndex ? "w-5 bg-primary-foreground" : "w-1.5 bg-primary-foreground/50"}`} />
+            )}
             </div>
             <div className="absolute top-3 left-3 bg-foreground/50 backdrop-blur-sm text-primary-foreground text-[11px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 pointer-events-none">
               <Images className="w-3 h-3" />
               {imgIndex + 1}/{ad.images.length}
             </div>
           </>
-        )}
+        }
       </div>
 
       {/* Thumbnail strip */}
-      {ad.images.length > 1 && (
-        <div className="flex gap-2 px-5 mt-3 overflow-x-auto hide-scrollbar">
-          {ad.images.map((img, i) => (
-            <button
-              key={i}
-              onClick={() => { setLightboxIndex(i); setLightboxOpen(true); }}
-              className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${
-                i === imgIndex ? "border-primary" : "border-transparent opacity-60"
-              }`}
-            >
+      {ad.images.length > 1 &&
+      <div className="flex gap-2 px-5 mt-3 overflow-x-auto hide-scrollbar">
+          {ad.images.map((img, i) =>
+        <button
+          key={i}
+          onClick={() => {setLightboxIndex(i);setLightboxOpen(true);}}
+          className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${
+          i === imgIndex ? "border-primary" : "border-transparent opacity-60"}`
+          }>
+
               <img src={img} alt="" className="w-full h-full object-cover" />
             </button>
-          ))}
+        )}
         </div>
-      )}
+      }
 
       {/* Info */}
       <div className="px-5 pt-5">
@@ -120,7 +120,7 @@ const AdDetail = () => {
         </div>
 
         <div className="mt-5 p-4 bg-card rounded-2xl shadow-card">
-          <h3 className="font-bold text-[14px] text-foreground mb-2">عن المتجر</h3>
+          <h3 className="font-bold text-[14px] text-foreground mb-2">نبذة</h3>
           <p className="text-[13px] text-muted-foreground leading-relaxed">{ad.description}</p>
         </div>
 
@@ -154,11 +154,11 @@ const AdDetail = () => {
         <p className="text-center text-muted-foreground text-[12px] mt-3 mb-2">{ad.phone}</p>
       </div>
 
-      {lightboxOpen && (
-        <ImageLightbox images={ad.images} initialIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />
-      )}
-    </div>
-  );
+      {lightboxOpen &&
+      <ImageLightbox images={ad.images} initialIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />
+      }
+    </div>);
+
 };
 
 export default AdDetail;
