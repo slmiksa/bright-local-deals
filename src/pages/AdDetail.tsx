@@ -119,7 +119,12 @@ const AdDetail = () => {
           <span className="text-[13px]">متاح الآن</span>
         </div>
 
-        {/* Contact - moved up */}
+        <div className="mt-5 p-4 bg-card rounded-2xl shadow-card">
+          <h3 className="font-bold text-[14px] text-foreground mb-2">نبذة</h3>
+          <p className="text-[13px] text-muted-foreground leading-relaxed">{ad.description}</p>
+        </div>
+
+        {/* Contact */}
         <div className="mt-5 flex gap-3">
           <a href={`tel:${ad.phone}`} className="touch-target flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-2xl py-3.5 font-bold text-[14px] active:scale-[0.97] transition-transform shadow-elevated">
             <Phone className="w-5 h-5" /> اتصل الآن
@@ -132,11 +137,6 @@ const AdDetail = () => {
           </a>
         </div>
         <p className="text-center text-muted-foreground text-[12px] mt-3">{ad.phone}</p>
-
-        <div className="mt-5 p-4 bg-card rounded-2xl shadow-card">
-          <h3 className="font-bold text-[14px] text-foreground mb-2">نبذة</h3>
-          <p className="text-[13px] text-muted-foreground leading-relaxed">{ad.description}</p>
-        </div>
 
         {/* Map */}
         <div className="mt-5 rounded-2xl overflow-hidden shadow-card bg-card">
