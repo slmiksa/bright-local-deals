@@ -1,17 +1,25 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images } from "lucide-react";
-import { getAdById } from "@/data/ads";
+import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images, Loader2 } from "lucide-react";
+import { useAdById } from "@/hooks/useAds";
 import { useState, useRef } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
 
 const AdDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const ad = getAdById(Number(id));
+  const { data: ad, isLoading } = useAdById(Number(id));
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [imgIndex, setImgIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center max-w-[430px] mx-auto">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!ad) {
     return (
@@ -35,20 +43,18 @@ const AdDetail = () => {
 
   return (
     <div className="min-h-screen bg-background pb-8 max-w-[430px] mx-auto">
-      {/* Header */}
       <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
         <div className="px-4 py-3 flex items-center justify-between">
           <button onClick={() => navigate(-1)} className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors">
             <ArrowRight className="w-5 h-5 text-foreground" />
           </button>
-          <h1 className="text-[15px] font-bold text-foreground">{ad.shopName}</h1>
+          <h1 className="text-[15px] font-bold text-foreground">{ad.shop_name}</h1>
           <button className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors">
             <Share2 className="w-[18px] h-[18px] text-foreground" />
           </button>
         </div>
       </div>
 
-      {/* Image Gallery */}
       <div className="relative aspect-[16/10] overflow-hidden">
         <div
           ref={scrollRef}
@@ -60,7 +66,7 @@ const AdDetail = () => {
             <img
               key={i}
               src={img}
-              alt={`${ad.shopName} ${i + 1}`}
+              alt={`${ad.shop_name} ${i + 1}`}
               className="w-full h-full object-cover shrink-0 snap-center cursor-pointer"
               onClick={() => { setLightboxIndex(i); setLightboxOpen(true); }}
             />
@@ -88,7 +94,6 @@ const AdDetail = () => {
         )}
       </div>
 
-      {/* Thumbnail strip */}
       {ad.images.length > 1 && (
         <div className="flex gap-2 px-5 mt-3 overflow-x-auto hide-scrollbar">
           {ad.images.map((img, i) => (
@@ -105,9 +110,8 @@ const AdDetail = () => {
         </div>
       )}
 
-      {/* Info */}
       <div className="px-5 pt-5">
-        <h2 className="text-xl font-bold text-foreground">{ad.shopName}</h2>
+        <h2 className="text-xl font-bold text-foreground">{ad.shop_name}</h2>
         <p className="text-primary font-semibold text-[14px] mt-1">{ad.offer}</p>
         
         <div className="flex items-center gap-2 mt-3 text-muted-foreground">
@@ -124,7 +128,6 @@ const AdDetail = () => {
           <p className="text-[13px] text-muted-foreground leading-relaxed">{ad.description}</p>
         </div>
 
-        {/* Map */}
         <div className="mt-5 rounded-2xl overflow-hidden shadow-card bg-card">
           <div className="p-4 pb-2">
             <h3 className="font-bold text-[14px] text-foreground flex items-center gap-2">
@@ -139,7 +142,6 @@ const AdDetail = () => {
           </a>
         </div>
 
-        {/* Contact */}
         <div className="mt-5 flex gap-3">
           <a href={`tel:${ad.phone}`} className="touch-target flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-2xl py-3.5 font-bold text-[14px] active:scale-[0.97] transition-transform shadow-elevated">
             <Phone className="w-5 h-5" /> اتصل الآن

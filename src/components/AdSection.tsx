@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import AdCard from "./AdCard";
 import { ChevronLeft } from "lucide-react";
-import { Ad } from "@/data/ads";
+import type { Ad } from "@/hooks/useAds";
 
 interface AdSectionProps {
   id: string;
@@ -30,7 +30,7 @@ const AdSection = ({ id, title, ads }: AdSectionProps) => {
       >
         {ads.map((ad) => (
           <div key={ad.id} className="shrink-0 w-[44%]">
-            <AdCard {...ad} />
+            <AdCard id={ad.id} images={ad.images} shop_name={ad.shop_name} offer={ad.offer} featured={ad.featured} />
           </div>
         ))}
         <div className="shrink-0 w-2" />
