@@ -37,8 +37,8 @@ const TopBar = () => {
             
 
 
-            <button className="touch-target flex items-center justify-center w-10 h-10 rounded-xl bg-secondary transition-colors active:bg-muted">
-              <Search className="w-[18px] h-[18px] text-foreground" />
+            <button className="touch-target flex items-center justify-center w-10 h-10 rounded-xl bg-primary transition-colors active:opacity-80">
+              <Search className="w-[18px] h-[18px] text-primary-foreground" />
             </button>
           </div>
         </div>
