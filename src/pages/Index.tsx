@@ -4,6 +4,7 @@ import CategoriesRow from "@/components/CategoriesRow";
 import EventsSlider from "@/components/EventsSlider";
 import AdSection from "@/components/AdSection";
 import PullToRefresh from "@/components/PullToRefresh";
+import CountdownTimer from "@/components/CountdownTimer";
 import { getAdsByCity } from "@/data/ads";
 import { useCity } from "@/contexts/CityContext";
 
@@ -14,6 +15,7 @@ const Index = () => {
   return (
     <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto relative">
       <TopBar />
+      <CountdownTimer />
       <FeaturedSlider />
       <EventsSlider />
       <CategoriesRow />
