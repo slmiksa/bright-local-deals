@@ -58,48 +58,44 @@ const FeaturedSlider = () => {
         {slides.map((slide, i) => (
           <div
             key={slide.id}
-            className="snap-center shrink-0 w-[88%] relative cursor-pointer group"
+            className="snap-center shrink-0 w-[88%] rounded-3xl overflow-hidden relative cursor-pointer group"
             style={{ aspectRatio: "3/4" }}
             onClick={() => navigate(`/ad/${slide.id}`)}
           >
-            {/* Gold border frame */}
+            {/* Image */}
+            <img
+              src={slide.image}
+              alt={slide.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-active:scale-105"
+              loading="lazy"
+            />
+
+            {/* Gold border glow */}
             <div
-              className="absolute -inset-[2px] rounded-[26px] pointer-events-none z-10"
+              className="absolute inset-0 rounded-3xl pointer-events-none"
               style={{
-                border: "2.5px solid hsl(40, 60%, 62%)",
-                boxShadow: "0 8px 40px -8px hsla(40, 60%, 40%, 0.35)",
+                boxShadow: "inset 0 0 0 2px hsl(40, 60%, 62%), 0 8px 40px -8px hsla(40, 60%, 40%, 0.35)",
               }}
             />
 
-            {/* Card content */}
-            <div className="w-full h-full rounded-3xl overflow-hidden relative">
-              {/* Image */}
-              <img
-                src={slide.image}
-                alt={slide.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-active:scale-105"
-                loading="lazy"
-              />
+            {/* Premium badge */}
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(40,65%,42%)] text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-lg">
+              <Sparkles className="w-3 h-3" />
+              مميز
+            </div>
 
-              {/* Premium badge */}
-              <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(40,65%,42%)] text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-lg z-10">
-                <Sparkles className="w-3 h-3" />
-                مميز
-              </div>
-
-              {/* Bottom content */}
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent pt-24 pb-5 px-5">
-                <span className="inline-block text-[11px] font-bold bg-white/20 backdrop-blur-md text-white px-3 py-1 rounded-lg mb-2.5">
-                  {slide.subtitle}
-                </span>
-                <h3 className="text-white text-[18px] font-extrabold mb-4 leading-snug line-clamp-2 drop-shadow-md">
-                  {slide.title}
-                </h3>
-                <button className="touch-target w-full flex items-center justify-center gap-2 bg-white text-foreground py-3.5 rounded-2xl font-bold text-[14px] active:scale-[0.97] transition-transform shadow-xl">
-                  <Eye className="w-4.5 h-4.5" />
-                  شاهد التفاصيل
-                </button>
-              </div>
+            {/* Bottom content */}
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent pt-24 pb-5 px-5">
+              <span className="inline-block text-[11px] font-bold bg-white/20 backdrop-blur-md text-white px-3 py-1 rounded-lg mb-2.5">
+                {slide.subtitle}
+              </span>
+              <h3 className="text-white text-[18px] font-extrabold mb-4 leading-snug line-clamp-2 drop-shadow-md">
+                {slide.title}
+              </h3>
+              <button className="touch-target w-full flex items-center justify-center gap-2 bg-white text-foreground py-3.5 rounded-2xl font-bold text-[14px] active:scale-[0.97] transition-transform shadow-xl">
+                <Eye className="w-4.5 h-4.5" />
+                شاهد التفاصيل
+              </button>
             </div>
           </div>
         ))}
