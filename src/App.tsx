@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CityProvider } from "@/contexts/CityContext";
 import SplashScreen from "./components/SplashScreen";
+import OnboardingTour from "./components/OnboardingTour";
 import Index from "./pages/Index";
 import AdDetail from "./pages/AdDetail";
 import CategoriesPage from "./pages/CategoriesPage";
@@ -24,7 +25,15 @@ const App = () => {
     sessionStorage.setItem("lamha_opened", "1");
     return true;
   });
+  const [showTour, setShowTour] = useState(() => {
+    if (localStorage.getItem("lamha_tour_done")) return false;
+    return true;
+  });
   const handleSplashFinish = useCallback(() => setShowSplash(false), []);
+  const handleTourFinish = useCallback(() => {
+    setShowTour(false);
+    localStorage.setItem("lamha_tour_done", "1");
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -33,6 +42,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
+          {!showSplash && showTour && <OnboardingTour onFinish={handleTourFinish} />}
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
