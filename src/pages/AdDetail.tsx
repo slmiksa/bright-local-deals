@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images } from "lucide-react";
+import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images, Eye, Heart } from "lucide-react";
 import { getAdById } from "@/data/ads";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
+import { useAdStats, recordView } from "@/hooks/useAdStats";
 
 const AdDetail = () => {
   const { id } = useParams();
@@ -12,6 +13,11 @@ const AdDetail = () => {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [imgIndex, setImgIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { views, likes, liked, toggleLike } = useAdStats(Number(id) || 0);
+
+  useEffect(() => {
+    if (ad) recordView(ad.id);
+  }, [ad]);
 
   if (!ad) {
     return (
@@ -107,8 +113,26 @@ const AdDetail = () => {
 
       {/* Info */}
       <div className="px-5 pt-5">
-        <h2 className="text-xl font-bold text-foreground">{ad.shopName}</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold text-foreground">{ad.shopName}</h2>
+          <button
+            onClick={toggleLike}
+            className="touch-target w-10 h-10 rounded-full bg-secondary flex items-center justify-center active:scale-90 transition-transform"
+          >
+            <Heart className={`w-5 h-5 transition-colors ${liked ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+          </button>
+        </div>
         <p className="text-primary font-semibold text-[14px] mt-1">{ad.offer}</p>
+        
+        {/* Stats */}
+        <div className="flex items-center gap-4 mt-3">
+          <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground bg-secondary px-3 py-1.5 rounded-xl">
+            <Eye className="w-4 h-4" /> {views} مشاهدة
+          </span>
+          <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground bg-secondary px-3 py-1.5 rounded-xl">
+            <Heart className={`w-4 h-4 ${liked ? "fill-red-500 text-red-500" : ""}`} /> {likes} إعجاب
+          </span>
+        </div>
         
         <div className="flex items-center gap-2 mt-3 text-muted-foreground">
           <MapPin className="w-4 h-4 shrink-0" />

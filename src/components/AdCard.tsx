@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Phone, Images } from "lucide-react";
+import { Phone, Images, Eye, Heart } from "lucide-react";
 import ImageLightbox from "./ImageLightbox";
+import { useAdStats } from "@/hooks/useAdStats";
 
 interface AdCardProps {
   id: number;
@@ -16,6 +17,7 @@ const AdCard = ({ id, images, shopName, offer, featured }: AdCardProps) => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [imgIndex, setImgIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { views, likes, liked, toggleLike } = useAdStats(id);
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
@@ -89,8 +91,27 @@ const AdCard = ({ id, images, shopName, offer, featured }: AdCardProps) => {
         <div className="p-3">
           <h3 className="font-bold text-[13px] text-foreground truncate">{shopName}</h3>
           <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{offer}</p>
+          
+          {/* Stats Row */}
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                <Eye className="w-3.5 h-3.5" /> {views}
+              </span>
+              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                <Heart className={`w-3.5 h-3.5 ${liked ? "fill-red-500 text-red-500" : ""}`} /> {likes}
+              </span>
+            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); toggleLike(); }}
+              className="touch-target w-8 h-8 flex items-center justify-center rounded-full active:scale-90 transition-transform"
+            >
+              <Heart className={`w-4 h-4 transition-colors ${liked ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+            </button>
+          </div>
+
           <button
-            className="touch-target mt-2.5 w-full flex items-center justify-center gap-1.5 bg-primary text-primary-foreground rounded-xl py-2.5 text-[12px] font-bold active:scale-[0.97] transition-transform"
+            className="touch-target mt-2 w-full flex items-center justify-center gap-1.5 bg-primary text-primary-foreground rounded-xl py-2.5 text-[12px] font-bold active:scale-[0.97] transition-transform"
             onClick={() => navigate(`/ad/${id}`)}
           >
             <Phone className="w-3.5 h-3.5" />
