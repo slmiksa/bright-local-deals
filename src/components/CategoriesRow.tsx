@@ -1,12 +1,13 @@
-import { Monitor, Coffee, Flower2, Sofa, UtensilsCrossed, Gem } from "lucide-react";
+import { Smartphone, CupSoda, SprayCan, Lamp, ChefHat, PartyPopper } from "lucide-react";
 
 const categories = [
-{ icon: Monitor, label: "إلكترونيات", id: "electronics", color: "158 45% 42%" },
-{ icon: Coffee, label: "كافيهات", id: "cafes", color: "25 80% 55%" },
-{ icon: Flower2, label: "عطور", id: "perfumes", color: "320 50% 50%" },
-{ icon: Sofa, label: "مفروشات", id: "furniture", color: "30 40% 50%" },
-{ icon: UtensilsCrossed, label: "مأكولات", id: "food", color: "0 65% 55%" },
-{ icon: Gem, label: "مناسبات", id: "events", color: "270 45% 55%" }];
+  { icon: Smartphone, label: "إلكترونيات", id: "electronics" },
+  { icon: CupSoda, label: "كافيهات", id: "cafes" },
+  { icon: SprayCan, label: "عطور", id: "perfumes" },
+  { icon: Lamp, label: "مفروشات", id: "furniture" },
+  { icon: ChefHat, label: "مأكولات", id: "food" },
+  { icon: PartyPopper, label: "مناسبات", id: "events" },
+];
 
 
 const CategoriesRow = () => {
@@ -23,12 +24,9 @@ const CategoriesRow = () => {
           }}>
 
             <div
-            className="w-11 h-11 rounded-[14px] flex items-center justify-center"
-            style={{ backgroundColor: `hsl(${cat.color} / 0.12)` }}>
-
+            className="w-11 h-11 rounded-[14px] flex items-center justify-center bg-primary">
               <cat.icon
-              className="w-5 h-5"
-              style={{ color: `hsl(${cat.color})` }} />
+              className="w-5 h-5 text-primary-foreground" />
 
             </div>
             <span className="text-[12px] font-semibold text-foreground">
