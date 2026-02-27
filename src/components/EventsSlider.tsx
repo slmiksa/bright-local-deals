@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, X, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { allAds } from "@/data/ads";
@@ -10,6 +10,8 @@ const EventsSlider = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [expandedAd, setExpandedAd] = useState<typeof allAds[0] | null>(null);
   const [expandedImageIndex, setExpandedImageIndex] = useState(0);
+  const touchStartX = useRef(0);
+  const touchDeltaX = useRef(0);
   const navigate = useNavigate();
   const { city } = useCity();
 
@@ -89,10 +91,24 @@ const EventsSlider = () => {
             <X className="w-5 h-5 text-white" />
           </button>
 
-          <div className="w-full max-w-[380px] px-4" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="w-full max-w-[380px] px-4"
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; touchDeltaX.current = 0; }}
+            onTouchMove={(e) => { touchDeltaX.current = e.touches[0].clientX - touchStartX.current; }}
+            onTouchEnd={() => {
+              if (!expandedAd) return;
+              const threshold = 50;
+              if (touchDeltaX.current > threshold) {
+                setExpandedImageIndex((i) => (i > 0 ? i - 1 : expandedAd.images.length - 1));
+              } else if (touchDeltaX.current < -threshold) {
+                setExpandedImageIndex((i) => (i < expandedAd.images.length - 1 ? i + 1 : 0));
+              }
+              touchDeltaX.current = 0;
+            }}
+          >
             <div className="rounded-2xl overflow-hidden relative" style={{ aspectRatio: "9/16" }}>
               <img src={expandedAd.images[expandedImageIndex]} alt={expandedAd.shopName} className="w-full h-full object-cover" />
-              
               {/* Image navigation arrows */}
               {expandedAd.images.length > 1 && (
                 <>
