@@ -16,6 +16,7 @@ import AddAdPage from "./pages/AddAdPage";
 import SupportPage from "./pages/SupportPage";
 import NotFound from "./pages/NotFound";
 import BottomTabBar from "./components/BottomTabBar";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => {
           {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
           {!showSplash && showTour && <OnboardingTour onFinish={handleTourFinish} />}
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/ad/:id" element={<AdDetail />} />
