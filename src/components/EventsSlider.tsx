@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Phone, ChevronLeft, X, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { allAds } from "@/data/ads";
 import { useCity } from "@/contexts/CityContext";
@@ -9,6 +9,7 @@ const EventsSlider = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [expandedAd, setExpandedAd] = useState<typeof allAds[0] | null>(null);
+  const [expandedImageIndex, setExpandedImageIndex] = useState(0);
   const navigate = useNavigate();
   const { city } = useCity();
 
@@ -48,7 +49,7 @@ const EventsSlider = () => {
             key={ad.id}
             className="snap-center shrink-0 w-[45%] rounded-2xl overflow-hidden shadow-slider relative cursor-pointer active:scale-[0.97] transition-transform"
             style={{ aspectRatio: "9/16" }}
-            onClick={() => setExpandedAd(ad)}
+            onClick={() => { setExpandedAd(ad); setExpandedImageIndex(0); }}
           >
             <img src={ad.images[0]} alt={ad.shopName} className="w-full h-full object-cover" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-transparent to-transparent" />
@@ -90,7 +91,35 @@ const EventsSlider = () => {
 
           <div className="w-full max-w-[380px] px-4" onClick={(e) => e.stopPropagation()}>
             <div className="rounded-2xl overflow-hidden relative" style={{ aspectRatio: "9/16" }}>
-              <img src={expandedAd.images[0]} alt={expandedAd.shopName} className="w-full h-full object-cover" />
+              <img src={expandedAd.images[expandedImageIndex]} alt={expandedAd.shopName} className="w-full h-full object-cover" />
+              
+              {/* Image navigation arrows */}
+              {expandedAd.images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setExpandedImageIndex((i) => (i > 0 ? i - 1 : expandedAd.images.length - 1))}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center"
+                  >
+                    <ChevronRight className="w-4 h-4 text-white" />
+                  </button>
+                  <button
+                    onClick={() => setExpandedImageIndex((i) => (i < expandedAd.images.length - 1 ? i + 1 : 0))}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center"
+                  >
+                    <ChevronLeft className="w-4 h-4 text-white" />
+                  </button>
+                  {/* Dots */}
+                  <div className="absolute top-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    {expandedAd.images.map((_, i) => (
+                      <div
+                        key={i}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${i === expandedImageIndex ? "w-5 bg-white" : "w-1.5 bg-white/40"}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
               <div className="absolute bottom-0 right-0 left-0 p-5">
                 <span className="inline-block text-[11px] font-bold bg-primary/90 text-primary-foreground px-2.5 py-1 rounded-lg mb-2">
