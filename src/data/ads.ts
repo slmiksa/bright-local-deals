@@ -19,6 +19,11 @@ import adEvents1 from "@/assets/ad-events-1.jpg";
 import adEvents2 from "@/assets/ad-events-2.jpg";
 import adEvents3 from "@/assets/ad-events-3.jpg";
 import adEvents4 from "@/assets/ad-events-4.jpg";
+import weddingCard1 from "@/assets/wedding-card-1.jpg";
+import weddingCard2 from "@/assets/wedding-card-2.jpg";
+import weddingCard3 from "@/assets/wedding-card-3.jpg";
+import weddingCard4 from "@/assets/wedding-card-4.jpg";
+import weddingCard5 from "@/assets/wedding-card-5.jpg";
 
 export interface Ad {
   id: number;
@@ -72,11 +77,11 @@ export const allAds: Ad[] = [
   { id: 18, images: [adFood3, adFood1], shopName: "شاورما الشام", offer: "وجبة عائلية ٤٩ ريال", category: "food", city: "الرياض", phone: "0508901235", description: "شاورما عربية أصلية.", lat: 24.6636, lng: 46.6453, address: "حي البديعة، الرياض" },
   { id: 19, images: [adFood4, adFood1], shopName: "برجر فاكتوري", offer: "اطلب ٢ والثالث مجان", category: "food", city: "الرياض", phone: "0509012346", description: "برجر طازج بلحم أنقس.", lat: 24.6736, lng: 46.6553, address: "حي العقيق، الرياض" },
   { id: 20, images: [adFood5, adFood2], shopName: "حلويات الأمير", offer: "كنافة طازجة يومياً", category: "food", city: "الرياض", phone: "0500123457", description: "حلويات شرقية وغربية.", lat: 24.6836, lng: 46.6653, address: "حي الروضة، الرياض" },
-  { id: 60, images: [adEvents1, adEvents2], shopName: "قاعة الماسة", offer: "خصم 15% على حجوزات الصيف", featured: false, category: "events", city: "الرياض", phone: "0511234567", description: "قاعة أفراح فاخرة تتسع لـ 500 شخص مع خدمة ضيافة متكاملة.", lat: 24.7236, lng: 46.7153, address: "طريق الملك عبدالله، الرياض" },
-  { id: 61, images: [adEvents3, adEvents1], shopName: "تنظيم ليالي", offer: "باقات تنظيم حفلات", featured: false, category: "events", city: "الرياض", phone: "0512345678", description: "تنظيم حفلات زواج ومناسبات خاصة باحترافية عالية.", lat: 24.7336, lng: 46.7253, address: "حي الملقا، الرياض" },
-  { id: 62, images: [adEvents2, adEvents3], shopName: "ضيافة الأصيل", offer: "بوفيهات مفتوحة من ٥٠ ريال", featured: false, category: "events", city: "الرياض", phone: "0513456789", description: "خدمة ضيافة وبوفيهات للمناسبات والأفراح.", lat: 24.7436, lng: 46.7353, address: "حي النرجس، الرياض" },
-  { id: 63, images: [adEvents3, adEvents4], shopName: "زينة المناسبات", offer: "تجهيز كوشات وديكور", featured: false, category: "events", city: "الرياض", phone: "0514567890", description: "تصميم وتجهيز كوشات أفراح وديكورات مناسبات.", lat: 24.7536, lng: 46.7453, address: "حي الياسمين، الرياض" },
-  { id: 64, images: [adEvents4], shopName: "تصوير لحظات", offer: "باقة تصوير كاملة ٢٠٠٠ ريال", featured: false, category: "events", city: "الرياض", phone: "0515678901", description: "تصوير احترافي فوتو وفيديو للأفراح والمناسبات.", lat: 24.7636, lng: 46.7553, address: "حي العقيق، الرياض" },
+  { id: 60, images: [weddingCard1, adEvents1, adEvents2], shopName: "قاعة الماسة", offer: "خصم 15% على حجوزات الصيف", featured: false, category: "events", city: "الرياض", phone: "0511234567", description: "قاعة أفراح فاخرة تتسع لـ 500 شخص مع خدمة ضيافة متكاملة.", lat: 24.7236, lng: 46.7153, address: "طريق الملك عبدالله، الرياض" },
+  { id: 61, images: [weddingCard3, adEvents3, adEvents1], shopName: "تنظيم ليالي", offer: "باقات تنظيم حفلات", featured: false, category: "events", city: "الرياض", phone: "0512345678", description: "تنظيم حفلات زواج ومناسبات خاصة باحترافية عالية.", lat: 24.7336, lng: 46.7253, address: "حي الملقا، الرياض" },
+  { id: 62, images: [weddingCard2, adEvents2, adEvents3], shopName: "ضيافة الأصيل", offer: "بوفيهات مفتوحة من ٥٠ ريال", featured: false, category: "events", city: "الرياض", phone: "0513456789", description: "خدمة ضيافة وبوفيهات للمناسبات والأفراح.", lat: 24.7436, lng: 46.7353, address: "حي النرجس، الرياض" },
+  { id: 63, images: [weddingCard4, adEvents3, adEvents4], shopName: "زينة المناسبات", offer: "تجهيز كوشات وديكور", featured: false, category: "events", city: "الرياض", phone: "0514567890", description: "تصميم وتجهيز كوشات أفراح وديكورات مناسبات.", lat: 24.7536, lng: 46.7453, address: "حي الياسمين، الرياض" },
+  { id: 64, images: [weddingCard5, adEvents4], shopName: "تصوير لحظات", offer: "باقة تصوير كاملة ٢٠٠٠ ريال", featured: false, category: "events", city: "الرياض", phone: "0515678901", description: "تصوير احترافي فوتو وفيديو للأفراح والمناسبات.", lat: 24.7636, lng: 46.7553, address: "حي العقيق، الرياض" },
 ];
 
 export const categoryMap: Record<string, string> = {
