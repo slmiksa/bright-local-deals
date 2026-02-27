@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Phone } from "lucide-react";
+import { Eye, Sparkles, ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getFeaturedAds } from "@/data/ads";
 import { useCity } from "@/contexts/CityContext";
@@ -16,14 +16,13 @@ const FeaturedSlider = () => {
     image: ad.images[0],
     title: ad.offer,
     subtitle: ad.shopName,
-    cta: "شاهد التفاصيل",
   }));
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
     const el = scrollRef.current;
     const scrollRight = el.scrollWidth - el.clientWidth - el.scrollLeft;
-    const cardWidth = el.clientWidth * 0.78 + 12;
+    const cardWidth = el.clientWidth * 0.88 + 16;
     const index = Math.round(scrollRight / cardWidth);
     setActiveIndex(slides.length - 1 - index);
   };
@@ -31,48 +30,93 @@ const FeaturedSlider = () => {
   if (slides.length === 0) return null;
 
   return (
-    <section className="pt-4">
-      <div className="px-5 mb-3 flex items-center justify-between">
-        <h2 className="text-base font-bold text-foreground">إعلانات مميزة</h2>
-        <div className="flex gap-1.5">
-          {slides.map((_, i) => (
-            <div
-              key={i}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === activeIndex ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/25"
-              }`}
-            />
-          ))}
+    <section className="pt-5">
+      {/* Header */}
+      <div className="px-5 mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[hsl(var(--gold))] to-[hsl(40,65%,42%)] flex items-center justify-center shadow-md">
+            <Sparkles className="w-4 h-4 text-white" />
+          </div>
+          <h2 className="text-[17px] font-extrabold text-foreground">إعلانات مميزة</h2>
         </div>
+        <button
+          onClick={() => navigate("/featured")}
+          className="touch-target flex items-center gap-0.5 text-[13px] font-semibold text-primary active:opacity-70 transition-opacity"
+        >
+          عرض الكل
+          <ChevronLeft className="w-4 h-4" />
+        </button>
       </div>
+
+      {/* Cards */}
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex gap-3 overflow-x-auto px-5 snap-x snap-mandatory hide-scrollbar"
+        className="flex gap-4 overflow-x-auto px-5 snap-x snap-mandatory hide-scrollbar"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
-        {slides.map((slide) => (
+        {slides.map((slide, i) => (
           <div
             key={slide.id}
-            className="snap-center shrink-0 w-[78%] rounded-2xl overflow-hidden shadow-slider relative aspect-[16/9] cursor-pointer"
+            className="snap-center shrink-0 w-[88%] rounded-3xl overflow-hidden relative cursor-pointer group"
+            style={{ aspectRatio: "3/4" }}
             onClick={() => navigate(`/ad/${slide.id}`)}
           >
-            <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" loading="lazy" />
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
-            <div className="absolute bottom-0 right-0 left-0 p-4">
-              <span className="inline-block text-[10px] font-bold bg-primary/90 text-primary-foreground px-2 py-0.5 rounded-md mb-2">
+            {/* Image */}
+            <img
+              src={slide.image}
+              alt={slide.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-active:scale-105"
+              loading="lazy"
+            />
+
+            {/* Gold border glow */}
+            <div
+              className="absolute inset-0 rounded-3xl pointer-events-none"
+              style={{
+                boxShadow: "inset 0 0 0 2px hsl(40, 60%, 62%), 0 8px 40px -8px hsla(40, 60%, 40%, 0.35)",
+              }}
+            />
+
+            {/* Premium badge */}
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(40,65%,42%)] text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-lg">
+              <Sparkles className="w-3 h-3" />
+              مميز
+            </div>
+
+            {/* Bottom content */}
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent pt-24 pb-5 px-5">
+              <span className="inline-block text-[11px] font-bold bg-white/20 backdrop-blur-md text-white px-3 py-1 rounded-lg mb-2.5">
                 {slide.subtitle}
               </span>
-              <h3 className="text-primary-foreground text-[17px] font-bold mb-2.5 leading-snug">{slide.title}</h3>
-              <button className="touch-target inline-flex items-center gap-1.5 bg-primary-foreground text-foreground px-4 py-2 rounded-xl font-bold text-[13px] shadow-card active:scale-95 transition-transform">
-                <Phone className="w-3.5 h-3.5" />
-                {slide.cta}
+              <h3 className="text-white text-[18px] font-extrabold mb-4 leading-snug line-clamp-2 drop-shadow-md">
+                {slide.title}
+              </h3>
+              <button className="touch-target w-full flex items-center justify-center gap-2 bg-white text-foreground py-3.5 rounded-2xl font-bold text-[14px] active:scale-[0.97] transition-transform shadow-xl">
+                <Eye className="w-4.5 h-4.5" />
+                شاهد التفاصيل
               </button>
             </div>
           </div>
         ))}
         <div className="shrink-0 w-2" />
       </div>
+
+      {/* Dots */}
+      {slides.length > 1 && (
+        <div className="flex justify-center gap-1.5 mt-4">
+          {slides.map((_, i) => (
+            <div
+              key={i}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                i === activeIndex
+                  ? "w-6 bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(40,65%,42%)]"
+                  : "w-2 bg-muted-foreground/20"
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 };
