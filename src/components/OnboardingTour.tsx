@@ -43,12 +43,12 @@ const steps: TourStep[] = [
     icon: <Plus className="w-6 h-6" />,
     tooltipPosition: "center",
     highlightStyle: {
-      bottom: 12,
+      bottom: 28,
       left: "50%",
       transform: "translateX(-50%)",
-      width: 64,
-      height: 64,
-      borderRadius: 32,
+      width: 58,
+      height: 58,
+      borderRadius: 18,
     },
   },
 ];
