@@ -13,8 +13,14 @@ const PullToRefresh = ({ children, className = "" }: PullToRefreshProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.scrollY <= 0) {
-      startY.current = e.touches[0].clientY;
+    // Only allow pull-to-refresh when scrolled to top AND touch starts in top 100px of screen
+    const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+    const rootEl = document.getElementById('root');
+    const rootScrollTop = rootEl ? rootEl.scrollTop : 0;
+    const touchY = e.touches[0].clientY;
+
+    if (scrollTop <= 0 && rootScrollTop <= 0 && touchY < 120) {
+      startY.current = touchY;
       setPulling(true);
     }
   }, []);
