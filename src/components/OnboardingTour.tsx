@@ -73,8 +73,33 @@ const OnboardingTour = ({ onFinish }: { onFinish: () => void }) => {
 
   return (
     <div className="fixed inset-0 z-[200]" dir="rtl" onClick={handleNext}>
-      {/* Dark overlay with cutout using CSS mask or simple overlay */}
+      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/75" />
+
+      {/* Sliding step counter at top center */}
+      <div className="absolute top-6 left-0 right-0 flex justify-center" style={{ zIndex: 203 }}>
+        <motion.div
+          key={currentStep}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="bg-primary/20 backdrop-blur-md rounded-full px-5 py-2 flex items-center gap-3"
+        >
+          <span className="text-white/90 text-sm font-bold">
+            {currentStep + 1} / {steps.length}
+          </span>
+          <div className="flex gap-1.5">
+            {steps.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-500 ${
+                  i === currentStep ? "w-6 bg-primary" : i < currentStep ? "w-1.5 bg-primary/60" : "w-1.5 bg-white/30"
+                }`}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </div>
 
       {/* Highlight border around target */}
       <AnimatePresence mode="wait">
@@ -94,53 +119,38 @@ const OnboardingTour = ({ onFinish }: { onFinish: () => void }) => {
         />
       </AnimatePresence>
 
-      {/* Centered tooltip card */}
+      {/* Centered tooltip card - bigger */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentStep}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          className="absolute inset-0 flex items-center justify-center px-6 pointer-events-none"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -40 }}
+          transition={{ duration: 0.35, delay: 0.1, type: "spring", damping: 20 }}
+          className="absolute inset-0 flex items-center justify-center px-5 pointer-events-none"
           style={{ zIndex: 202 }}
         >
           <div
-            className="bg-card rounded-2xl p-6 shadow-2xl border border-border w-full max-w-[340px] pointer-events-auto"
+            className="bg-card rounded-3xl p-8 shadow-2xl border border-border w-full max-w-[380px] pointer-events-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Icon */}
-            <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center text-primary mb-3 mx-auto">
+            {/* Icon - bigger */}
+            <div className="w-16 h-16 rounded-2xl bg-primary/15 flex items-center justify-center text-primary mb-4 mx-auto">
               {step.icon}
             </div>
 
-            {/* Text */}
-            <h3 className="text-lg font-bold text-foreground mb-2 text-center">{step.title}</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed text-center">{step.description}</p>
+            {/* Text - bigger */}
+            <h3 className="text-xl font-bold text-foreground mb-3 text-center">{step.title}</h3>
+            <p className="text-base text-muted-foreground leading-relaxed text-center">{step.description}</p>
 
-            {/* Actions */}
-            <div className="flex items-center justify-between mt-5">
-              {/* Dots */}
-              <div className="flex gap-1.5">
-                {steps.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      i === currentStep ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/25"
-                    }`}
-                  />
-                ))}
-              </div>
-
-              {/* Button */}
-              <button
-                onClick={handleNext}
-                className="flex items-center gap-1.5 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-bold text-sm active:scale-95 transition-transform"
-              >
-                {isLast ? "ابدأ" : "التالي"}
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-            </div>
+            {/* Button */}
+            <button
+              onClick={handleNext}
+              className="w-full mt-6 flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3.5 rounded-2xl font-bold text-base active:scale-95 transition-transform"
+            >
+              {isLast ? "ابدأ الآن" : "التالي"}
+              <ChevronLeft className="w-5 h-5" />
+            </button>
           </div>
         </motion.div>
       </AnimatePresence>
@@ -148,8 +158,8 @@ const OnboardingTour = ({ onFinish }: { onFinish: () => void }) => {
       {/* Skip */}
       <button
         onClick={(e) => { e.stopPropagation(); onFinish(); }}
-        className="absolute top-14 left-5 text-sm text-white/70 font-medium active:text-white"
-        style={{ zIndex: 203 }}
+        className="absolute top-7 left-5 text-sm text-white/70 font-medium active:text-white backdrop-blur-sm bg-white/10 px-3 py-1.5 rounded-full"
+        style={{ zIndex: 204 }}
       >
         تخطي
       </button>
