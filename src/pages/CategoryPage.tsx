@@ -1,9 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Smartphone, CupSoda, SprayCan, Lamp, ChefHat, PartyPopper } from "lucide-react";
 import AdCard from "@/components/AdCard";
 import { allAds, categoryMap } from "@/data/ads";
 import { useCity } from "@/contexts/CityContext";
 import PullToRefresh from "@/components/PullToRefresh";
+
+const categoryIcons: Record<string, React.ElementType> = {
+  electronics: Smartphone,
+  cafes: CupSoda,
+  perfumes: SprayCan,
+  furniture: Lamp,
+  food: ChefHat,
+  events: PartyPopper,
+};
 
 const CategoryPage = () => {
   const { id } = useParams();
@@ -12,6 +21,7 @@ const CategoryPage = () => {
 
   const ads = allAds.filter((ad) => ad.category === id && ad.city === city);
   const title = categoryMap[id || ""] || "القسم";
+  const Icon = categoryIcons[id || ""];
 
   return (
     <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
@@ -23,6 +33,11 @@ const CategoryPage = () => {
           >
             <ArrowRight className="w-5 h-5 text-foreground" />
           </button>
+          {Icon && (
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <Icon className="w-4.5 h-4.5 text-primary-foreground" />
+            </div>
+          )}
           <h1 className="text-[16px] font-bold text-foreground">{title}</h1>
         </div>
       </div>
