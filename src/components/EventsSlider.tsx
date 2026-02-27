@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, X, Eye, Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Eye, PartyPopper } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { allAds } from "@/data/ads";
 import { useCity } from "@/contexts/CityContext";
@@ -32,10 +32,10 @@ const EventsSlider = () => {
     <section className="pt-7">
       <div className="px-5 mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-md">
-            <Heart className="w-4 h-4 text-white fill-white" />
+          <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
+            <PartyPopper className="w-4 h-4 text-primary-foreground" />
           </div>
-          <h2 className="text-base font-bold text-foreground">اعلانات زواجات ومناسبات</h2>
+          <h2 className="text-base font-bold text-foreground">اعلانات محال الزينة والأفراح</h2>
         </div>
         <button
           onClick={() => navigate("/category/events")}
@@ -81,7 +81,7 @@ const EventsSlider = () => {
         <div
           key={i}
           className={`h-1.5 rounded-full transition-all duration-300 ${
-          i === activeIndex ? "w-5 bg-pink-500" : "w-1.5 bg-muted-foreground/25"}`
+          i === activeIndex ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/25"}`
           } />
 
         )}
