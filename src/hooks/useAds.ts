@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { AdRow } from "@/types/database";
 
-type Ad = AdRow;
+export type Ad = AdRow;
 
 export interface Section {
   id: string;
@@ -10,7 +10,7 @@ export interface Section {
   ads: Ad[];
 }
 
-const categoryMap: Record<string, string> = {
+export const categoryMap: Record<string, string> = {
   electronics: "💻 إلكترونيات",
   cafes: "☕ كافيهات",
   perfumes: "🌸 عطور وروائح",
@@ -30,7 +30,7 @@ export function useAdsByCity(city: string) {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      const ads = data || [];
+      const ads = (data || []) as Ad[];
       const grouped: Record<string, Ad[]> = {};
       for (const ad of ads) {
         if (!grouped[ad.category]) grouped[ad.category] = [];
@@ -58,7 +58,7 @@ export function useFeaturedAds(city: string) {
         .limit(5);
 
       if (error) throw error;
-      return data || [];
+      return (data || []) as Ad[];
     },
   });
 }
@@ -74,9 +74,41 @@ export function useAdById(id: number) {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Ad;
     },
   });
 }
 
-export { categoryMap };
+export function useAdsByCategory(category: string, city: string) {
+  return useQuery({
+    queryKey: ["ads", "category", category, city],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("ads")
+        .select("*")
+        .eq("category", category)
+        .eq("city", city)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return (data || []) as Ad[];
+    },
+  });
+}
+
+export function useEventAds(city: string) {
+  return useQuery({
+    queryKey: ["ads", "events", city],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("ads")
+        .select("*")
+        .eq("category", "events")
+        .eq("city", city)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return (data || []) as Ad[];
+    },
+  });
+}

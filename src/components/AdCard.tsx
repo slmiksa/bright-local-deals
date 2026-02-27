@@ -6,12 +6,12 @@ import ImageLightbox from "./ImageLightbox";
 interface AdCardProps {
   id: number;
   images: string[];
-  shopName: string;
+  shop_name: string;
   offer: string;
   featured?: boolean;
 }
 
-const AdCard = ({ id, images, shopName, offer, featured }: AdCardProps) => {
+const AdCard = ({ id, images, shop_name, offer, featured }: AdCardProps) => {
   const navigate = useNavigate();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [imgIndex, setImgIndex] = useState(0);
@@ -44,7 +44,7 @@ const AdCard = ({ id, images, shopName, offer, featured }: AdCardProps) => {
                 <img
                   key={i}
                   src={img}
-                  alt={`${shopName} ${i + 1}`}
+                  alt={`${shop_name} ${i + 1}`}
                   className="w-full h-full object-cover shrink-0 snap-center cursor-pointer"
                   loading="lazy"
                   onClick={() => { setImgIndex(i); setLightboxOpen(true); }}
@@ -54,7 +54,7 @@ const AdCard = ({ id, images, shopName, offer, featured }: AdCardProps) => {
           ) : (
             <img
               src={images[0]}
-              alt={shopName}
+              alt={shop_name}
               className="w-full h-full object-cover cursor-pointer"
               loading="lazy"
               onClick={() => { setImgIndex(0); setLightboxOpen(true); }}
@@ -87,7 +87,7 @@ const AdCard = ({ id, images, shopName, offer, featured }: AdCardProps) => {
           )}
         </div>
         <div className="p-3">
-          <h3 className="font-bold text-[13px] text-foreground truncate">{shopName}</h3>
+          <h3 className="font-bold text-[13px] text-foreground truncate">{shop_name}</h3>
           <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{offer}</p>
           <button
             className="touch-target mt-2.5 w-full flex items-center justify-center gap-1.5 bg-primary text-primary-foreground rounded-xl py-2.5 text-[12px] font-bold active:scale-[0.97] transition-transform"
