@@ -1,5 +1,5 @@
-import { useRef, useState, useCallback } from "react";
-import { ChevronLeft, ChevronRight, X, Eye } from "lucide-react";
+import { useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, X, Eye, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { allAds } from "@/data/ads";
 import { useCity } from "@/contexts/CityContext";
@@ -31,7 +31,12 @@ const EventsSlider = () => {
   return (
     <section className="pt-7">
       <div className="px-5 mb-3 flex items-center justify-between">
-        <h2 className="text-base font-bold text-foreground">💍 أفراح ومناسبات</h2>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-md">
+            <Heart className="w-4 h-4 text-white fill-white" />
+          </div>
+          <h2 className="text-base font-bold text-foreground">دعوات زواج ومناسبات</h2>
+        </div>
         <button
           onClick={() => navigate("/category/events")}
           className="touch-target flex items-center gap-0.5 text-[13px] font-semibold text-primary active:opacity-70 transition-opacity"
@@ -49,17 +54,22 @@ const EventsSlider = () => {
         {events.map((ad) => (
           <div
             key={ad.id}
-            className="snap-center shrink-0 w-[45%] rounded-2xl overflow-hidden shadow-slider relative cursor-pointer active:scale-[0.97] transition-transform"
+            className="snap-center shrink-0 w-[45%] rounded-2xl overflow-hidden relative cursor-pointer active:scale-[0.97] transition-transform"
             style={{ aspectRatio: "9/16" }}
             onClick={() => { setExpandedAd(ad); setExpandedImageIndex(0); }}
           >
+            {/* Wedding card image as background */}
             <img src={ad.images[0]} alt={ad.shopName} className="w-full h-full object-cover" loading="lazy" />
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-transparent to-transparent" />
+            
+            {/* Elegant overlay for text */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            
+            {/* Bottom content */}
             <div className="absolute bottom-0 right-0 left-0 p-3">
-              <span className="inline-block text-[9px] font-bold bg-primary/90 text-primary-foreground px-2 py-0.5 rounded-md mb-1.5">
+              <span className="inline-block text-[9px] font-bold bg-white/90 text-foreground px-2 py-0.5 rounded-md mb-1.5 backdrop-blur-sm">
                 {ad.shopName}
               </span>
-              <h3 className="text-primary-foreground text-[13px] font-bold leading-snug line-clamp-2">{ad.offer}</h3>
+              <h3 className="text-white text-[13px] font-bold leading-snug line-clamp-2 drop-shadow-md">{ad.offer}</h3>
             </div>
           </div>
         ))}
@@ -71,7 +81,7 @@ const EventsSlider = () => {
             <div
               key={i}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === activeIndex ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/25"
+                i === activeIndex ? "w-5 bg-pink-500" : "w-1.5 bg-muted-foreground/25"
               }`}
             />
           ))}
@@ -109,7 +119,6 @@ const EventsSlider = () => {
           >
             <div className="rounded-2xl overflow-hidden relative" style={{ aspectRatio: "9/16" }}>
               <img src={expandedAd.images[expandedImageIndex]} alt={expandedAd.shopName} className="w-full h-full object-cover" />
-              {/* Image navigation arrows */}
               {expandedAd.images.length > 1 && (
                 <>
                   <button
@@ -124,7 +133,6 @@ const EventsSlider = () => {
                   >
                     <ChevronLeft className="w-4 h-4 text-white" />
                   </button>
-                  {/* Dots */}
                   <div className="absolute top-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                     {expandedAd.images.map((_, i) => (
                       <div
@@ -138,7 +146,7 @@ const EventsSlider = () => {
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
               <div className="absolute bottom-0 right-0 left-0 p-5">
-                <span className="inline-block text-[11px] font-bold bg-primary/90 text-primary-foreground px-2.5 py-1 rounded-lg mb-2">
+                <span className="inline-block text-[11px] font-bold bg-white/90 text-foreground px-2.5 py-1 rounded-lg mb-2 backdrop-blur-sm">
                   {expandedAd.shopName}
                 </span>
                 <h3 className="text-white text-lg font-bold mb-4 leading-snug">{expandedAd.offer}</h3>
