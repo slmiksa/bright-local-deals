@@ -85,7 +85,7 @@ export const allAds: Ad[] = [
 ];
 
 export const categoryMap: Record<string, string> = {
-  electronics: "💻 إلكترونيات",
+  electronics: "💻 اعلانات متاجر إلكترونيات",
   cafes: "☕ كافيهات",
   perfumes: "🌸 عطور وروائح",
   furniture: "🛋 مفروشات",
