@@ -1,22 +1,21 @@
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X, Eye, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEventAds } from "@/hooks/useAds";
+import { allAds } from "@/data/ads";
 import { useCity } from "@/contexts/CityContext";
 import { createPortal } from "react-dom";
-import type { Ad } from "@/hooks/useAds";
 
 const EventsSlider = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [expandedAd, setExpandedAd] = useState<Ad | null>(null);
+  const [expandedAd, setExpandedAd] = useState<typeof allAds[0] | null>(null);
   const [expandedImageIndex, setExpandedImageIndex] = useState(0);
   const touchStartX = useRef(0);
   const touchDeltaX = useRef(0);
   const navigate = useNavigate();
   const { city } = useCity();
 
-  const { data: events = [] } = useEventAds(city);
+  const events = allAds.filter((ad) => ad.category === "events" && ad.city === city);
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
@@ -59,11 +58,16 @@ const EventsSlider = () => {
             style={{ aspectRatio: "9/16" }}
             onClick={() => { setExpandedAd(ad); setExpandedImageIndex(0); }}
           >
-            <img src={ad.images[0]} alt={ad.shop_name} className="w-full h-full object-cover" loading="lazy" />
+            {/* Wedding card image as background */}
+            <img src={ad.images[0]} alt={ad.shopName} className="w-full h-full object-cover" loading="lazy" />
+            
+            {/* Elegant overlay for text */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            
+            {/* Bottom content */}
             <div className="absolute bottom-0 right-0 left-0 p-3">
               <span className="inline-block text-[9px] font-bold bg-white/90 text-foreground px-2 py-0.5 rounded-md mb-1.5 backdrop-blur-sm">
-                {ad.shop_name}
+                {ad.shopName}
               </span>
               <h3 className="text-white text-[13px] font-bold leading-snug line-clamp-2 drop-shadow-md">{ad.offer}</h3>
             </div>
@@ -84,6 +88,7 @@ const EventsSlider = () => {
         </div>
       )}
 
+      {/* Expanded overlay */}
       {expandedAd && createPortal(
         <div
           className="fixed inset-0 z-[9999] bg-black/95 flex flex-col items-center justify-center"
@@ -113,7 +118,7 @@ const EventsSlider = () => {
             }}
           >
             <div className="rounded-2xl overflow-hidden relative" style={{ aspectRatio: "9/16" }}>
-              <img src={expandedAd.images[expandedImageIndex]} alt={expandedAd.shop_name} className="w-full h-full object-cover" />
+              <img src={expandedAd.images[expandedImageIndex]} alt={expandedAd.shopName} className="w-full h-full object-cover" />
               {expandedAd.images.length > 1 && (
                 <>
                   <button
@@ -142,7 +147,7 @@ const EventsSlider = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
               <div className="absolute bottom-0 right-0 left-0 p-5">
                 <span className="inline-block text-[11px] font-bold bg-white/90 text-foreground px-2.5 py-1 rounded-lg mb-2 backdrop-blur-sm">
-                  {expandedAd.shop_name}
+                  {expandedAd.shopName}
                 </span>
                 <h3 className="text-white text-lg font-bold mb-4 leading-snug">{expandedAd.offer}</h3>
                 <button
