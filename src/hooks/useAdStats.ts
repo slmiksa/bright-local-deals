@@ -30,7 +30,7 @@ export async function recordView(adId: number) {
   viewed.push(adId);
   localStorage.setItem("lamha_ad_viewed", JSON.stringify(viewed));
 
-  // Upsert: increment views in DB
+  // Upsert view count in DB
   const { data: existing } = await supabase
     .from("ad_stats")
     .select("id, views")
@@ -55,34 +55,39 @@ export function useAdStats(adId: number): AdStats & { toggleLike: () => void } {
     likes: 0,
     liked: getLikedAds().includes(adId),
   });
+  const [fetched, setFetched] = useState(false);
 
   // Fetch real stats from DB
   useEffect(() => {
-    if (!adId) return;
-    const fetchStats = async () => {
-      const { data } = await supabase
-        .from("ad_stats")
-        .select("views, likes")
-        .eq("ad_id", adId)
-        .maybeSingle();
+    if (!adId || fetched) return;
+    let cancelled = false;
+    
+    supabase
+      .from("ad_stats")
+      .select("views, likes")
+      .eq("ad_id", adId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled) return;
+        if (data) {
+          setStats(prev => ({
+            ...prev,
+            views: data.views || 0,
+            likes: data.likes || 0,
+          }));
+        }
+        setFetched(true);
+      });
 
-      if (data) {
-        setStats(prev => ({
-          ...prev,
-          views: data.views || 0,
-          likes: data.likes || 0,
-        }));
-      }
-    };
-    fetchStats();
-  }, [adId]);
+    return () => { cancelled = true; };
+  }, [adId, fetched]);
 
   const toggleLike = useCallback(async () => {
     const likedAds = getLikedAds();
     const currentlyLiked = likedAds.includes(adId);
     const newLiked = !currentlyLiked;
 
-    // Update local state immediately
+    // Update local state immediately (optimistic)
     setStats(prev => ({
       ...prev,
       liked: newLiked,

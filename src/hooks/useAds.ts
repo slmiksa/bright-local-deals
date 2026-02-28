@@ -170,6 +170,7 @@ export function useCities() {
   return useQuery({
     queryKey: ["cities"],
     queryFn: fetchCities,
-    staleTime: 1000 * 60 * 60, // 1 hour
+    staleTime: 1000 * 60 * 60,
+    gcTime: 1000 * 60 * 60 * 24,
   });
 }
