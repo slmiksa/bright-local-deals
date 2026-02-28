@@ -1,9 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowRight, Smartphone, CupSoda, SprayCan, Lamp, ChefHat, PartyPopper } from "lucide-react";
 import AdCard from "@/components/AdCard";
-import { useAdsByCategory, categoryMap } from "@/hooks/useAds";
+import { useAdsByCategory } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
 import PullToRefresh from "@/components/PullToRefresh";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const categoryIcons: Record<string, React.ElementType> = {
   electronics: Smartphone,
@@ -20,7 +22,15 @@ const CategoryPage = () => {
   const { city } = useCity();
 
   const { data: ads = [], isLoading } = useAdsByCategory(id || "", city);
-  const title = categoryMap[id || ""] || "القسم";
+  const { data: category } = useQuery({
+    queryKey: ["category", id],
+    queryFn: async () => {
+      const { data } = await supabase.from("categories").select("id, name").eq("id", id || "").maybeSingle();
+      return data;
+    },
+    enabled: !!id,
+  });
+  const title = category?.name || "القسم";
   const Icon = categoryIcons[id || ""];
 
   return (

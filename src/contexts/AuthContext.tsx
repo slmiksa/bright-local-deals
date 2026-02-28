@@ -60,8 +60,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return { error: error.message };
+    // Immediately check admin role so navigation works
+    if (data.user) {
+      setUser(data.user);
+      const admin = await checkAdminRole(data.user.id);
+      setIsAdmin(admin);
+    }
     return { error: null };
   };
 
