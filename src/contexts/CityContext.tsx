@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, startTransition } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface CityContextType {
@@ -11,24 +11,18 @@ const CityContext = createContext<CityContextType>({ city: "", setCity: () => {}
 const CITY_STORAGE_KEY = "lamha_selected_city";
 
 export const CityProvider = ({ children }: { children: ReactNode }) => {
-  // Initialize from localStorage immediately - no waiting for network
-  const [city, setCityState] = useState(() => {
-    return localStorage.getItem(CITY_STORAGE_KEY) || "";
-  });
-  const [initialized, setInitialized] = useState(!!city);
+  const [city, setCityState] = useState(() => localStorage.getItem(CITY_STORAGE_KEY) || "");
 
   const setCity = (newCity: string) => {
-    setCityState(newCity);
     localStorage.setItem(CITY_STORAGE_KEY, newCity);
+    startTransition(() => {
+      setCityState(newCity);
+    });
   };
 
-  // Only fetch from DB if no saved city
   useEffect(() => {
-    if (city) {
-      setInitialized(true);
-      return;
-    }
-    // No saved city - fetch first city from DB
+    if (city) return;
+
     supabase
       .from("cities")
       .select("name")
@@ -38,15 +32,11 @@ export const CityProvider = ({ children }: { children: ReactNode }) => {
         if (data && data.length > 0) {
           setCity(data[0].name);
         }
-        setInitialized(true);
       });
   }, []);
 
-  return (
-    <CityContext.Provider value={{ city, setCity }}>
-      {children}
-    </CityContext.Provider>
-  );
+  return <CityContext.Provider value={{ city, setCity }}>{children}</CityContext.Provider>;
 };
 
 export const useCity = () => useContext(CityContext);
+

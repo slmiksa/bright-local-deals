@@ -7,14 +7,14 @@ import { useNavigate } from "react-router-dom";
 const TopBar = () => {
   const { city, setCity } = useCity();
   const { data: cities = [], isLoading: citiesLoading } = useCities();
-  const { data: sections = [] } = useAdsByCity(city);
   const [showCities, setShowCities] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
+  const { data: sections = [] } = useAdsByCity(city, { enabled: showSearch });
   const navigate = useNavigate();
 
   // Flatten all ads from sections for search
-  const allAdsInCity = useMemo(() => sections.flatMap(s => s.ads), [sections]);
+  const allAdsInCity = useMemo(() => (showSearch ? sections.flatMap((s) => s.ads) : []), [sections, showSearch]);
 
   const results = useMemo(() => {
     if (!query.trim()) return [];
