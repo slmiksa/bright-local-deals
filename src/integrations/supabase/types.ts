@@ -14,7 +14,177 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ad_images: {
+        Row: {
+          ad_id: number
+          created_at: string
+          id: string
+          image_url: string
+          sort_order: number | null
+        }
+        Insert: {
+          ad_id: number
+          created_at?: string
+          id?: string
+          image_url: string
+          sort_order?: number | null
+        }
+        Update: {
+          ad_id?: number
+          created_at?: string
+          id?: string
+          image_url?: string
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_images_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "ads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_stats: {
+        Row: {
+          ad_id: number
+          created_at: string
+          id: string
+          likes: number | null
+          updated_at: string
+          views: number | null
+        }
+        Insert: {
+          ad_id: number
+          created_at?: string
+          id?: string
+          likes?: number | null
+          updated_at?: string
+          views?: number | null
+        }
+        Update: {
+          ad_id?: number
+          created_at?: string
+          id?: string
+          likes?: number | null
+          updated_at?: string
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_stats_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: true
+            referencedRelation: "ads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ads: {
+        Row: {
+          active: boolean | null
+          address: string | null
+          category: string
+          city: string
+          created_at: string
+          description: string | null
+          featured: boolean | null
+          id: number
+          lat: number | null
+          lng: number | null
+          offer: string
+          phone: string | null
+          shop_name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          address?: string | null
+          category: string
+          city: string
+          created_at?: string
+          description?: string | null
+          featured?: boolean | null
+          id?: number
+          lat?: number | null
+          lng?: number | null
+          offer: string
+          phone?: string | null
+          shop_name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          address?: string | null
+          category?: string
+          city?: string
+          created_at?: string
+          description?: string | null
+          featured?: boolean | null
+          id?: number
+          lat?: number | null
+          lng?: number | null
+          offer?: string
+          phone?: string | null
+          shop_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ads_category_fkey"
+            columns: ["category"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id: string
+          name: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      cities: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
