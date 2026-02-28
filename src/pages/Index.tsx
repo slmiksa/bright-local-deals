@@ -19,7 +19,7 @@ const Index = () => {
       <FeaturedSlider />
       <EventsSlider />
       <CategoriesRow />
-      {sections.map((section) => (
+      {sections.filter(s => s.id !== "events").map((section) => (
         <AdSection key={section.id} {...section} />
       ))}
       {!isLoading && sections.length === 0 && (
