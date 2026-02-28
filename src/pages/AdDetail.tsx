@@ -4,6 +4,7 @@ import { useAdById } from "@/hooks/useAds";
 import { useState, useRef, useEffect } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { useAdStats, recordView } from "@/hooks/useAdStats";
+import { toast } from "@/hooks/use-toast";
 
 const AdDetail = () => {
   const { id } = useParams();
@@ -59,7 +60,25 @@ const AdDetail = () => {
             <ArrowRight className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="text-[15px] font-bold text-foreground">{ad.shopName}</h1>
-          <button className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors">
+          <button
+            onClick={async () => {
+              const url = `${window.location.origin}/ad/${ad.id}`;
+              const shareData = {
+                title: `تطبيق لمحة للتسويق - ${ad.shopName}`,
+                text: `${ad.offer}\n📍 ${ad.address || ad.city}\n\nشاهد التفاصيل على تطبيق لمحة 👓`,
+                url,
+              };
+              try {
+                if (navigator.share) {
+                  await navigator.share(shareData);
+                } else {
+                  await navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${url}`);
+                  toast({ title: "تم النسخ", description: "تم نسخ رابط الإعلان" });
+                }
+              } catch {}
+            }}
+            className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors"
+          >
             <Share2 className="w-[18px] h-[18px] text-foreground" />
           </button>
         </div>
