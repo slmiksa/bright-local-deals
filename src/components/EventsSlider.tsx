@@ -1,21 +1,21 @@
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X, Eye, PartyPopper } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { allAds } from "@/data/ads";
+import { useEventAds, Ad } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
 import { createPortal } from "react-dom";
 
 const EventsSlider = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [expandedAd, setExpandedAd] = useState<typeof allAds[0] | null>(null);
+  const [expandedAd, setExpandedAd] = useState<Ad | null>(null);
   const [expandedImageIndex, setExpandedImageIndex] = useState(0);
   const touchStartX = useRef(0);
   const touchDeltaX = useRef(0);
   const navigate = useNavigate();
   const { city } = useCity();
 
-  const events = allAds.filter((ad) => ad.category === "events" && ad.city === city);
+  const { data: events = [] } = useEventAds(city);
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
@@ -40,7 +40,6 @@ const EventsSlider = () => {
         <button
           onClick={() => navigate("/category/events")}
           className="touch-target flex items-center gap-0.5 text-[13px] font-semibold text-primary active:opacity-70 transition-opacity">
-
           عرض الكل
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -50,21 +49,14 @@ const EventsSlider = () => {
         onScroll={handleScroll}
         className="flex gap-3 overflow-x-auto px-5 snap-x snap-mandatory hide-scrollbar"
         style={{ WebkitOverflowScrolling: "touch" }}>
-
         {events.map((ad) =>
-        <div
-          key={ad.id}
-          className="snap-center shrink-0 w-[45%] rounded-2xl overflow-hidden relative cursor-pointer active:scale-[0.97] transition-transform"
-          style={{ aspectRatio: "9/16" }}
-          onClick={() => {setExpandedAd(ad);setExpandedImageIndex(0);}}>
-
-            {/* Wedding card image as background */}
+          <div
+            key={ad.id}
+            className="snap-center shrink-0 w-[45%] rounded-2xl overflow-hidden relative cursor-pointer active:scale-[0.97] transition-transform"
+            style={{ aspectRatio: "9/16" }}
+            onClick={() => {setExpandedAd(ad);setExpandedImageIndex(0);}}>
             <img src={ad.images[0]} alt={ad.shopName} className="w-full h-full object-cover" loading="lazy" />
-            
-            {/* Elegant overlay for text */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            
-            {/* Bottom content */}
             <div className="absolute bottom-0 right-0 left-0 p-3">
               <span className="inline-block text-[9px] font-bold bg-white/90 text-foreground px-2 py-0.5 rounded-md mb-1.5 backdrop-blur-sm">
                 {ad.shopName}
@@ -76,31 +68,26 @@ const EventsSlider = () => {
         <div className="shrink-0 w-2" />
       </div>
       {events.length > 1 &&
-      <div className="flex justify-center gap-1.5 mt-3">
+        <div className="flex justify-center gap-1.5 mt-3">
           {events.map((_, i) =>
-        <div
-          key={i}
-          className={`h-1.5 rounded-full transition-all duration-300 ${
-          i === activeIndex ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/25"}`
-          } />
-
-        )}
+            <div
+              key={i}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === activeIndex ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/25"}`
+              } />
+          )}
         </div>
       }
 
-      {/* Expanded overlay */}
       {expandedAd && createPortal(
         <div
           className="fixed inset-0 z-[9999] bg-black/95 flex flex-col items-center justify-center"
           onClick={() => setExpandedAd(null)}>
-
           <button
             onClick={() => setExpandedAd(null)}
             className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center">
-
             <X className="w-5 h-5 text-white" />
           </button>
-
           <div
             className="w-full max-w-[380px] px-4"
             onClick={(e) => e.stopPropagation()}
@@ -116,34 +103,29 @@ const EventsSlider = () => {
               }
               touchDeltaX.current = 0;
             }}>
-
             <div className="rounded-2xl overflow-hidden relative" style={{ aspectRatio: "9/16" }}>
               <img src={expandedAd.images[expandedImageIndex]} alt={expandedAd.shopName} className="w-full h-full object-cover" />
               {expandedAd.images.length > 1 &&
-              <>
+                <>
                   <button
-                  onClick={() => setExpandedImageIndex((i) => i > 0 ? i - 1 : expandedAd.images.length - 1)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center">
-
+                    onClick={() => setExpandedImageIndex((i) => i > 0 ? i - 1 : expandedAd.images.length - 1)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center">
                     <ChevronRight className="w-4 h-4 text-white" />
                   </button>
                   <button
-                  onClick={() => setExpandedImageIndex((i) => i < expandedAd.images.length - 1 ? i + 1 : 0)}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center">
-
+                    onClick={() => setExpandedImageIndex((i) => i < expandedAd.images.length - 1 ? i + 1 : 0)}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center">
                     <ChevronLeft className="w-4 h-4 text-white" />
                   </button>
                   <div className="absolute top-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                     {expandedAd.images.map((_, i) =>
-                  <div
-                    key={i}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${i === expandedImageIndex ? "w-5 bg-white" : "w-1.5 bg-white/40"}`} />
-
-                  )}
+                      <div
+                        key={i}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${i === expandedImageIndex ? "w-5 bg-white" : "w-1.5 bg-white/40"}`} />
+                    )}
                   </div>
                 </>
               }
-
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
               <div className="absolute bottom-0 right-0 left-0 p-5">
                 <span className="inline-block text-[11px] font-bold bg-white/90 text-foreground px-2.5 py-1 rounded-lg mb-2 backdrop-blur-sm">
@@ -153,7 +135,6 @@ const EventsSlider = () => {
                 <button
                   onClick={() => {setExpandedAd(null);navigate(`/ad/${expandedAd.id}`);}}
                   className="touch-target w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-xl font-bold text-[14px] active:scale-[0.97] transition-transform shadow-elevated">
-
                   <Eye className="w-4 h-4" />
                   عرض التفاصيل
                 </button>
@@ -163,8 +144,8 @@ const EventsSlider = () => {
         </div>,
         document.body
       )}
-    </section>);
-
+    </section>
+  );
 };
 
 export default EventsSlider;

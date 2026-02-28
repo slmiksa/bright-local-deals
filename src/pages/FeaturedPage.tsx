@@ -1,12 +1,12 @@
 import { Star } from "lucide-react";
 import AdCard from "@/components/AdCard";
-import { getFeaturedAds } from "@/data/ads";
+import { useFeaturedAds } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
 import PullToRefresh from "@/components/PullToRefresh";
 
 const FeaturedPage = () => {
   const { city } = useCity();
-  const featured = getFeaturedAds(city);
+  const { data: featured = [], isLoading } = useFeaturedAds(city);
 
   return (
     <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
@@ -23,7 +23,7 @@ const FeaturedPage = () => {
         ))}
       </div>
 
-      {featured.length === 0 && (
+      {!isLoading && featured.length === 0 && (
         <div className="text-center py-16">
           <p className="text-muted-foreground">لا توجد إعلانات مميزة في {city}</p>
         </div>

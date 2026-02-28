@@ -5,12 +5,12 @@ import EventsSlider from "@/components/EventsSlider";
 import AdSection from "@/components/AdSection";
 import PullToRefresh from "@/components/PullToRefresh";
 import CountdownTimer from "@/components/CountdownTimer";
-import { getAdsByCity } from "@/data/ads";
+import { useAdsByCity } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
 
 const Index = () => {
   const { city } = useCity();
-  const sections = getAdsByCity(city);
+  const { data: sections = [], isLoading } = useAdsByCity(city);
 
   return (
     <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto relative">
@@ -22,7 +22,7 @@ const Index = () => {
       {sections.map((section) => (
         <AdSection key={section.id} {...section} />
       ))}
-      {sections.length === 0 && (
+      {!isLoading && sections.length === 0 && (
         <div className="text-center py-16">
           <p className="text-muted-foreground text-[15px]">لا توجد إعلانات في {city} حالياً</p>
         </div>
