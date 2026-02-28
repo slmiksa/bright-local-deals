@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CityProvider } from "@/contexts/CityContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import SplashScreen from "./components/SplashScreen";
 import OnboardingTour from "./components/OnboardingTour";
 import Index from "./pages/Index";
@@ -17,6 +18,15 @@ import SupportPage from "./pages/SupportPage";
 import NotFound from "./pages/NotFound";
 import BottomTabBar from "./components/BottomTabBar";
 import ScrollToTop from "./components/ScrollToTop";
+
+// Admin pages
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminAds from "./pages/admin/AdminAds";
+import AdminCategories from "./pages/admin/AdminCategories";
+import AdminCities from "./pages/admin/AdminCities";
+import AdminStats from "./pages/admin/AdminStats";
 
 const queryClient = new QueryClient();
 
@@ -39,26 +49,40 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <CityProvider>
-          <Toaster />
-          <Sonner />
-          {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
-          {!showSplash && showTour && <OnboardingTour onFinish={handleTourFinish} />}
-          <BrowserRouter>
-            <ScrollToTop />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/ad/:id" element={<AdDetail />} />
-              <Route path="/categories" element={<CategoriesPage />} />
-              <Route path="/category/:id" element={<CategoryPage />} />
-              <Route path="/featured" element={<FeaturedPage />} />
-              <Route path="/add" element={<AddAdPage />} />
-              <Route path="/support" element={<SupportPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <BottomTabBar />
-          </BrowserRouter>
-        </CityProvider>
+        <AuthProvider>
+          <CityProvider>
+            <Toaster />
+            <Sonner />
+            {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
+            {!showSplash && showTour && <OnboardingTour onFinish={handleTourFinish} />}
+            <BrowserRouter>
+              <ScrollToTop />
+              <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/ad/:id" element={<AdDetail />} />
+                <Route path="/categories" element={<CategoriesPage />} />
+                <Route path="/category/:id" element={<CategoryPage />} />
+                <Route path="/featured" element={<FeaturedPage />} />
+                <Route path="/add" element={<AddAdPage />} />
+                <Route path="/support" element={<SupportPage />} />
+
+                {/* Admin routes */}
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="ads" element={<AdminAds />} />
+                  <Route path="categories" element={<AdminCategories />} />
+                  <Route path="cities" element={<AdminCities />} />
+                  <Route path="stats" element={<AdminStats />} />
+                </Route>
+
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <BottomTabBar />
+            </BrowserRouter>
+          </CityProvider>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
