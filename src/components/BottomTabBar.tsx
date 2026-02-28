@@ -13,6 +13,9 @@ const BottomTabBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Hide on admin pages
+  if (location.pathname.startsWith("/admin")) return null;
+
   const getActiveTab = () => {
     const path = location.pathname;
     const tab = tabs.find((t) => t.path === path);
