@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { resolveImageUrl } from "@/data/imageMap";
 
@@ -107,15 +107,18 @@ async function fetchCities(): Promise<string[]> {
 }
 
 // React Query hooks
-export function useAdsByCity(city: string) {
+export function useAdsByCity(city: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["ads", "byCity", city],
     queryFn: async () => {
-      const ads = await fetchAds(city);
-      // Fetch all categories to show sections even if empty
-      const { data: cats } = await supabase.from("categories").select("id, name").order("sort_order");
-      const categories = cats || [];
-      
+      const [ads, categoriesResult] = await Promise.all([
+        fetchAds(city),
+        supabase.from("categories").select("id, name").order("sort_order"),
+      ]);
+
+      if (categoriesResult.error) throw categoriesResult.error;
+      const categories = categoriesResult.data || [];
+
       const grouped: Record<string, Ad[]> = {};
       for (const cat of categories) {
         grouped[cat.id] = [];
@@ -124,16 +127,21 @@ export function useAdsByCity(city: string) {
         if (!grouped[ad.category]) grouped[ad.category] = [];
         grouped[ad.category].push(ad);
       }
-      
-      const sections: Section[] = categories.map(cat => ({
+
+      const sections: Section[] = categories.map((cat) => ({
         id: cat.id,
         title: cat.name,
         ads: grouped[cat.id] || [],
       }));
-      
+
       return sections;
     },
-    enabled: !!city,
+    enabled: (options?.enabled ?? true) && !!city,
+    placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 60,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }
 
@@ -141,6 +149,10 @@ export function useFeaturedAds(city: string) {
   return useQuery({
     queryKey: ["ads", "featured", city],
     queryFn: () => fetchAds(city, undefined, true),
+    enabled: !!city,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 60,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -148,6 +160,10 @@ export function useAdsByCategory(category: string, city: string) {
   return useQuery({
     queryKey: ["ads", "category", category, city],
     queryFn: () => fetchAds(city, category),
+    enabled: !!city,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 60,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -163,6 +179,10 @@ export function useEventAds(city: string) {
   return useQuery({
     queryKey: ["ads", "events", city],
     queryFn: () => fetchAds(city, "events"),
+    enabled: !!city,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 60,
+    refetchOnWindowFocus: false,
   });
 }
 
