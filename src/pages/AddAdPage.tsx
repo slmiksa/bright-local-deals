@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star } from "lucide-react";
+import { useState, useMemo, useRef } from "react";
+import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { useCities } from "@/hooks/useAds";
@@ -42,6 +42,11 @@ const AddAdPage = () => {
   const [location, setLocation] = useState("");
   const [adTier, setAdTier] = useState<"عادي" | "متميز">("عادي");
 
+  const [mainImage, setMainImage] = useState<{ file: File; preview: string } | null>(null);
+  const [extraImages, setExtraImages] = useState<{ file: File; preview: string }[]>([]);
+  const mainInputRef = useRef<HTMLInputElement>(null);
+  const extraInputRef = useRef<HTMLInputElement>(null);
+
   const totalPrice = useMemo(() => {
     const plan = pricingPlans.find((p) => p.title === adType || (adType === "متجر" && p.title === "المتاجر"));
     if (!plan) return null;
@@ -49,12 +54,41 @@ const AddAdPage = () => {
     return adTier === "متميز" ? base + FEATURED_EXTRA : base;
   }, [adType, adTier]);
 
+  const handleMainImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (mainImage) URL.revokeObjectURL(mainImage.preview);
+    setMainImage({ file, preview: URL.createObjectURL(file) });
+  };
+
+  const handleExtraImages = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const newImages = Array.from(files).slice(0, 10 - extraImages.length).map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+    setExtraImages((prev) => [...prev, ...newImages]);
+  };
+
+  const removeExtraImage = (index: number) => {
+    setExtraImages((prev) => {
+      URL.revokeObjectURL(prev[index].preview);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
   const handleSubmit = () => {
     if (!adType || !storeName || !location) {
       toast({ title: "تنبيه", description: "يرجى تعبئة جميع الحقول", variant: "destructive" });
       return;
     }
-    const message = `طلب إعلان جديد:\nنوع الإعلان: ${adType}\nالفئة: ${adTier}\nاسم المتجر: ${storeName}\nالعنوان: ${location}\nالسعر: ${totalPrice} ريال`;
+    if (!mainImage) {
+      toast({ title: "تنبيه", description: "يرجى اختيار الصورة الأساسية", variant: "destructive" });
+      return;
+    }
+    const imagesCount = 1 + extraImages.length;
+    const message = `طلب إعلان جديد:\nنوع الإعلان: ${adType}\nالفئة: ${adTier}\nاسم المتجر: ${storeName}\nالعنوان: ${location}\nالسعر: ${totalPrice} ريال\nعدد الصور: ${imagesCount} (الصورة الأساسية + ${extraImages.length} صور إضافية)\n\nيرجى إرسال الصور بعد هذه الرسالة`;
     const whatsappUrl = `https://wa.me/966500000000?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
@@ -140,6 +174,74 @@ const AddAdPage = () => {
               <option value="">اختر المدينة</option>
               {cities.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
+          </div>
+
+          {/* Main Image Upload */}
+          <div>
+            <label className="block text-[13px] font-bold text-foreground mb-1.5">
+              الصورة الأساسية <span className="text-[11px] text-muted-foreground font-normal">(تظهر كغلاف للإعلان)</span>
+            </label>
+            <input ref={mainInputRef} type="file" accept="image/*" className="hidden" onChange={handleMainImage} />
+            {mainImage ? (
+              <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border-2 border-primary">
+                <img src={mainImage.preview} alt="الصورة الأساسية" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => { URL.revokeObjectURL(mainImage.preview); setMainImage(null); }}
+                  className="absolute top-2 left-2 w-7 h-7 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform"
+                >
+                  <X className="w-4 h-4 text-primary-foreground" />
+                </button>
+                <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-lg">
+                  صورة الغلاف
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => mainInputRef.current?.click()}
+                className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 flex flex-col items-center justify-center gap-2 active:bg-primary/10 transition-colors"
+              >
+                <Camera className="w-8 h-8 text-primary/60" />
+                <span className="text-[13px] font-bold text-primary/70">اختر صورة الغلاف</span>
+                <span className="text-[11px] text-muted-foreground">تظهر في بطاقة الإعلان</span>
+              </button>
+            )}
+          </div>
+
+          {/* Extra Images Upload */}
+          <div>
+            <label className="block text-[13px] font-bold text-foreground mb-1.5">
+              صور إضافية <span className="text-[11px] text-muted-foreground font-normal">(تظهر داخل تفاصيل الإعلان)</span>
+            </label>
+            <input ref={extraInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleExtraImages} />
+            <div className="grid grid-cols-3 gap-2">
+              {extraImages.map((img, i) => (
+                <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-border">
+                  <img src={img.preview} alt={`صورة ${i + 1}`} className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeExtraImage(i)}
+                    className="absolute top-1 left-1 w-6 h-6 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform"
+                  >
+                    <X className="w-3.5 h-3.5 text-primary-foreground" />
+                  </button>
+                </div>
+              ))}
+              {extraImages.length < 10 && (
+                <button
+                  type="button"
+                  onClick={() => extraInputRef.current?.click()}
+                  className="aspect-square rounded-xl border-2 border-dashed border-border bg-secondary/30 flex flex-col items-center justify-center gap-1 active:bg-secondary/50 transition-colors"
+                >
+                  <ImagePlus className="w-5 h-5 text-muted-foreground" />
+                  <span className="text-[10px] text-muted-foreground">إضافة</span>
+                </button>
+              )}
+            </div>
+            {extraImages.length > 0 && (
+              <p className="text-[11px] text-muted-foreground mt-1.5">{extraImages.length} / 10 صور</p>
+            )}
           </div>
 
           {totalPrice !== null && (
