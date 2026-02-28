@@ -10,10 +10,8 @@ export const initNativeApp = async () => {
   if (!isNative) return;
 
   try {
-    await StatusBar.setStyle({ style: Style.Light });
-    if (isIOS) {
-      await StatusBar.setOverlaysWebView({ overlay: true });
-    }
+    await StatusBar.setStyle({ style: Style.Dark });
+    await StatusBar.setOverlaysWebView({ overlay: true });
   } catch (e) {
     console.log('StatusBar not available');
   }
