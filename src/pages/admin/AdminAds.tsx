@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, X, Check, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, Search, Upload, Image as ImageIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { resolveImageUrl } from "@/data/imageMap";
 
@@ -37,7 +37,6 @@ const emptyForm = {
   lng: "",
   featured: false,
   active: true,
-  image_urls: "",
 };
 
 const AdminAds = () => {
@@ -49,6 +48,9 @@ const AdminAds = () => {
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [search, setSearch] = useState("");
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<{ id: string; url: string }[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   const fetchAds = useCallback(async () => {
     setLoading(true);
@@ -87,15 +89,52 @@ const AdminAds = () => {
       lng: String(ad.lng || ""),
       featured: ad.featured || false,
       active: ad.active !== false,
-      image_urls: ad.ad_images.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map(i => i.image_url).join(", "),
     });
+    setExistingImages(
+      ad.ad_images
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+        .map(i => ({ id: i.id, url: i.image_url }))
+    );
+    setImageFiles([]);
     setShowForm(true);
   };
 
   const openNew = () => {
     setEditId(null);
     setForm(emptyForm);
+    setImageFiles([]);
+    setExistingImages([]);
     setShowForm(true);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setImageFiles(prev => [...prev, ...Array.from(e.target.files!)]);
+    }
+  };
+
+  const removeNewImage = (index: number) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (id: string) => {
+    setExistingImages(prev => prev.filter(img => img.id !== id));
+  };
+
+  const uploadImages = async (adId: number): Promise<string[]> => {
+    const urls: string[] = [];
+    for (const file of imageFiles) {
+      const ext = file.name.split('.').pop();
+      const path = `${adId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from("ad-images").upload(path, file);
+      if (error) {
+        toast({ title: "خطأ في رفع الصورة", description: error.message, variant: "destructive" });
+        continue;
+      }
+      const { data: urlData } = supabase.storage.from("ad-images").getPublicUrl(path);
+      urls.push(urlData.publicUrl);
+    }
+    return urls;
   };
 
   const handleSave = async () => {
@@ -103,6 +142,8 @@ const AdminAds = () => {
       toast({ title: "خطأ", description: "يرجى تعبئة الحقول المطلوبة", variant: "destructive" });
       return;
     }
+
+    setUploading(true);
 
     const adData = {
       shop_name: form.shop_name.trim(),
@@ -122,24 +163,35 @@ const AdminAds = () => {
 
     if (editId) {
       const { error } = await supabase.from("ads").update(adData).eq("id", editId);
-      if (error) { toast({ title: "خطأ", description: error.message, variant: "destructive" }); return; }
+      if (error) { toast({ title: "خطأ", description: error.message, variant: "destructive" }); setUploading(false); return; }
     } else {
       const { data, error } = await supabase.from("ads").insert(adData).select("id").single();
-      if (error) { toast({ title: "خطأ", description: error.message, variant: "destructive" }); return; }
+      if (error) { toast({ title: "خطأ", description: error.message, variant: "destructive" }); setUploading(false); return; }
       adId = data.id;
     }
 
-    // Handle images
     if (adId) {
-      await supabase.from("ad_images").delete().eq("ad_id", adId);
-      const imageUrls = form.image_urls.split(",").map(s => s.trim()).filter(Boolean);
-      if (imageUrls.length > 0) {
+      // Delete removed existing images
+      if (editId) {
+        const keepIds = existingImages.map(i => i.id);
+        const originalAd = ads.find(a => a.id === editId);
+        const removedImages = originalAd?.ad_images.filter(i => !keepIds.includes(i.id)) || [];
+        for (const img of removedImages) {
+          await supabase.from("ad_images").delete().eq("id", img.id);
+        }
+      }
+
+      // Upload new images
+      const newUrls = await uploadImages(adId);
+      const startOrder = existingImages.length;
+      if (newUrls.length > 0) {
         await supabase.from("ad_images").insert(
-          imageUrls.map((url, i) => ({ ad_id: adId!, image_url: url, sort_order: i }))
+          newUrls.map((url, i) => ({ ad_id: adId!, image_url: url, sort_order: startOrder + i }))
         );
       }
     }
 
+    setUploading(false);
     toast({ title: "تم", description: editId ? "تم تحديث الإعلان" : "تم إضافة الإعلان" });
     setShowForm(false);
     fetchAds();
@@ -290,14 +342,63 @@ const AdminAds = () => {
                   <input value={form.lng} onChange={(e) => setForm(f => ({...f, lng: e.target.value}))} className="w-full h-10 px-3 rounded-xl bg-background text-foreground text-sm border border-border" dir="ltr" />
                 </div>
               </div>
+
+              {/* Image Upload Section */}
               <div>
-                <label className="block text-xs font-bold text-foreground mb-1">أسماء ملفات الصور (مفصولة بفواصل)</label>
-                <input value={form.image_urls} onChange={(e) => setForm(f => ({...f, image_urls: e.target.value}))} placeholder="ad-tech-1.jpg, ad-tech-2.jpg" className="w-full h-10 px-3 rounded-xl bg-background text-foreground text-sm border border-border" dir="ltr" />
+                <label className="block text-xs font-bold text-foreground mb-2">صور الإعلان</label>
+                
+                {/* Existing images */}
+                {existingImages.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {existingImages.map((img) => (
+                      <div key={img.id} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border group">
+                        <img src={resolveImageUrl(img.url)} alt="" className="w-full h-full object-cover" />
+                        <button
+                          onClick={() => removeExistingImage(img.id)}
+                          className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-4 h-4 text-white" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* New image previews */}
+                {imageFiles.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {imageFiles.map((file, i) => (
+                      <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-primary/30 group">
+                        <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
+                        <button
+                          onClick={() => removeNewImage(i)}
+                          className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-4 h-4 text-white" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Upload button */}
+                <label className="flex items-center justify-center gap-2 w-full h-20 rounded-xl border-2 border-dashed border-border hover:border-primary/50 bg-background cursor-pointer transition-colors">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <Upload className="w-5 h-5 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">اضغط لاختيار صور</span>
+                </label>
               </div>
+
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.featured} onChange={(e) => setForm(f => ({...f, featured: e.target.checked}))} className="w-4 h-4 rounded border-border text-primary" />
-                  <span className="text-sm text-foreground">إعلان مميز</span>
+                  <span className="text-sm text-foreground">إعلان مميز ⭐</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.active} onChange={(e) => setForm(f => ({...f, active: e.target.checked}))} className="w-4 h-4 rounded border-border text-primary" />
@@ -306,8 +407,13 @@ const AdminAds = () => {
               </div>
             </div>
             <div className="p-4 border-t border-border flex gap-2">
-              <button onClick={handleSave} className="flex-1 h-10 bg-primary text-primary-foreground rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-transform">
-                <Check className="w-4 h-4" /> حفظ
+              <button onClick={handleSave} disabled={uploading} className="flex-1 h-10 bg-primary text-primary-foreground rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-transform disabled:opacity-50">
+                {uploading ? (
+                  <span className="animate-spin w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full" />
+                ) : (
+                  <Check className="w-4 h-4" />
+                )}
+                {uploading ? "جاري الرفع..." : "حفظ"}
               </button>
               <button onClick={() => setShowForm(false)} className="h-10 px-4 bg-muted text-foreground rounded-xl text-sm font-bold active:scale-95 transition-transform">
                 إلغاء
