@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const TopBar = () => {
   const { city, setCity } = useCity();
-  const { data: cities = ["الرياض", "جدة", "مكة المكرمة", "المدينة المنورة", "الدمام", "الخبر", "أبها", "تبوك", "بريدة", "حائل"] } = useCities();
+  const { data: cities = [] } = useCities();
   const { data: sections = [] } = useAdsByCity(city);
   const [showCities, setShowCities] = useState(false);
   const [showSearch, setShowSearch] = useState(false);

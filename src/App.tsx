@@ -27,6 +27,7 @@ import AdminAds from "./pages/admin/AdminAds";
 import AdminCategories from "./pages/admin/AdminCategories";
 import AdminCities from "./pages/admin/AdminCities";
 import AdminStats from "./pages/admin/AdminStats";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +76,7 @@ const App = () => {
                   <Route path="categories" element={<AdminCategories />} />
                   <Route path="cities" element={<AdminCities />} />
                   <Route path="stats" element={<AdminStats />} />
+                  <Route path="settings" element={<AdminSettings />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />
