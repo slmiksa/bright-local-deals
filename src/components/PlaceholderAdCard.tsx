@@ -13,7 +13,7 @@ const PlaceholderAdCard = () => {
         وزد مبيعاتك
       </p>
       <button
-        onClick={() => navigate("/add-ad")}
+        onClick={() => navigate("/add")}
         className="touch-target w-full flex items-center justify-center gap-1.5 bg-primary text-primary-foreground rounded-xl py-2.5 text-[12px] font-bold active:scale-[0.97] transition-transform"
       >
         أضف إعلانك الآن
