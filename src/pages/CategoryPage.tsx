@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowRight, Smartphone, CupSoda, SprayCan, Lamp, ChefHat, PartyPopper } from "lucide-react";
 import AdCard from "@/components/AdCard";
-import { allAds, categoryMap } from "@/data/ads";
+import { useAdsByCategory, categoryMap } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
 import PullToRefresh from "@/components/PullToRefresh";
 
@@ -19,7 +19,7 @@ const CategoryPage = () => {
   const navigate = useNavigate();
   const { city } = useCity();
 
-  const ads = allAds.filter((ad) => ad.category === id && ad.city === city);
+  const { data: ads = [], isLoading } = useAdsByCategory(id || "", city);
   const title = categoryMap[id || ""] || "القسم";
   const Icon = categoryIcons[id || ""];
 
@@ -48,7 +48,7 @@ const CategoryPage = () => {
         ))}
       </div>
 
-      {ads.length === 0 && (
+      {!isLoading && ads.length === 0 && (
         <div className="text-center py-16">
           <p className="text-muted-foreground">لا توجد إعلانات في {city} لهذا القسم</p>
         </div>

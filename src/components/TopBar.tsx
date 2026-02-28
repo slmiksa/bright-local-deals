@@ -1,21 +1,25 @@
 import { Search, MapPin, ChevronDown, X } from "lucide-react";
 import { useCity } from "@/contexts/CityContext";
-import { cities, allAds } from "@/data/ads";
+import { useCities, useAdsByCity } from "@/hooks/useAds";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 const TopBar = () => {
   const { city, setCity } = useCity();
+  const { data: cities = ["الرياض", "جدة", "مكة المكرمة", "المدينة المنورة", "الدمام", "الخبر", "أبها", "تبوك", "بريدة", "حائل"] } = useCities();
+  const { data: sections = [] } = useAdsByCity(city);
   const [showCities, setShowCities] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
 
+  // Flatten all ads from sections for search
+  const allAdsInCity = useMemo(() => sections.flatMap(s => s.ads), [sections]);
+
   const results = useMemo(() => {
     if (!query.trim()) return [];
     const q = query.trim().toLowerCase();
-    return allAds
-      .filter((ad) => ad.city === city)
+    return allAdsInCity
       .filter(
         (ad) =>
           ad.shopName.toLowerCase().includes(q) ||
@@ -23,7 +27,7 @@ const TopBar = () => {
           ad.description.toLowerCase().includes(q)
       )
       .slice(0, 10);
-  }, [query, city]);
+  }, [query, allAdsInCity]);
 
   return (
     <>
@@ -45,7 +49,6 @@ const TopBar = () => {
             </div>
           </button>
 
-          {/* App Name Center */}
           <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center">
             <span className="text-lg font-black text-foreground leading-none">لمحة</span>
             <span className="text-[18px] leading-none mt-0.5">👓</span>
@@ -62,7 +65,6 @@ const TopBar = () => {
         </div>
       </header>
 
-      {/* Search Sheet */}
       {showSearch && (
         <div className="fixed inset-0 z-[100]" onClick={() => setShowSearch(false)}>
           <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" />
@@ -99,11 +101,7 @@ const TopBar = () => {
                         onClick={() => { setShowSearch(false); navigate(`/ad/${ad.id}`); }}
                         className="touch-target w-full flex items-center gap-3 p-3 rounded-xl active:bg-secondary transition-colors text-right"
                       >
-                        <img
-                          src={ad.images[0]}
-                          alt={ad.shopName}
-                          className="w-12 h-12 rounded-xl object-cover shrink-0"
-                        />
+                        <img src={ad.images[0]} alt={ad.shopName} className="w-12 h-12 rounded-xl object-cover shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-[14px] font-bold text-foreground truncate">{ad.shopName}</p>
                           <p className="text-[12px] text-muted-foreground truncate">{ad.offer}</p>
@@ -120,7 +118,6 @@ const TopBar = () => {
         </div>
       )}
 
-      {/* City Picker Sheet */}
       {showCities && (
         <div className="fixed inset-0 z-[100]" onClick={() => setShowCities(false)}>
           <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" />

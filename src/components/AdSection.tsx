@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import AdCard from "./AdCard";
 import { ChevronLeft, Smartphone, CupSoda, SprayCan, Lamp, ChefHat, PartyPopper } from "lucide-react";
-import { Ad } from "@/data/ads";
+import { Ad } from "@/hooks/useAds";
 
 const categoryIcons: Record<string, React.ElementType> = {
   electronics: Smartphone,

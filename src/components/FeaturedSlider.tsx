@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Eye, Sparkles, ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getFeaturedAds } from "@/data/ads";
+import { useFeaturedAds } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
 
 const FeaturedSlider = () => {
@@ -9,7 +9,7 @@ const FeaturedSlider = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
   const { city } = useCity();
-  const featured = getFeaturedAds(city);
+  const { data: featured = [] } = useFeaturedAds(city);
 
   const slides = featured.slice(0, 5).map((ad) => ({
     id: ad.id,
@@ -42,7 +42,6 @@ const FeaturedSlider = () => {
         <button
           onClick={() => navigate("/featured")}
           className="touch-target flex items-center gap-0.5 text-[13px] font-semibold text-primary active:opacity-70 transition-opacity">
-
           عرض الكل
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -54,37 +53,26 @@ const FeaturedSlider = () => {
         onScroll={handleScroll}
         className="flex gap-4 overflow-x-auto px-5 snap-x snap-mandatory hide-scrollbar"
         style={{ WebkitOverflowScrolling: "touch" }}>
-
-        {slides.map((slide, i) =>
-        <div
-          key={slide.id}
-          className="snap-center shrink-0 w-[88%] rounded-3xl overflow-hidden relative cursor-pointer group"
-          style={{ aspectRatio: "3/4" }}
-          onClick={() => navigate(`/ad/${slide.id}`)}>
-
-            {/* Image */}
+        {slides.map((slide) =>
+          <div
+            key={slide.id}
+            className="snap-center shrink-0 w-[88%] rounded-3xl overflow-hidden relative cursor-pointer group"
+            style={{ aspectRatio: "3/4" }}
+            onClick={() => navigate(`/ad/${slide.id}`)}>
             <img
-            src={slide.image}
-            alt={slide.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-active:scale-105"
-            loading="lazy" />
-
-
-            {/* Gold border glow */}
+              src={slide.image}
+              alt={slide.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-active:scale-105"
+              loading="lazy" />
             <div
-            className="absolute inset-0 rounded-3xl pointer-events-none"
-            style={{
-              boxShadow: "inset 0 0 0 2px hsl(40, 60%, 62%), 0 8px 40px -8px hsla(40, 60%, 40%, 0.35)"
-            }} />
-
-
-            {/* Premium badge */}
+              className="absolute inset-0 rounded-3xl pointer-events-none"
+              style={{
+                boxShadow: "inset 0 0 0 2px hsl(40, 60%, 62%), 0 8px 40px -8px hsla(40, 60%, 40%, 0.35)"
+              }} />
             <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(40,65%,42%)] text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-lg">
               <Sparkles className="w-3 h-3" />
               مميز
             </div>
-
-            {/* Bottom content */}
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent pt-24 pb-5 px-5">
               <span className="inline-block text-[11px] font-bold bg-white/20 backdrop-blur-md text-white px-3 py-1 rounded-lg mb-2.5">
                 {slide.subtitle}
@@ -104,21 +92,20 @@ const FeaturedSlider = () => {
 
       {/* Dots */}
       {slides.length > 1 &&
-      <div className="flex justify-center gap-1.5 mt-4">
+        <div className="flex justify-center gap-1.5 mt-4">
           {slides.map((_, i) =>
-        <div
-          key={i}
-          className={`h-2 rounded-full transition-all duration-300 ${
-          i === activeIndex ?
-          "w-6 bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(40,65%,42%)]" :
-          "w-2 bg-muted-foreground/20"}`
-          } />
-
-        )}
+            <div
+              key={i}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                i === activeIndex ?
+                "w-6 bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(40,65%,42%)]" :
+                "w-2 bg-muted-foreground/20"}`
+              } />
+          )}
         </div>
       }
-    </section>);
-
+    </section>
+  );
 };
 
 export default FeaturedSlider;
