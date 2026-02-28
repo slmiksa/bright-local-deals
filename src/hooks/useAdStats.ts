@@ -1,28 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AdStats {
   views: number;
   likes: number;
   liked: boolean;
-}
-
-const STATS_KEY = "lamha_ad_stats";
-const VIEWED_KEY = "lamha_ad_viewed";
-
-function getStoredStats(): Record<number, { views: number; likes: number }> {
-  try {
-    return JSON.parse(localStorage.getItem(STATS_KEY) || "{}");
-  } catch {
-    return {};
-  }
-}
-
-function getViewedAds(): number[] {
-  try {
-    return JSON.parse(localStorage.getItem(VIEWED_KEY) || "[]");
-  } catch {
-    return [];
-  }
 }
 
 function getLikedAds(): number[] {
@@ -33,63 +15,109 @@ function getLikedAds(): number[] {
   }
 }
 
-// Generate fake initial stats for demo
-function getInitialStats(id: number): { views: number; likes: number } {
-  const seed = id * 137 + 42;
-  return {
-    views: 120 + (seed % 400),
-    likes: 15 + (seed % 60),
-  };
+function getViewedAds(): number[] {
+  try {
+    return JSON.parse(localStorage.getItem("lamha_ad_viewed") || "[]");
+  } catch {
+    return [];
+  }
 }
 
-export function recordView(adId: number) {
+export async function recordView(adId: number) {
   const viewed = getViewedAds();
   if (viewed.includes(adId)) return;
-  
+
   viewed.push(adId);
-  localStorage.setItem(VIEWED_KEY, JSON.stringify(viewed));
-  
-  const stats = getStoredStats();
-  const initial = getInitialStats(adId);
-  const current = stats[adId] || initial;
-  stats[adId] = { ...current, views: current.views + 1 };
-  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  localStorage.setItem("lamha_ad_viewed", JSON.stringify(viewed));
+
+  // Upsert: increment views in DB
+  const { data: existing } = await supabase
+    .from("ad_stats")
+    .select("id, views")
+    .eq("ad_id", adId)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase
+      .from("ad_stats")
+      .update({ views: (existing.views || 0) + 1 })
+      .eq("id", existing.id);
+  } else {
+    await supabase
+      .from("ad_stats")
+      .insert({ ad_id: adId, views: 1, likes: 0 });
+  }
 }
 
 export function useAdStats(adId: number): AdStats & { toggleLike: () => void } {
-  const initial = getInitialStats(adId);
-  const stored = getStoredStats()[adId] || initial;
-  const liked = getLikedAds().includes(adId);
-
   const [stats, setStats] = useState<AdStats>({
-    views: stored.views,
-    likes: stored.likes,
-    liked,
+    views: 0,
+    likes: 0,
+    liked: getLikedAds().includes(adId),
   });
 
-  const toggleLike = useCallback(() => {
-    setStats((prev) => {
-      const newLiked = !prev.liked;
-      const newLikes = newLiked ? prev.likes + 1 : prev.likes - 1;
+  // Fetch real stats from DB
+  useEffect(() => {
+    if (!adId) return;
+    const fetchStats = async () => {
+      const { data } = await supabase
+        .from("ad_stats")
+        .select("views, likes")
+        .eq("ad_id", adId)
+        .maybeSingle();
 
-      // Persist
-      const allStats = getStoredStats();
-      const initial = getInitialStats(adId);
-      const current = allStats[adId] || initial;
-      allStats[adId] = { ...current, likes: newLikes };
-      localStorage.setItem(STATS_KEY, JSON.stringify(allStats));
-
-      const likedAds = getLikedAds();
-      if (newLiked) {
-        likedAds.push(adId);
-      } else {
-        const idx = likedAds.indexOf(adId);
-        if (idx > -1) likedAds.splice(idx, 1);
+      if (data) {
+        setStats(prev => ({
+          ...prev,
+          views: data.views || 0,
+          likes: data.likes || 0,
+        }));
       }
-      localStorage.setItem("lamha_liked", JSON.stringify(likedAds));
+    };
+    fetchStats();
+  }, [adId]);
 
-      return { views: prev.views, likes: newLikes, liked: newLiked };
-    });
+  const toggleLike = useCallback(async () => {
+    const likedAds = getLikedAds();
+    const currentlyLiked = likedAds.includes(adId);
+    const newLiked = !currentlyLiked;
+
+    // Update local state immediately
+    setStats(prev => ({
+      ...prev,
+      liked: newLiked,
+      likes: newLiked ? prev.likes + 1 : Math.max(0, prev.likes - 1),
+    }));
+
+    // Update localStorage
+    if (newLiked) {
+      likedAds.push(adId);
+    } else {
+      const idx = likedAds.indexOf(adId);
+      if (idx > -1) likedAds.splice(idx, 1);
+    }
+    localStorage.setItem("lamha_liked", JSON.stringify(likedAds));
+
+    // Update DB
+    const { data: existing } = await supabase
+      .from("ad_stats")
+      .select("id, likes")
+      .eq("ad_id", adId)
+      .maybeSingle();
+
+    if (existing) {
+      const newLikes = newLiked
+        ? (existing.likes || 0) + 1
+        : Math.max(0, (existing.likes || 0) - 1);
+      await supabase
+        .from("ad_stats")
+        .update({ likes: newLikes })
+        .eq("id", existing.id);
+    } else {
+      await supabase
+        .from("ad_stats")
+        .insert({ ad_id: adId, views: 0, likes: newLiked ? 1 : 0 });
+    }
   }, [adId]);
 
   return { ...stats, toggleLike };
