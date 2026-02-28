@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import AdCard from "./AdCard";
+import PlaceholderAdCard from "./PlaceholderAdCard";
 import { ChevronLeft, Smartphone, CupSoda, SprayCan, Lamp, ChefHat, PartyPopper } from "lucide-react";
 import { Ad } from "@/hooks/useAds";
 
@@ -50,6 +51,9 @@ const AdSection = ({ id, title, ads }: AdSectionProps) => {
             <AdCard {...ad} />
           </div>
         ))}
+        <div className="shrink-0 w-[44%]">
+          <PlaceholderAdCard />
+        </div>
         <div className="shrink-0 w-2" />
       </div>
     </section>

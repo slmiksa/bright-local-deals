@@ -110,19 +110,30 @@ async function fetchCities(): Promise<string[]> {
 export function useAdsByCity(city: string) {
   return useQuery({
     queryKey: ["ads", "byCity", city],
-    queryFn: () => fetchAds(city),
-    select: (ads): Section[] => {
+    queryFn: async () => {
+      const ads = await fetchAds(city);
+      // Fetch all categories to show sections even if empty
+      const { data: cats } = await supabase.from("categories").select("id, name").order("sort_order");
+      const categories = cats || [];
+      
       const grouped: Record<string, Ad[]> = {};
+      for (const cat of categories) {
+        grouped[cat.id] = [];
+      }
       for (const ad of ads) {
         if (!grouped[ad.category]) grouped[ad.category] = [];
         grouped[ad.category].push(ad);
       }
-      return Object.entries(grouped).map(([id, ads]) => ({
-        id,
-        title: categoryMap[id] || id,
-        ads,
+      
+      const sections: Section[] = categories.map(cat => ({
+        id: cat.id,
+        title: cat.name,
+        ads: grouped[cat.id] || [],
       }));
+      
+      return sections;
     },
+    enabled: !!city,
   });
 }
 

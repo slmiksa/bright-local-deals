@@ -23,6 +23,7 @@ import {
   BarChart3,
   LogOut,
   PanelLeft,
+  Settings,
 } from "lucide-react";
 
 const menuItems = [
@@ -31,6 +32,7 @@ const menuItems = [
   { title: "التصنيفات", url: "/admin/categories", icon: FolderOpen },
   { title: "المدن", url: "/admin/cities", icon: MapPin },
   { title: "الإحصائيات", url: "/admin/stats", icon: BarChart3 },
+  { title: "الإعدادات", url: "/admin/settings", icon: Settings },
 ];
 
 function AdminSidebar() {
