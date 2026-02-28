@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const TopBar = () => {
   const { city, setCity } = useCity();
-  const { data: cities = [] } = useCities();
+  const { data: cities = [], isLoading: citiesLoading } = useCities();
   const { data: sections = [] } = useAdsByCity(city);
   const [showCities, setShowCities] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -129,19 +129,27 @@ const TopBar = () => {
             <div className="px-5 py-4">
               <h2 className="text-[16px] font-bold text-foreground mb-4">اختر مدينتك</h2>
               <div className="space-y-1.5 max-h-[50vh] overflow-y-auto">
-                {cities.map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => { setCity(c); setShowCities(false); }}
-                    className={`touch-target w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                      c === city ? "bg-primary/10 text-primary font-bold" : "text-foreground active:bg-secondary"
-                    }`}
-                  >
-                    <MapPin className={`w-4 h-4 ${c === city ? "text-primary" : "text-muted-foreground"}`} />
-                    <span className="text-[14px]">{c}</span>
-                    {c === city && <span className="mr-auto text-[11px] text-primary">✓ محدد</span>}
-                  </button>
-                ))}
+                {citiesLoading ? (
+                  <div className="text-center py-8">
+                    <span className="animate-spin inline-block w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
+                  </div>
+                ) : cities.length === 0 ? (
+                  <p className="text-center text-muted-foreground text-[14px] py-8">لا توجد مدن مسجلة</p>
+                ) : (
+                  cities.map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => { setCity(c); setShowCities(false); }}
+                      className={`touch-target w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                        c === city ? "bg-primary/10 text-primary font-bold" : "text-foreground active:bg-secondary"
+                      }`}
+                    >
+                      <MapPin className={`w-4 h-4 ${c === city ? "text-primary" : "text-muted-foreground"}`} />
+                      <span className="text-[14px]">{c}</span>
+                      {c === city && <span className="mr-auto text-[11px] text-primary">✓ محدد</span>}
+                    </button>
+                  ))
+                )}
               </div>
             </div>
             <div className="safe-bottom" />
