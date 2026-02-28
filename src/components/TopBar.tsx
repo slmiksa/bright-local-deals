@@ -27,8 +27,9 @@ const TopBar = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-        <div className="px-5 py-3.5 flex items-center justify-between">
+      <header className="sticky top-0 z-50 bg-primary backdrop-blur-md border-b border-border">
+        <div style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }} className="bg-primary" />
+        <div className="px-5 py-3.5 flex items-center justify-between bg-card">
           <button
             onClick={() => setShowCities(true)}
             className="flex items-center gap-2.5 active:opacity-70 transition-opacity">

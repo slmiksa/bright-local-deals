@@ -143,4 +143,8 @@ body.keyboard-open nav.fixed.bottom-0 {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
+  /* Status bar area background */
+  header.sticky {
+    padding-top: 0;
+  }
 }

@@ -13,6 +13,7 @@ const config: CapacitorConfig = {
     preferredContentMode: 'mobile',
     backgroundColor: '#f2efe9',
     scheme: 'lamha',
+    allowsLinkPreview: false,
   },
   plugins: {
     SplashScreen: {
@@ -22,8 +23,9 @@ const config: CapacitorConfig = {
       showSpinner: false,
     },
     StatusBar: {
-      style: 'LIGHT',
-      backgroundColor: '#ffffff',
+      style: 'DARK',
+      backgroundColor: '#2b8a68',
+      overlaysWebView: true,
     },
     Keyboard: {
       resize: 'body',
