@@ -10,7 +10,7 @@ const AdminCountdown = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const { data } = await supabase.from("app_settings").select("launch_date").eq("id", "default").single();
+      const { data } = await supabase.from("app_settings" as any).select("launch_date").eq("id", "default").single() as { data: { launch_date: string } | null };
       if (data?.launch_date) {
         const d = new Date(data.launch_date);
         setLaunchDate(d.toISOString().slice(0, 16));
@@ -27,7 +27,7 @@ const AdminCountdown = () => {
     }
     setSaving(true);
     const { error } = await supabase
-      .from("app_settings")
+      .from("app_settings" as any)
       .update({ launch_date: new Date(launchDate).toISOString(), updated_at: new Date().toISOString() })
       .eq("id", "default");
     if (error) {

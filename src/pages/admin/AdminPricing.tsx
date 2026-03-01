@@ -21,7 +21,7 @@ const AdminPricing = () => {
 
   const fetchPricing = async () => {
     const { data, error } = await supabase
-      .from("ad_pricing")
+      .from("ad_pricing" as any)
       .select("*")
       .order("sort_order");
     if (error) {
@@ -54,14 +54,14 @@ const AdminPricing = () => {
     };
 
     if (editingId) {
-      const { error } = await supabase.from("ad_pricing").update(payload).eq("id", editingId);
+      const { error } = await supabase.from("ad_pricing" as any).update(payload).eq("id", editingId);
       if (error) {
         toast({ title: "خطأ", description: error.message, variant: "destructive" });
         return;
       }
       toast({ title: "تم", description: "تم تحديث الباقة" });
     } else {
-      const { error } = await supabase.from("ad_pricing").insert(payload);
+      const { error } = await supabase.from("ad_pricing" as any).insert(payload);
       if (error) {
         toast({ title: "خطأ", description: error.message, variant: "destructive" });
         return;
@@ -86,7 +86,7 @@ const AdminPricing = () => {
 
   const handleDelete = async (id: string) => {
     if (!confirm("هل أنت متأكد من حذف هذه الباقة؟")) return;
-    const { error } = await supabase.from("ad_pricing").delete().eq("id", id);
+    const { error } = await supabase.from("ad_pricing" as any).delete().eq("id", id);
     if (error) {
       toast({ title: "خطأ", description: error.message, variant: "destructive" });
     } else {

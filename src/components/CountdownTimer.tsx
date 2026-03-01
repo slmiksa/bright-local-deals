@@ -8,10 +8,10 @@ const CountdownTimer = () => {
     queryKey: ["app_settings", "launch_date"],
     queryFn: async () => {
       const { data } = await supabase
-        .from("app_settings")
+        .from("app_settings" as any)
         .select("launch_date")
         .eq("id", "default")
-        .single();
+        .single() as { data: { launch_date: string } | null };
       return data?.launch_date ? new Date(data.launch_date).getTime() : null;
     },
     staleTime: 1000 * 60 * 5,
