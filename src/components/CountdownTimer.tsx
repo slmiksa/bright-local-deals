@@ -1,27 +1,41 @@
 import { useState, useEffect } from "react";
 import { Rocket } from "lucide-react";
-
-const LAUNCH_DATE = new Date();
-LAUNCH_DATE.setMonth(LAUNCH_DATE.getMonth() + 1);
-const LAUNCH_TIMESTAMP = LAUNCH_DATE.getTime();
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const CountdownTimer = () => {
-  const [timeLeft, setTimeLeft] = useState(getTimeLeft());
+  const { data: launchDate } = useQuery({
+    queryKey: ["app_settings", "launch_date"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("app_settings")
+        .select("launch_date")
+        .eq("id", "default")
+        .single();
+      return data?.launch_date ? new Date(data.launch_date).getTime() : null;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
 
-  function getTimeLeft() {
-    const diff = Math.max(0, LAUNCH_TIMESTAMP - Date.now());
-    return {
-      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((diff / (1000 * 60)) % 60),
-      seconds: Math.floor((diff / 1000) % 60),
-    };
-  }
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const timer = setInterval(() => setTimeLeft(getTimeLeft()), 1000);
+    if (!launchDate) return;
+    const calc = () => {
+      const diff = Math.max(0, launchDate - Date.now());
+      return {
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      };
+    };
+    setTimeLeft(calc());
+    const timer = setInterval(() => setTimeLeft(calc()), 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [launchDate]);
+
+  if (!launchDate || launchDate <= Date.now()) return null;
 
   const units = [
     { label: "ثانية", value: timeLeft.seconds },

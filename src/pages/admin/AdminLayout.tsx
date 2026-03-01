@@ -24,6 +24,8 @@ import {
   LogOut,
   PanelLeft,
   Settings,
+  DollarSign,
+  Timer,
 } from "lucide-react";
 
 const menuItems = [
@@ -31,6 +33,8 @@ const menuItems = [
   { title: "الإعلانات", url: "/admin/ads", icon: Megaphone },
   { title: "التصنيفات", url: "/admin/categories", icon: FolderOpen },
   { title: "المدن", url: "/admin/cities", icon: MapPin },
+  { title: "الأسعار", url: "/admin/pricing", icon: DollarSign },
+  { title: "العد التنازلي", url: "/admin/countdown", icon: Timer },
   { title: "الإحصائيات", url: "/admin/stats", icon: BarChart3 },
   { title: "الإعدادات", url: "/admin/settings", icon: Settings },
 ];

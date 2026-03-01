@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CityProvider } from "@/contexts/CityContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import SplashScreen from "./components/SplashScreen";
-import OnboardingTour from "./components/OnboardingTour";
 import Index from "./pages/Index";
 import AdDetail from "./pages/AdDetail";
 import CategoriesPage from "./pages/CategoriesPage";
@@ -28,6 +27,8 @@ import AdminCategories from "./pages/admin/AdminCategories";
 import AdminCities from "./pages/admin/AdminCities";
 import AdminStats from "./pages/admin/AdminStats";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminPricing from "./pages/admin/AdminPricing";
+import AdminCountdown from "./pages/admin/AdminCountdown";
 
 const queryClient = new QueryClient();
 
@@ -37,15 +38,7 @@ const App = () => {
     sessionStorage.setItem("lamha_opened", "1");
     return true;
   });
-  const [showTour, setShowTour] = useState(() => {
-    if (localStorage.getItem("lamha_tour_done")) return false;
-    return true;
-  });
   const handleSplashFinish = useCallback(() => setShowSplash(false), []);
-  const handleTourFinish = useCallback(() => {
-    setShowTour(false);
-    localStorage.setItem("lamha_tour_done", "1");
-  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -55,7 +48,6 @@ const App = () => {
             <Toaster />
             <Sonner />
             {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
-            {!showSplash && showTour && <OnboardingTour onFinish={handleTourFinish} />}
             <BrowserRouter>
               <ScrollToTop />
               <Routes>
@@ -75,6 +67,8 @@ const App = () => {
                   <Route path="ads" element={<AdminAds />} />
                   <Route path="categories" element={<AdminCategories />} />
                   <Route path="cities" element={<AdminCities />} />
+                  <Route path="pricing" element={<AdminPricing />} />
+                  <Route path="countdown" element={<AdminCountdown />} />
                   <Route path="stats" element={<AdminStats />} />
                   <Route path="settings" element={<AdminSettings />} />
                 </Route>

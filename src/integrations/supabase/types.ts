@@ -46,6 +46,36 @@ export type Database = {
           },
         ]
       }
+      ad_pricing: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_days: number
+          id: string
+          name: string
+          price: number
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_days?: number
+          id?: string
+          name: string
+          price?: number
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_days?: number
+          id?: string
+          name?: string
+          price?: number
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       ad_stats: {
         Row: {
           ad_id: number
@@ -139,6 +169,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      app_settings: {
+        Row: {
+          id: string
+          launch_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          launch_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          launch_date?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       categories: {
         Row: {
