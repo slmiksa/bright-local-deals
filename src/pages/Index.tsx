@@ -13,7 +13,7 @@ const Index = () => {
   const { data: sections = [], isLoading } = useAdsByCity(city);
 
   return (
-    <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto relative">
+    <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto relative" key={city}>
       <TopBar />
       <CountdownTimer />
       <FeaturedSlider />
