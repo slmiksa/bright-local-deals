@@ -35,7 +35,7 @@ const EventsSlider = () => {
           <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
             <PartyPopper className="w-4 h-4 text-primary-foreground" />
           </div>
-          <h2 className="text-base font-bold text-foreground">اعلانات محال الزينة والأفراح</h2>
+          <h2 className="text-base font-bold text-foreground">اعلانات دعوات الزواج     </h2>
         </div>
         <button
           onClick={() => navigate("/category/events")}
@@ -50,11 +50,11 @@ const EventsSlider = () => {
         className="flex gap-3 overflow-x-auto px-5 snap-x snap-mandatory hide-scrollbar"
         style={{ WebkitOverflowScrolling: "touch" }}>
         {events.map((ad) =>
-          <div
-            key={ad.id}
-            className="snap-center shrink-0 w-[45%] rounded-2xl overflow-hidden relative cursor-pointer active:scale-[0.97] transition-transform"
-            style={{ aspectRatio: "9/16" }}
-            onClick={() => {setExpandedAd(ad);setExpandedImageIndex(0);}}>
+        <div
+          key={ad.id}
+          className="snap-center shrink-0 w-[45%] rounded-2xl overflow-hidden relative cursor-pointer active:scale-[0.97] transition-transform"
+          style={{ aspectRatio: "9/16" }}
+          onClick={() => {setExpandedAd(ad);setExpandedImageIndex(0);}}>
             <img src={ad.images[0]} alt={ad.shopName} className="w-full h-full object-cover" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute bottom-0 right-0 left-0 p-3">
@@ -68,14 +68,14 @@ const EventsSlider = () => {
         <div className="shrink-0 w-2" />
       </div>
       {events.length > 1 &&
-        <div className="flex justify-center gap-1.5 mt-3">
+      <div className="flex justify-center gap-1.5 mt-3">
           {events.map((_, i) =>
-            <div
-              key={i}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === activeIndex ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/25"}`
-              } />
-          )}
+        <div
+          key={i}
+          className={`h-1.5 rounded-full transition-all duration-300 ${
+          i === activeIndex ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/25"}`
+          } />
+        )}
         </div>
       }
 
@@ -106,23 +106,23 @@ const EventsSlider = () => {
             <div className="rounded-2xl overflow-hidden relative" style={{ aspectRatio: "9/16" }}>
               <img src={expandedAd.images[expandedImageIndex]} alt={expandedAd.shopName} className="w-full h-full object-cover" />
               {expandedAd.images.length > 1 &&
-                <>
+              <>
                   <button
-                    onClick={() => setExpandedImageIndex((i) => i > 0 ? i - 1 : expandedAd.images.length - 1)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center">
+                  onClick={() => setExpandedImageIndex((i) => i > 0 ? i - 1 : expandedAd.images.length - 1)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center">
                     <ChevronRight className="w-4 h-4 text-white" />
                   </button>
                   <button
-                    onClick={() => setExpandedImageIndex((i) => i < expandedAd.images.length - 1 ? i + 1 : 0)}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center">
+                  onClick={() => setExpandedImageIndex((i) => i < expandedAd.images.length - 1 ? i + 1 : 0)}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center">
                     <ChevronLeft className="w-4 h-4 text-white" />
                   </button>
                   <div className="absolute top-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                     {expandedAd.images.map((_, i) =>
-                      <div
-                        key={i}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${i === expandedImageIndex ? "w-5 bg-white" : "w-1.5 bg-white/40"}`} />
-                    )}
+                  <div
+                    key={i}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${i === expandedImageIndex ? "w-5 bg-white" : "w-1.5 bg-white/40"}`} />
+                  )}
                   </div>
                 </>
               }
@@ -144,8 +144,8 @@ const EventsSlider = () => {
         </div>,
         document.body
       )}
-    </section>
-  );
+    </section>);
+
 };
 
 export default EventsSlider;
