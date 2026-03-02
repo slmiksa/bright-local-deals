@@ -3,14 +3,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, X, Check, DollarSign } from "lucide-react";
 
-interface PricingItem {
+type PricingItem = {
   id: string;
   name: string;
   description: string | null;
   price: number;
   duration_days: number;
   sort_order: number | null;
-}
+};
+
+const arabicDigits = "٠١٢٣٤٥٦٧٨٩";
+
+const normalizeNumberInput = (value: string) =>
+  value
+    .replace(/[٠-٩]/g, (digit) => String(arabicDigits.indexOf(digit)))
+    .replace(/٫/g, ".")
+    .replace(/٬/g, "")
+    .trim();
+
+const parseNumericInput = (value: string) => {
+  const parsed = Number(normalizeNumberInput(value));
+  return Number.isFinite(parsed) ? parsed : NaN;
+};
 
 const AdminPricing = () => {
   const [items, setItems] = useState<PricingItem[]>([]);
@@ -20,19 +34,24 @@ const AdminPricing = () => {
   const [form, setForm] = useState({ name: "", description: "", price: "", duration_days: "30", sort_order: "0" });
 
   const fetchPricing = async () => {
+    setLoading(true);
     const { data, error } = await supabase
-      .from("ad_pricing" as any)
-      .select("*")
-      .order("sort_order");
+      .from("ad_pricing")
+      .select("id, name, description, price, duration_days, sort_order")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
+
     if (error) {
       toast({ title: "خطأ", description: error.message, variant: "destructive" });
     } else {
-      setItems((data as any[]) || []);
+      setItems(data || []);
     }
     setLoading(false);
   };
 
-  useEffect(() => { fetchPricing(); }, []);
+  useEffect(() => {
+    fetchPricing();
+  }, []);
 
   const resetForm = () => {
     setForm({ name: "", description: "", price: "", duration_days: "30", sort_order: "0" });
@@ -41,35 +60,41 @@ const AdminPricing = () => {
   };
 
   const handleSave = async () => {
-    if (!form.name.trim() || !form.price) {
-      toast({ title: "خطأ", description: "يرجى تعبئة الاسم والسعر", variant: "destructive" });
+    const price = parseNumericInput(form.price);
+    const durationDays = Math.max(1, Math.floor(parseNumericInput(form.duration_days) || 30));
+    const sortOrder = Math.floor(parseNumericInput(form.sort_order) || 0);
+
+    if (!form.name.trim() || !Number.isFinite(price) || price <= 0) {
+      toast({ title: "خطأ", description: "يرجى إدخال اسم الباقة وسعر صحيح", variant: "destructive" });
       return;
     }
+
     const payload = {
       name: form.name.trim(),
       description: form.description.trim() || null,
-      price: parseFloat(form.price),
-      duration_days: parseInt(form.duration_days) || 30,
-      sort_order: parseInt(form.sort_order) || 0,
+      price,
+      duration_days: durationDays,
+      sort_order: sortOrder,
     };
 
     if (editingId) {
-      const { error } = await supabase.from("ad_pricing" as any).update(payload).eq("id", editingId);
+      const { error } = await supabase.from("ad_pricing").update(payload).eq("id", editingId);
       if (error) {
         toast({ title: "خطأ", description: error.message, variant: "destructive" });
         return;
       }
       toast({ title: "تم", description: "تم تحديث الباقة" });
     } else {
-      const { error } = await supabase.from("ad_pricing" as any).insert(payload);
+      const { error } = await supabase.from("ad_pricing").insert(payload);
       if (error) {
         toast({ title: "خطأ", description: error.message, variant: "destructive" });
         return;
       }
       toast({ title: "تم", description: "تمت إضافة الباقة" });
     }
+
     resetForm();
-    fetchPricing();
+    await fetchPricing();
   };
 
   const handleEdit = (item: PricingItem) => {
@@ -86,13 +111,13 @@ const AdminPricing = () => {
 
   const handleDelete = async (id: string) => {
     if (!confirm("هل أنت متأكد من حذف هذه الباقة؟")) return;
-    const { error } = await supabase.from("ad_pricing" as any).delete().eq("id", id);
+    const { error } = await supabase.from("ad_pricing").delete().eq("id", id);
     if (error) {
       toast({ title: "خطأ", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "تم", description: "تم حذف الباقة" });
-      fetchPricing();
+      return;
     }
+    toast({ title: "تم", description: "تم حذف الباقة" });
+    await fetchPricing();
   };
 
   const inputClass = "w-full h-10 px-3 rounded-xl bg-background text-foreground text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30";
@@ -105,7 +130,10 @@ const AdminPricing = () => {
         </h1>
         {!showAdd && (
           <button
-            onClick={() => { resetForm(); setShowAdd(true); }}
+            onClick={() => {
+              resetForm();
+              setShowAdd(true);
+            }}
             className="h-9 px-4 bg-primary text-primary-foreground rounded-xl text-sm font-bold flex items-center gap-1.5 active:scale-95 transition-transform"
           >
             <Plus className="w-4 h-4" /> إضافة باقة
@@ -115,23 +143,21 @@ const AdminPricing = () => {
 
       {showAdd && (
         <div className="bg-card border border-border rounded-2xl p-5 mb-6 space-y-3">
-          <h2 className="text-sm font-bold text-foreground mb-2">
-            {editingId ? "تعديل الباقة" : "إضافة باقة جديدة"}
-          </h2>
-          <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="اسم الباقة" className={inputClass} />
-          <input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="وصف الباقة (اختياري)" className={inputClass} />
+          <h2 className="text-sm font-bold text-foreground mb-2">{editingId ? "تعديل الباقة" : "إضافة باقة جديدة"}</h2>
+          <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="اسم الباقة" className={inputClass} />
+          <input value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="وصف الباقة (اختياري)" className={inputClass} />
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">السعر (ريال)</label>
-              <input type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="0" className={inputClass} dir="ltr" />
+              <input type="text" inputMode="decimal" value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: normalizeNumberInput(e.target.value) }))} placeholder="0" className={inputClass} dir="ltr" />
             </div>
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">المدة (أيام)</label>
-              <input type="number" value={form.duration_days} onChange={e => setForm(f => ({ ...f, duration_days: e.target.value }))} placeholder="30" className={inputClass} dir="ltr" />
+              <input type="text" inputMode="numeric" value={form.duration_days} onChange={(e) => setForm((f) => ({ ...f, duration_days: normalizeNumberInput(e.target.value) }))} placeholder="30" className={inputClass} dir="ltr" />
             </div>
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">الترتيب</label>
-              <input type="number" value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: e.target.value }))} placeholder="0" className={inputClass} dir="ltr" />
+              <input type="text" inputMode="numeric" value={form.sort_order} onChange={(e) => setForm((f) => ({ ...f, sort_order: normalizeNumberInput(e.target.value) }))} placeholder="0" className={inputClass} dir="ltr" />
             </div>
           </div>
           <div className="flex gap-2 pt-2">
@@ -153,7 +179,7 @@ const AdminPricing = () => {
         <div className="text-center py-16 text-muted-foreground text-sm">لا توجد باقات أسعار حالياً</div>
       ) : (
         <div className="space-y-3">
-          {items.map(item => (
+          {items.map((item) => (
             <div key={item.id} className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between">
               <div className="flex-1">
                 <h3 className="font-bold text-foreground text-sm">{item.name}</h3>

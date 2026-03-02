@@ -70,7 +70,13 @@
     @apply bg-background text-foreground antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100dvh;
     overscroll-behavior-y: none;
+  }
+
+  #root {
+    min-height: 100dvh;
+    width: 100%;
   }
 }
 
@@ -131,15 +137,9 @@ body.keyboard-open nav.fixed.bottom-0 {
   display: none;
 }
 
-/* iOS-specific styles */
+/* iOS viewport handling */
 @supports (-webkit-touch-callout: none) {
-  html, body {
-    height: 100%;
-    overflow: hidden;
-  }
-  #root {
-    height: 100%;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+  html, body, #root {
+    min-height: -webkit-fill-available;
   }
 }
