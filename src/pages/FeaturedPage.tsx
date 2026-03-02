@@ -10,7 +10,7 @@ const FeaturedPage = () => {
 
   return (
     <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
-      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
+      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
         <div className="px-5 py-3.5 flex items-center gap-2">
           <Star className="w-5 h-5 text-gold" />
           <h1 className="text-lg font-bold text-foreground">الإعلانات المميزة</h1>
