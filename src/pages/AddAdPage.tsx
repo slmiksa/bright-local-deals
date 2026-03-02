@@ -3,40 +3,50 @@ import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlu
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { useCities } from "@/hooks/useAds";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-const pricingPlans = [
-  {
-    icon: Store,
-    title: "المتاجر",
-    price: 300,
-    period: "أسبوع",
-    color: "from-primary/20 to-primary/5",
-    border: "border-primary/30",
-  },
-  {
-    icon: PartyPopper,
-    title: "أفراح ومناسبات",
-    price: 250,
-    period: "أسبوع",
-    color: "from-accent/20 to-accent/5",
-    border: "border-accent/30",
-  },
-  {
-    icon: ChefHat,
-    title: "أسر منتجة",
-    price: 100,
-    period: "أسبوع",
-    color: "from-secondary/40 to-secondary/10",
-    border: "border-border",
-  },
-];
+type PricingPlan = {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  duration_days: number;
+  sort_order: number | null;
+};
 
 const FEATURED_EXTRA = 50;
-const adTypes = ["متجر", "أفراح ومناسبات", "أسر منتجة"];
+
+const getPlanIcon = (name: string) => {
+  if (name.includes("أفراح") || name.includes("مناسبات") || name.includes("زينة")) return PartyPopper;
+  if (name.includes("أسر") || name.includes("مطاعم") || name.includes("كافيه")) return ChefHat;
+  return Store;
+};
+
+const cardStyles = [
+  { color: "from-primary/20 to-primary/5", border: "border-primary/30" },
+  { color: "from-accent/20 to-accent/5", border: "border-accent/30" },
+  { color: "from-secondary/40 to-secondary/10", border: "border-border" },
+];
 
 const AddAdPage = () => {
   const navigate = useNavigate();
   const { data: cities = [] } = useCities();
+  const { data: pricingPlans = [], isLoading: pricingLoading } = useQuery({
+    queryKey: ["ad-pricing"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("ad_pricing")
+        .select("id, name, description, price, duration_days, sort_order")
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+      return (data || []) as PricingPlan[];
+    },
+  });
+
+  const adTypes = useMemo(() => pricingPlans.map((plan) => plan.name), [pricingPlans]);
   const [adType, setAdType] = useState("");
   const [storeName, setStoreName] = useState("");
   const [location, setLocation] = useState("");
@@ -47,12 +57,15 @@ const AddAdPage = () => {
   const mainInputRef = useRef<HTMLInputElement>(null);
   const extraInputRef = useRef<HTMLInputElement>(null);
 
+  const selectedPlan = useMemo(
+    () => pricingPlans.find((plan) => plan.name === adType) || null,
+    [pricingPlans, adType]
+  );
+
   const totalPrice = useMemo(() => {
-    const plan = pricingPlans.find((p) => p.title === adType || (adType === "متجر" && p.title === "المتاجر"));
-    if (!plan) return null;
-    const base = plan.price;
-    return adTier === "متميز" ? base + FEATURED_EXTRA : base;
-  }, [adType, adTier]);
+    if (!selectedPlan) return null;
+    return adTier === "متميز" ? selectedPlan.price + FEATURED_EXTRA : selectedPlan.price;
+  }, [selectedPlan, adTier]);
 
   const handleMainImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -64,10 +77,12 @@ const AddAdPage = () => {
   const handleExtraImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-    const newImages = Array.from(files).slice(0, 10 - extraImages.length).map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-    }));
+    const newImages = Array.from(files)
+      .slice(0, 10 - extraImages.length)
+      .map((file) => ({
+        file,
+        preview: URL.createObjectURL(file),
+      }));
     setExtraImages((prev) => [...prev, ...newImages]);
   };
 
@@ -83,10 +98,17 @@ const AddAdPage = () => {
       toast({ title: "تنبيه", description: "يرجى تعبئة جميع الحقول", variant: "destructive" });
       return;
     }
+
+    if (!selectedPlan) {
+      toast({ title: "تنبيه", description: "يرجى اختيار باقة أسعار متاحة", variant: "destructive" });
+      return;
+    }
+
     if (!mainImage) {
       toast({ title: "تنبيه", description: "يرجى اختيار الصورة الأساسية", variant: "destructive" });
       return;
     }
+
     const imagesCount = 1 + extraImages.length;
     const message = `طلب إعلان جديد:\nنوع الإعلان: ${adType}\nالفئة: ${adTier}\nاسم المتجر: ${storeName}\nالعنوان: ${location}\nالسعر: ${totalPrice} ريال\nعدد الصور: ${imagesCount} (الصورة الأساسية + ${extraImages.length} صور إضافية)\n\nيرجى إرسال الصور بعد هذه الرسالة`;
     const whatsappUrl = `https://wa.me/966500000000?text=${encodeURIComponent(message)}`;
@@ -105,42 +127,63 @@ const AddAdPage = () => {
       </div>
 
       <div className="px-5 pt-6 space-y-6">
-        {/* Pricing Cards */}
         <div>
           <h2 className="text-[15px] font-bold text-foreground mb-3">أسعار الإعلانات</h2>
-          <div className="space-y-3">
-            {pricingPlans.map((plan) => (
-              <div key={plan.title} className={`relative p-4 rounded-2xl bg-gradient-to-l ${plan.color} border ${plan.border}`}>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-card flex items-center justify-center shadow-sm">
-                    <plan.icon className="w-6 h-6 text-primary" />
+          {pricingLoading ? (
+            <div className="bg-card border border-border rounded-2xl p-6 flex justify-center">
+              <span className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
+            </div>
+          ) : pricingPlans.length === 0 ? (
+            <div className="bg-card border border-border rounded-2xl p-4 text-center text-[13px] text-muted-foreground">
+              لا توجد باقات أسعار حالياً، الرجاء إضافتها من لوحة التحكم.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {pricingPlans.map((plan, index) => {
+                const Icon = getPlanIcon(plan.name);
+                const style = cardStyles[index % cardStyles.length];
+                return (
+                  <div key={plan.id} className={`relative p-4 rounded-2xl bg-gradient-to-l ${style.color} border ${style.border}`}>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-card flex items-center justify-center shadow-sm">
+                        <Icon className="w-6 h-6 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[14px] font-bold text-foreground">{plan.name}</p>
+                        {plan.description && <p className="text-[11px] text-muted-foreground mt-1">{plan.description}</p>}
+                      </div>
+                      <div className="text-left">
+                        <span className="text-xl font-black text-primary">{plan.price}</span>
+                        <span className="text-[12px] text-muted-foreground mr-1">ريال / {plan.duration_days} يوم</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-2.5 mr-16">
+                      <Sparkles className="w-3.5 h-3.5 text-[hsl(var(--gold))]" />
+                      <span className="text-[11px] font-semibold text-muted-foreground">الإعلان المتميز: +{FEATURED_EXTRA} ريال</span>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-[14px] font-bold text-foreground">{plan.title}</p>
-                  </div>
-                  <div className="text-left">
-                    <span className="text-xl font-black text-primary">{plan.price}</span>
-                    <span className="text-[12px] text-muted-foreground mr-1">ريال / {plan.period}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 mt-2.5 mr-16">
-                  <Sparkles className="w-3.5 h-3.5 text-[hsl(var(--gold))]" />
-                  <span className="text-[11px] font-semibold text-muted-foreground">الإعلان المتميز: +{FEATURED_EXTRA} ريال</span>
-                </div>
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {/* Form */}
         <div className="space-y-4 pt-2">
           <h2 className="text-[15px] font-bold text-foreground">طلب إعلان</h2>
 
           <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">نوع الإعلان</label>
-            <select value={adType} onChange={(e) => setAdType(e.target.value)} className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring appearance-none">
+            <select
+              value={adType}
+              onChange={(e) => setAdType(e.target.value)}
+              className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring appearance-none"
+            >
               <option value="">اختر نوع الإعلان</option>
-              {adTypes.map((type) => <option key={type} value={type}>{type}</option>)}
+              {adTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -172,11 +215,14 @@ const AddAdPage = () => {
             <label className="block text-[13px] font-bold text-foreground mb-1.5">المدينة</label>
             <select value={location} onChange={(e) => setLocation(e.target.value)} className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring appearance-none">
               <option value="">اختر المدينة</option>
-              {cities.map((c) => <option key={c} value={c}>{c}</option>)}
+              {cities.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
             </select>
           </div>
 
-          {/* Main Image Upload */}
           <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">
               الصورة الأساسية <span className="text-[11px] text-muted-foreground font-normal">(تظهر كغلاف للإعلان)</span>
@@ -187,14 +233,15 @@ const AddAdPage = () => {
                 <img src={mainImage.preview} alt="الصورة الأساسية" className="w-full h-full object-cover" />
                 <button
                   type="button"
-                  onClick={() => { URL.revokeObjectURL(mainImage.preview); setMainImage(null); }}
+                  onClick={() => {
+                    URL.revokeObjectURL(mainImage.preview);
+                    setMainImage(null);
+                  }}
                   className="absolute top-2 left-2 w-7 h-7 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform"
                 >
                   <X className="w-4 h-4 text-primary-foreground" />
                 </button>
-                <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-lg">
-                  صورة الغلاف
-                </div>
+                <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-lg">صورة الغلاف</div>
               </div>
             ) : (
               <button
@@ -209,7 +256,6 @@ const AddAdPage = () => {
             )}
           </div>
 
-          {/* Extra Images Upload */}
           <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">
               صور إضافية <span className="text-[11px] text-muted-foreground font-normal">(تظهر داخل تفاصيل الإعلان)</span>
@@ -239,21 +285,21 @@ const AddAdPage = () => {
                 </button>
               )}
             </div>
-            {extraImages.length > 0 && (
-              <p className="text-[11px] text-muted-foreground mt-1.5">{extraImages.length} / 10 صور</p>
-            )}
+            {extraImages.length > 0 && <p className="text-[11px] text-muted-foreground mt-1.5">{extraImages.length} / 10 صور</p>}
           </div>
 
-          {totalPrice !== null && (
+          {totalPrice !== null && selectedPlan && (
             <div className="bg-card rounded-2xl border border-border p-4 space-y-2">
               <h3 className="text-[13px] font-bold text-foreground">ملخص السعر</h3>
               <div className="flex justify-between text-[13px]">
                 <span className="text-muted-foreground">سعر الباقة</span>
-                <span className="font-bold text-foreground">{pricingPlans.find((p) => p.title === adType || (adType === "متجر" && p.title === "المتاجر"))?.price} ريال</span>
+                <span className="font-bold text-foreground">{selectedPlan.price} ريال</span>
               </div>
               {adTier === "متميز" && (
                 <div className="flex justify-between text-[13px]">
-                  <span className="text-muted-foreground flex items-center gap-1"><Sparkles className="w-3 h-3 text-[hsl(var(--gold))]" /> إعلان متميز</span>
+                  <span className="text-muted-foreground flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-[hsl(var(--gold))]" /> إعلان متميز
+                  </span>
                   <span className="font-bold text-[hsl(var(--gold))]">+{FEATURED_EXTRA} ريال</span>
                 </div>
               )}
