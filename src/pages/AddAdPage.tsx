@@ -95,7 +95,7 @@ const AddAdPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
-      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
+      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
         <div className="px-5 py-3.5 flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="touch-target">
             <ArrowRight className="w-5 h-5 text-foreground" />

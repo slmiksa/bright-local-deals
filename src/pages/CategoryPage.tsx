@@ -35,7 +35,7 @@ const CategoryPage = () => {
 
   return (
     <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
-      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
+      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
         <div className="px-4 py-3 flex items-center gap-3">
           <button
             onClick={() => navigate(-1)}

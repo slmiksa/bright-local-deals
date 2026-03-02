@@ -54,7 +54,7 @@ const AdDetail = () => {
   return (
     <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
+      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
         <div className="px-4 py-3 flex items-center justify-between">
           <button onClick={() => navigate(-1)} className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors">
             <ArrowRight className="w-5 h-5 text-foreground" />
