@@ -133,7 +133,6 @@ body.keyboard-open nav.fixed.bottom-0 {
 
 /* iOS-specific styles */
 @supports (-webkit-touch-callout: none) {
-  /* Prevent rubber-band scrolling on iOS */
   html, body {
     height: 100%;
     overflow: hidden;
@@ -142,9 +141,5 @@ body.keyboard-open nav.fixed.bottom-0 {
     height: 100%;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-  }
-  /* Status bar area background */
-  header.sticky {
-    padding-top: 0;
   }
 }
