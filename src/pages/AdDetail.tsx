@@ -63,16 +63,14 @@ const AdDetail = () => {
           <button
             onClick={async () => {
               const url = `${window.location.origin}/ad/${ad.id}`;
-              const shareData = {
-                title: `تطبيق لمحة للتسويق - ${ad.shopName}`,
-                text: `${ad.offer}\n📍 ${ad.address || ad.city}\n\nشاهد التفاصيل على تطبيق لمحة 👓`,
-                url
-              };
               try {
                 if (navigator.share) {
-                  await navigator.share(shareData);
+                  await navigator.share({
+                    title: ad.shopName,
+                    url
+                  });
                 } else {
-                  await navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${url}`);
+                  await navigator.clipboard.writeText(url);
                   toast({ title: "تم النسخ", description: "تم نسخ رابط الإعلان" });
                 }
               } catch {}
