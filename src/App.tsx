@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CityProvider } from "@/contexts/CityContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import SplashScreen from "./components/SplashScreen";
 import Index from "./pages/Index";
 import AdDetail from "./pages/AdDetail";
@@ -32,7 +33,15 @@ import AdminPricing from "./pages/admin/AdminPricing";
 import AdminCountdown from "./pages/admin/AdminCountdown";
 import AdminTerms from "./pages/admin/AdminTerms";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
+      staleTime: 1000 * 60 * 5,
+    },
+  },
+});
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(() => {
@@ -43,9 +52,10 @@ const App = () => {
   const handleSplashFinish = useCallback(() => setShowSplash(false), []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AuthProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <AuthProvider>
           <CityProvider>
             <Toaster />
             <Sonner />
@@ -82,9 +92,10 @@ const App = () => {
               <BottomTabBar />
             </BrowserRouter>
           </CityProvider>
-        </AuthProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+          </AuthProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
