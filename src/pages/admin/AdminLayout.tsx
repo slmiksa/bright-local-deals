@@ -26,6 +26,7 @@ import {
   Settings,
   DollarSign,
   Timer,
+  FileText,
 } from "lucide-react";
 
 const menuItems = [
@@ -35,6 +36,7 @@ const menuItems = [
   { title: "المدن", url: "/admin/cities", icon: MapPin },
   { title: "الأسعار", url: "/admin/pricing", icon: DollarSign },
   { title: "العد التنازلي", url: "/admin/countdown", icon: Timer },
+  { title: "الشروط والسياسات", url: "/admin/terms", icon: FileText },
   { title: "الإحصائيات", url: "/admin/stats", icon: BarChart3 },
   { title: "الإعدادات", url: "/admin/settings", icon: Settings },
 ];

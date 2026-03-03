@@ -14,6 +14,7 @@ import CategoryPage from "./pages/CategoryPage";
 import FeaturedPage from "./pages/FeaturedPage";
 import AddAdPage from "./pages/AddAdPage";
 import SupportPage from "./pages/SupportPage";
+import TermsPage from "./pages/TermsPage";
 import NotFound from "./pages/NotFound";
 import BottomTabBar from "./components/BottomTabBar";
 import ScrollToTop from "./components/ScrollToTop";
@@ -29,6 +30,7 @@ import AdminStats from "./pages/admin/AdminStats";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminPricing from "./pages/admin/AdminPricing";
 import AdminCountdown from "./pages/admin/AdminCountdown";
+import AdminTerms from "./pages/admin/AdminTerms";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +61,7 @@ const App = () => {
                 <Route path="/featured" element={<FeaturedPage />} />
                 <Route path="/add" element={<AddAdPage />} />
                 <Route path="/support" element={<SupportPage />} />
+                <Route path="/terms" element={<TermsPage />} />
 
                 {/* Admin routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
@@ -71,6 +74,7 @@ const App = () => {
                   <Route path="countdown" element={<AdminCountdown />} />
                   <Route path="stats" element={<AdminStats />} />
                   <Route path="settings" element={<AdminSettings />} />
+                  <Route path="terms" element={<AdminTerms />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />

@@ -172,16 +172,22 @@ export type Database = {
       }
       app_settings: {
         Row: {
+          featured_surcharge: number
+          featured_surcharge_enabled: boolean
           id: string
           launch_date: string | null
           updated_at: string
         }
         Insert: {
+          featured_surcharge?: number
+          featured_surcharge_enabled?: boolean
           id?: string
           launch_date?: string | null
           updated_at?: string
         }
         Update: {
+          featured_surcharge?: number
+          featured_surcharge_enabled?: boolean
           id?: string
           launch_date?: string | null
           updated_at?: string
@@ -230,6 +236,24 @@ export type Database = {
           id?: string
           name?: string
           sort_order?: number | null
+        }
+        Relationships: []
+      }
+      terms_policies: {
+        Row: {
+          content: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          id?: string
+          updated_at?: string
         }
         Relationships: []
       }

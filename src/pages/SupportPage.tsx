@@ -1,4 +1,4 @@
-import { Headphones, MessageCircle, Phone, Mail, ArrowRight } from "lucide-react";
+import { Headphones, MessageCircle, Phone, Mail, ArrowRight, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const contactOptions = [
@@ -65,6 +65,19 @@ const SupportPage = () => {
             </button>
           ))}
         </div>
+
+        <button
+          onClick={() => navigate("/terms")}
+          className="w-full flex items-center gap-4 p-4 bg-card rounded-2xl border border-border active:scale-[0.98] transition-transform"
+        >
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-purple-500/10 text-purple-600">
+            <FileText className="w-6 h-6" />
+          </div>
+          <div className="text-right flex-1">
+            <p className="text-[14px] font-bold text-foreground">الشروط والسياسات</p>
+            <p className="text-[12px] text-muted-foreground">اطلع على شروط وسياسات الاستخدام</p>
+          </div>
+        </button>
 
         <p className="text-center text-muted-foreground text-[11px] pt-4">
           أوقات العمل: من السبت إلى الخميس ٩ ص - ٩ م
