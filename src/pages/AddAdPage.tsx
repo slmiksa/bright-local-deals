@@ -15,7 +15,10 @@ type PricingPlan = {
   sort_order: number | null;
 };
 
-const FEATURED_EXTRA = 50;
+type SurchargeSettings = {
+  featured_surcharge: number;
+  featured_surcharge_enabled: boolean;
+};
 
 const getPlanIcon = (name: string) => {
   if (name.includes("أفراح") || name.includes("مناسبات") || name.includes("زينة")) return PartyPopper;
@@ -40,11 +43,26 @@ const AddAdPage = () => {
         .select("id, name, description, price, duration_days, sort_order")
         .order("sort_order", { ascending: true })
         .order("created_at", { ascending: true });
-
       if (error) throw error;
       return (data || []) as PricingPlan[];
     },
   });
+
+  const { data: surchargeSettings } = useQuery({
+    queryKey: ["featured-surcharge"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("featured_surcharge, featured_surcharge_enabled")
+        .eq("id", "default")
+        .single();
+      if (error) throw error;
+      return data as SurchargeSettings;
+    },
+  });
+
+  const featuredExtra = surchargeSettings?.featured_surcharge ?? 50;
+  const featuredEnabled = surchargeSettings?.featured_surcharge_enabled ?? true;
 
   const adTypes = useMemo(() => pricingPlans.map((plan) => plan.name), [pricingPlans]);
   const [adType, setAdType] = useState("");
@@ -64,8 +82,8 @@ const AddAdPage = () => {
 
   const totalPrice = useMemo(() => {
     if (!selectedPlan) return null;
-    return adTier === "متميز" ? selectedPlan.price + FEATURED_EXTRA : selectedPlan.price;
-  }, [selectedPlan, adTier]);
+    return adTier === "متميز" && featuredEnabled ? selectedPlan.price + featuredExtra : selectedPlan.price;
+  }, [selectedPlan, adTier, featuredExtra, featuredEnabled]);
 
   const handleMainImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -157,10 +175,12 @@ const AddAdPage = () => {
                         <span className="text-[12px] text-muted-foreground mr-1">ريال / {plan.duration_days} يوم</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 mt-2.5 mr-16">
-                      <Sparkles className="w-3.5 h-3.5 text-[hsl(var(--gold))]" />
-                      <span className="text-[11px] font-semibold text-muted-foreground">الإعلان المتميز: +{FEATURED_EXTRA} ريال</span>
-                    </div>
+                    {featuredEnabled && (
+                      <div className="flex items-center gap-1.5 mt-2.5 mr-16">
+                        <Sparkles className="w-3.5 h-3.5 text-[hsl(var(--gold))]" />
+                        <span className="text-[11px] font-semibold text-muted-foreground">الإعلان المتميز: +{featuredExtra} ريال</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -187,24 +207,26 @@ const AddAdPage = () => {
             </select>
           </div>
 
-          <div>
-            <label className="block text-[13px] font-bold text-foreground mb-2">فئة الإعلان</label>
-            <div className="grid grid-cols-2 gap-3">
-              <button type="button" onClick={() => setAdTier("عادي")} className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${adTier === "عادي" ? "border-primary bg-primary/5" : "border-border bg-card"}`}>
-                <Star className={`w-5 h-5 ${adTier === "عادي" ? "text-primary" : "text-muted-foreground"}`} />
-                <span className={`text-[14px] font-bold ${adTier === "عادي" ? "text-primary" : "text-foreground"}`}>عادي</span>
-              </button>
-              <button type="button" onClick={() => setAdTier("متميز")} className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${adTier === "متميز" ? "border-[hsl(var(--gold))] bg-[hsl(var(--gold))]/10" : "border-border bg-card"}`}>
-                <Sparkles className={`w-5 h-5 ${adTier === "متميز" ? "text-[hsl(var(--gold))]" : "text-muted-foreground"}`} />
-                <span className={`text-[14px] font-bold ${adTier === "متميز" ? "text-[hsl(var(--gold))]" : "text-foreground"}`}>متميز</span>
-              </button>
+          {featuredEnabled && (
+            <div>
+              <label className="block text-[13px] font-bold text-foreground mb-2">فئة الإعلان</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button type="button" onClick={() => setAdTier("عادي")} className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${adTier === "عادي" ? "border-primary bg-primary/5" : "border-border bg-card"}`}>
+                  <Star className={`w-5 h-5 ${adTier === "عادي" ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className={`text-[14px] font-bold ${adTier === "عادي" ? "text-primary" : "text-foreground"}`}>عادي</span>
+                </button>
+                <button type="button" onClick={() => setAdTier("متميز")} className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${adTier === "متميز" ? "border-[hsl(var(--gold))] bg-[hsl(var(--gold))]/10" : "border-border bg-card"}`}>
+                  <Sparkles className={`w-5 h-5 ${adTier === "متميز" ? "text-[hsl(var(--gold))]" : "text-muted-foreground"}`} />
+                  <span className={`text-[14px] font-bold ${adTier === "متميز" ? "text-[hsl(var(--gold))]" : "text-foreground"}`}>متميز</span>
+                </button>
+              </div>
+              {adTier === "متميز" && (
+                <p className="text-[11px] text-[hsl(var(--gold))] font-semibold mt-2 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" /> الإعلان المتميز يظهر في أعلى التطبيق بالصورة الكبيرة
+                </p>
+              )}
             </div>
-            {adTier === "متميز" && (
-              <p className="text-[11px] text-[hsl(var(--gold))] font-semibold mt-2 flex items-center gap-1">
-                <Sparkles className="w-3 h-3" /> الإعلان المتميز يظهر في أعلى التطبيق بالصورة الكبيرة
-              </p>
-            )}
-          </div>
+          )}
 
           <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">اسم المتجر / النشاط</label>
@@ -295,12 +317,12 @@ const AddAdPage = () => {
                 <span className="text-muted-foreground">سعر الباقة</span>
                 <span className="font-bold text-foreground">{selectedPlan.price} ريال</span>
               </div>
-              {adTier === "متميز" && (
+              {adTier === "متميز" && featuredEnabled && (
                 <div className="flex justify-between text-[13px]">
                   <span className="text-muted-foreground flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-[hsl(var(--gold))]" /> إعلان متميز
                   </span>
-                  <span className="font-bold text-[hsl(var(--gold))]">+{FEATURED_EXTRA} ريال</span>
+                  <span className="font-bold text-[hsl(var(--gold))]">+{featuredExtra} ريال</span>
                 </div>
               )}
               <div className="border-t border-border pt-2 flex justify-between text-[14px]">

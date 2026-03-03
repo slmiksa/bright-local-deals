@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, X, Check, DollarSign } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, DollarSign, Sparkles } from "lucide-react";
 
 type PricingItem = {
   id: string;
@@ -33,6 +33,11 @@ const AdminPricing = () => {
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ name: "", description: "", price: "", duration_days: "30", sort_order: "0" });
 
+  // Featured surcharge settings
+  const [surcharge, setSurcharge] = useState("50");
+  const [surchargeEnabled, setSurchargeEnabled] = useState(true);
+  const [surchargeLoading, setSurchargeLoading] = useState(true);
+
   const fetchPricing = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -49,8 +54,40 @@ const AdminPricing = () => {
     setLoading(false);
   };
 
+  const fetchSurcharge = async () => {
+    setSurchargeLoading(true);
+    const { data } = await supabase
+      .from("app_settings")
+      .select("featured_surcharge, featured_surcharge_enabled")
+      .eq("id", "default")
+      .single();
+    if (data) {
+      setSurcharge(String(data.featured_surcharge));
+      setSurchargeEnabled(data.featured_surcharge_enabled);
+    }
+    setSurchargeLoading(false);
+  };
+
+  const saveSurcharge = async () => {
+    const val = parseNumericInput(surcharge);
+    if (!Number.isFinite(val) || val < 0) {
+      toast({ title: "خطأ", description: "أدخل مبلغ صحيح", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase
+      .from("app_settings")
+      .update({ featured_surcharge: val, featured_surcharge_enabled: surchargeEnabled })
+      .eq("id", "default");
+    if (error) {
+      toast({ title: "خطأ", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "تم", description: "تم تحديث إعدادات الإعلان المتميز" });
+    }
+  };
+
   useEffect(() => {
     fetchPricing();
+    fetchSurcharge();
   }, []);
 
   const resetForm = () => {
@@ -168,6 +205,47 @@ const AdminPricing = () => {
               <X className="w-4 h-4" /> إلغاء
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Featured surcharge settings */}
+      {!surchargeLoading && (
+        <div className="bg-card border border-border rounded-2xl p-5 mb-6">
+          <h2 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[hsl(var(--gold))]" /> إعدادات الإعلان المتميز
+          </h2>
+          <div className="flex items-center gap-3 mb-3">
+            <label className="text-xs text-muted-foreground">تفعيل</label>
+            <button
+              onClick={() => setSurchargeEnabled((v) => !v)}
+              className={`w-10 h-6 rounded-full transition-colors relative ${surchargeEnabled ? "bg-primary" : "bg-muted"}`}
+            >
+              <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${surchargeEnabled ? "right-0.5" : "right-[18px]"}`} />
+            </button>
+          </div>
+          {surchargeEnabled && (
+            <div className="flex items-end gap-3">
+              <div className="flex-1">
+                <label className="text-xs text-muted-foreground mb-1 block">المبلغ الإضافي (ريال)</label>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={surcharge}
+                  onChange={(e) => setSurcharge(normalizeNumberInput(e.target.value))}
+                  className={inputClass}
+                  dir="ltr"
+                />
+              </div>
+              <button onClick={saveSurcharge} className="h-10 px-4 bg-primary text-primary-foreground rounded-xl text-sm font-bold active:scale-95 transition-transform">
+                حفظ
+              </button>
+            </div>
+          )}
+          {!surchargeEnabled && (
+            <button onClick={saveSurcharge} className="h-9 px-4 bg-primary text-primary-foreground rounded-xl text-sm font-bold active:scale-95 transition-transform">
+              حفظ
+            </button>
+          )}
         </div>
       )}
 
