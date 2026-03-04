@@ -74,6 +74,8 @@ const AddAdPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
 
+  const [wantsEmail, setWantsEmail] = useState(false);
+  const [email, setEmail] = useState("");
   const [mainImage, setMainImage] = useState<{ file: File; preview: string } | null>(null);
   const [extraImages, setExtraImages] = useState<{ file: File; preview: string }[]>([]);
   const mainInputRef = useRef<HTMLInputElement>(null);
