@@ -185,6 +185,23 @@ const AddAdPage = () => {
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, "_blank");
 
+      // 4. Send email notifications
+      try {
+        await supabase.functions.invoke("send-ad-notification", {
+          body: {
+            orderNumber: request.order_number,
+            adType,
+            adTier,
+            storeName,
+            city: location,
+            totalPrice,
+            customerEmail: wantsEmail ? email : null,
+          },
+        });
+      } catch (emailErr) {
+        console.error("Email notification error:", emailErr);
+      }
+
     } catch (err: any) {
       console.error(err);
       toast({ title: "خطأ", description: "حدث خطأ أثناء إرسال الطلب، حاول مرة أخرى", variant: "destructive" });
