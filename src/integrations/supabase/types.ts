@@ -190,6 +190,7 @@ export type Database = {
           city: string
           created_at: string
           description: string | null
+          end_date: string | null
           featured: boolean | null
           id: number
           lat: number | null
@@ -197,6 +198,7 @@ export type Database = {
           offer: string
           phone: string | null
           shop_name: string
+          start_date: string | null
           updated_at: string
         }
         Insert: {
@@ -206,6 +208,7 @@ export type Database = {
           city: string
           created_at?: string
           description?: string | null
+          end_date?: string | null
           featured?: boolean | null
           id?: number
           lat?: number | null
@@ -213,6 +216,7 @@ export type Database = {
           offer: string
           phone?: string | null
           shop_name: string
+          start_date?: string | null
           updated_at?: string
         }
         Update: {
@@ -222,6 +226,7 @@ export type Database = {
           city?: string
           created_at?: string
           description?: string | null
+          end_date?: string | null
           featured?: boolean | null
           id?: number
           lat?: number | null
@@ -229,6 +234,7 @@ export type Database = {
           offer?: string
           phone?: string | null
           shop_name?: string
+          start_date?: string | null
           updated_at?: string
         }
         Relationships: [
