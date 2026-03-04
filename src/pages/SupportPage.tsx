@@ -68,7 +68,7 @@ const SupportPage = () => {
         </div>
 
         <button
-          onClick={() => navigate("/terms")}
+          onClick={() => navigate("/privacy")}
           className="w-full flex items-center gap-4 p-4 bg-card rounded-2xl border border-border active:scale-[0.98] transition-transform"
         >
           <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-purple-500/10 text-purple-600">
