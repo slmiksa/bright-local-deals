@@ -34,6 +34,8 @@ import AdminCountdown from "./pages/admin/AdminCountdown";
 import AdminTerms from "./pages/admin/AdminTerms";
 import AdminRequests from "./pages/admin/AdminRequests";
 import AdminRequestDetail from "./pages/admin/AdminRequestDetail";
+import AdminPopupAds from "./pages/admin/AdminPopupAds";
+import PopupAd from "./components/PopupAd";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -64,6 +66,7 @@ const App = () => {
             {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
             <BrowserRouter>
               <ScrollToTop />
+              <PopupAd />
               <Routes>
                 {/* Public routes */}
                 <Route path="/" element={<Index />} />
@@ -89,6 +92,7 @@ const App = () => {
                   <Route path="stats" element={<AdminStats />} />
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="privacy" element={<AdminTerms />} />
+                  <Route path="popup-ads" element={<AdminPopupAds />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />
