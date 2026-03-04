@@ -1,5 +1,6 @@
-import { Headphones, MessageCircle, Phone, Mail, ArrowRight, FileText } from "lucide-react";
+import { Headphones, MessageCircle, Phone, Mail, ArrowRight, FileText, HelpCircle, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const contactOptions = [
   {
