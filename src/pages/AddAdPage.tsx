@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from "react";
-import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera, Loader2, CheckCircle } from "lucide-react";
+import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera, Loader2, CheckCircle, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { useCities } from "@/hooks/useAds";
@@ -130,6 +130,10 @@ const AddAdPage = () => {
     }
     if (!selectedPlan) {
       toast({ title: "تنبيه", description: "يرجى اختيار باقة أسعار متاحة", variant: "destructive" });
+      return;
+    }
+    if (wantsEmail && !email) {
+      toast({ title: "تنبيه", description: "يرجى إدخال البريد الإلكتروني", variant: "destructive" });
       return;
     }
     if (!mainImage) {
