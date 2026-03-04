@@ -1,8 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, X, Check, Search, Upload, Image as ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, Search, Upload, Image as ImageIcon, CalendarIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { resolveImageUrl } from "@/data/imageMap";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface DbAd {
   id: number;
