@@ -18,7 +18,27 @@ const AdDetail = () => {
   const { views, likes, liked, toggleLike } = useAdStats(adId);
 
   useEffect(() => {
-    if (ad) recordView(ad.id);
+    if (ad) {
+      recordView(ad.id);
+      // Update OG meta tags dynamically for link previews
+      document.title = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`;
+      const setMeta = (property: string, content: string) => {
+        let el = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
+        if (!el) {
+          el = document.createElement("meta");
+          el.setAttribute("property", property);
+          document.head.appendChild(el);
+        }
+        el.content = content;
+      };
+      setMeta("og:title", `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`);
+      setMeta("og:description", `${ad.shopName} | ${ad.city} - ${ad.description || ad.offer}`);
+      setMeta("og:url", `${window.location.origin}/ad/${ad.id}`);
+      if (ad.images?.[0]) setMeta("og:image", ad.images[0]);
+    }
+    return () => {
+      document.title = "تطبيق لمحة للتسويق";
+    };
   }, [ad]);
 
   if (isLoading) {
