@@ -1,8 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, X, Check, Search, Upload, Image as ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, Search, Upload, Image as ImageIcon, CalendarIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { resolveImageUrl } from "@/data/imageMap";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface DbAd {
   id: number;
@@ -17,6 +21,8 @@ interface DbAd {
   lng: number | null;
   featured: boolean | null;
   active: boolean | null;
+  start_date: string | null;
+  end_date: string | null;
   ad_images: { id: string; image_url: string; sort_order: number | null }[];
 }
 
@@ -37,6 +43,8 @@ const emptyForm = {
   lng: "",
   featured: false,
   active: true,
+  start_date: null as Date | null,
+  end_date: null as Date | null,
 };
 
 const AdminAds = () => {
@@ -89,6 +97,8 @@ const AdminAds = () => {
       lng: String(ad.lng || ""),
       featured: ad.featured || false,
       active: ad.active !== false,
+      start_date: ad.start_date ? new Date(ad.start_date) : null,
+      end_date: ad.end_date ? new Date(ad.end_date) : null,
     });
     setExistingImages(
       ad.ad_images
@@ -157,6 +167,8 @@ const AdminAds = () => {
       lng: form.lng ? parseFloat(form.lng) : null,
       featured: form.featured,
       active: form.active,
+      start_date: form.start_date ? form.start_date.toISOString() : new Date().toISOString(),
+      end_date: form.end_date ? form.end_date.toISOString() : null,
     };
 
     let adId = editId;
@@ -264,6 +276,11 @@ const AdminAds = () => {
                         {ad.active !== false ? "نشط" : "معطل"}
                       </span>
                       {ad.featured && <span className="mr-1 px-2 py-0.5 rounded-full text-xs font-bold bg-[hsl(var(--gold))]/10 text-[hsl(var(--gold))]">مميز</span>}
+                      {ad.end_date && (
+                        <span className={`mr-1 px-2 py-0.5 rounded-full text-xs font-bold ${new Date(ad.end_date) < new Date() ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground"}`}>
+                          {new Date(ad.end_date) < new Date() ? "منتهي" : `حتى ${format(new Date(ad.end_date), "MM/dd")}`}
+                        </span>
+                      )}
                     </td>
                     <td className="p-3">
                       <div className="flex items-center gap-1">
@@ -393,6 +410,38 @@ const AdminAds = () => {
                   <Upload className="w-5 h-5 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">اضغط لاختيار صور</span>
                 </label>
+              </div>
+
+              {/* Date Range */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">تاريخ البداية</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className={cn("w-full h-10 px-3 rounded-xl bg-background text-sm border border-border flex items-center gap-2 text-right", !form.start_date && "text-muted-foreground")}>
+                        <CalendarIcon className="w-4 h-4 shrink-0" />
+                        {form.start_date ? format(form.start_date, "yyyy/MM/dd") : "اختر تاريخ"}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={form.start_date || undefined} onSelect={(d) => setForm(f => ({ ...f, start_date: d || null }))} initialFocus className={cn("p-3 pointer-events-auto")} />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">تاريخ الانتهاء</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className={cn("w-full h-10 px-3 rounded-xl bg-background text-sm border border-border flex items-center gap-2 text-right", !form.end_date && "text-muted-foreground")}>
+                        <CalendarIcon className="w-4 h-4 shrink-0" />
+                        {form.end_date ? format(form.end_date, "yyyy/MM/dd") : "بدون انتهاء"}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={form.end_date || undefined} onSelect={(d) => setForm(f => ({ ...f, end_date: d || null }))} initialFocus className={cn("p-3 pointer-events-auto")} />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
 
               <div className="flex items-center gap-4">
