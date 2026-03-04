@@ -75,8 +75,8 @@ const SupportPage = () => {
             <FileText className="w-6 h-6" />
           </div>
           <div className="text-right flex-1">
-            <p className="text-[14px] font-bold text-foreground">الشروط والسياسات</p>
-            <p className="text-[12px] text-muted-foreground">اطلع على شروط وسياسات الاستخدام</p>
+            <p className="text-[14px] font-bold text-foreground">سياسة الخصوصية</p>
+            <p className="text-[12px] text-muted-foreground">اطلع على سياسة الخصوصية</p>
           </div>
         </button>
 
