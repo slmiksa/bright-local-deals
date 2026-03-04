@@ -31,7 +31,7 @@ const AdminTerms = () => {
     if (error) {
       toast({ title: "خطأ", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "تم", description: "تم حفظ الشروط والسياسات" });
+      toast({ title: "تم", description: "تم حفظ سياسة الخصوصية" });
     }
     setSaving(false);
   };
@@ -48,7 +48,7 @@ const AdminTerms = () => {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-black text-foreground flex items-center gap-2">
-          <FileText className="w-5 h-5" /> الشروط والسياسات
+          <FileText className="w-5 h-5" /> سياسة الخصوصية
         </h1>
         <button
           onClick={handleSave}
@@ -61,7 +61,7 @@ const AdminTerms = () => {
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="اكتب الشروط والسياسات هنا..."
+        placeholder="اكتب سياسة الخصوصية هنا..."
         className="w-full min-h-[400px] p-4 rounded-2xl bg-card text-foreground text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 resize-y leading-7"
         dir="rtl"
       />

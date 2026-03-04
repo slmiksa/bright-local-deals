@@ -28,7 +28,7 @@ const TermsPage = () => {
           <button onClick={() => navigate(-1)} className="touch-target">
             <ArrowRight className="w-5 h-5 text-foreground" />
           </button>
-          <h1 className="text-lg font-bold text-foreground">الشروط والسياسات</h1>
+          <h1 className="text-lg font-bold text-foreground">سياسة الخصوصية</h1>
         </div>
       </div>
 
@@ -44,7 +44,7 @@ const TermsPage = () => {
         ) : (
           <div className="flex flex-col items-center text-center gap-3 py-16">
             <FileText className="w-10 h-10 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">لا توجد شروط وسياسات حالياً</p>
+            <p className="text-sm text-muted-foreground">لا توجد سياسة خصوصية حالياً</p>
           </div>
         )}
       </div>
