@@ -70,11 +70,16 @@ function mapDbAdToAd(dbAd: DbAd): Ad {
 }
 
 async function fetchAds(city?: string, category?: string, featured?: boolean): Promise<Ad[]> {
+  const now = new Date().toISOString();
   let query = supabase
     .from("ads")
     .select("*, ad_images(image_url, sort_order)")
     .eq("active", true)
+    .lte("start_date", now)
     .order("created_at", { ascending: false });
+
+  // Filter out expired ads: end_date is null (no expiry) or in the future
+  query = query.or(`end_date.is.null,end_date.gte.${now}`);
 
   if (city) query = query.eq("city", city);
   if (category) query = query.eq("category", category);

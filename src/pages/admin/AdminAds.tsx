@@ -276,6 +276,11 @@ const AdminAds = () => {
                         {ad.active !== false ? "نشط" : "معطل"}
                       </span>
                       {ad.featured && <span className="mr-1 px-2 py-0.5 rounded-full text-xs font-bold bg-[hsl(var(--gold))]/10 text-[hsl(var(--gold))]">مميز</span>}
+                      {ad.end_date && (
+                        <span className={`mr-1 px-2 py-0.5 rounded-full text-xs font-bold ${new Date(ad.end_date) < new Date() ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground"}`}>
+                          {new Date(ad.end_date) < new Date() ? "منتهي" : `حتى ${format(new Date(ad.end_date), "MM/dd")}`}
+                        </span>
+                      )}
                     </td>
                     <td className="p-3">
                       <div className="flex items-center gap-1">
