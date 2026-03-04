@@ -73,7 +73,7 @@ const App = () => {
                 <Route path="/featured" element={<FeaturedPage />} />
                 <Route path="/add" element={<AddAdPage />} />
                 <Route path="/support" element={<SupportPage />} />
-                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/privacy" element={<TermsPage />} />
 
                 {/* Admin routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
@@ -88,7 +88,7 @@ const App = () => {
                   <Route path="countdown" element={<AdminCountdown />} />
                   <Route path="stats" element={<AdminStats />} />
                   <Route path="settings" element={<AdminSettings />} />
-                  <Route path="terms" element={<AdminTerms />} />
+                  <Route path="privacy" element={<AdminTerms />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />
