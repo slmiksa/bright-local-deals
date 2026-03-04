@@ -57,7 +57,7 @@ serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "لمحة للتسويق <onboarding@resend.dev>",
+        from: "لمحة للتسويق <info@lamha.trndsky.com>",
         to: [adminEmail],
         subject: `طلب إعلان جديد #${orderNumber} - ${storeName}`,
         html: adminHtml,
@@ -104,7 +104,7 @@ serve(async (req) => {
         method: "POST",
         headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          from: "لمحة للتسويق <onboarding@resend.dev>",
+          from: "لمحة للتسويق <info@lamha.trndsky.com>",
           to: [customerEmail],
           subject: `تأكيد طلب إعلانك #${orderNumber} - لمحة للتسويق`,
           html: customerHtml,
