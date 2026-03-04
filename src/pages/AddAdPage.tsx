@@ -397,7 +397,35 @@ const AddAdPage = () => {
             {extraImages.length > 0 && <p className="text-[11px] text-muted-foreground mt-1.5">{extraImages.length} / 10 صور</p>}
           </div>
 
-          {/* Price summary */}
+          {/* Email notification */}
+          <div className="bg-card rounded-2xl border border-border p-4 space-y-3">
+            <button
+              type="button"
+              onClick={() => setWantsEmail(!wantsEmail)}
+              className="flex items-center gap-3 w-full"
+            >
+              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${wantsEmail ? "bg-primary border-primary" : "border-muted-foreground/40"}`}>
+                {wantsEmail && <span className="text-primary-foreground text-[11px] font-bold">✓</span>}
+              </div>
+              <div className="flex items-center gap-2 flex-1">
+                <Mail className={`w-4 h-4 ${wantsEmail ? "text-primary" : "text-muted-foreground"}`} />
+                <span className={`text-[13px] font-bold ${wantsEmail ? "text-foreground" : "text-muted-foreground"}`}>
+                  أريد إشعاري عبر الإيميل عند قبول إعلاني
+                </span>
+              </div>
+            </button>
+            {wantsEmail && (
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@email.com"
+                dir="ltr"
+                className="w-full bg-background rounded-xl px-4 py-3 text-[14px] text-foreground placeholder:text-muted-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring text-left"
+              />
+            )}
+          </div>
+
           {totalPrice !== null && selectedPlan && (
             <div className="bg-card rounded-2xl border border-border p-4 space-y-2">
               <h3 className="text-[13px] font-bold text-foreground">ملخص السعر</h3>
