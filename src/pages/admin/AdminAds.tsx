@@ -21,6 +21,8 @@ interface DbAd {
   lng: number | null;
   featured: boolean | null;
   active: boolean | null;
+  start_date: string | null;
+  end_date: string | null;
   ad_images: { id: string; image_url: string; sort_order: number | null }[];
 }
 
@@ -41,6 +43,8 @@ const emptyForm = {
   lng: "",
   featured: false,
   active: true,
+  start_date: null as Date | null,
+  end_date: null as Date | null,
 };
 
 const AdminAds = () => {
