@@ -319,6 +319,36 @@ export type Database = {
         }
         Relationships: []
       }
+      popup_ads: {
+        Row: {
+          active: boolean
+          city: string
+          created_at: string
+          id: string
+          image_url: string
+          link_type: string
+          link_url: string | null
+        }
+        Insert: {
+          active?: boolean
+          city: string
+          created_at?: string
+          id?: string
+          image_url: string
+          link_type?: string
+          link_url?: string | null
+        }
+        Update: {
+          active?: boolean
+          city?: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          link_type?: string
+          link_url?: string | null
+        }
+        Relationships: []
+      }
       terms_policies: {
         Row: {
           content: string
