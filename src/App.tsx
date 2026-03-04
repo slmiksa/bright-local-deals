@@ -32,6 +32,8 @@ import AdminSettings from "./pages/admin/AdminSettings";
 import AdminPricing from "./pages/admin/AdminPricing";
 import AdminCountdown from "./pages/admin/AdminCountdown";
 import AdminTerms from "./pages/admin/AdminTerms";
+import AdminRequests from "./pages/admin/AdminRequests";
+import AdminRequestDetail from "./pages/admin/AdminRequestDetail";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -77,6 +79,8 @@ const App = () => {
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />
+                  <Route path="requests" element={<AdminRequests />} />
+                  <Route path="requests/:id" element={<AdminRequestDetail />} />
                   <Route path="ads" element={<AdminAds />} />
                   <Route path="categories" element={<AdminCategories />} />
                   <Route path="cities" element={<AdminCities />} />
