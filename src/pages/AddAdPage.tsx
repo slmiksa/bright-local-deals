@@ -18,6 +18,7 @@ type PricingPlan = {
 type SurchargeSettings = {
   featured_surcharge: number;
   featured_surcharge_enabled: boolean;
+  whatsapp_number: string;
 };
 
 const getPlanIcon = (name: string) => {
@@ -53,7 +54,7 @@ const AddAdPage = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("app_settings")
-        .select("featured_surcharge, featured_surcharge_enabled")
+        .select("featured_surcharge, featured_surcharge_enabled, whatsapp_number")
         .eq("id", "default")
         .single();
       if (error) throw error;
@@ -63,6 +64,7 @@ const AddAdPage = () => {
 
   const featuredExtra = surchargeSettings?.featured_surcharge ?? 50;
   const featuredEnabled = surchargeSettings?.featured_surcharge_enabled ?? true;
+  const whatsappNumber = surchargeSettings?.whatsapp_number ?? "966500000000";
 
   const adTypes = useMemo(() => pricingPlans.map((plan) => plan.name), [pricingPlans]);
   const [adType, setAdType] = useState("");
@@ -173,7 +175,7 @@ const AddAdPage = () => {
 
       // 3. Send WhatsApp with order number
       const message = `طلب إعلان جديد #${request.order_number}\nنوع الإعلان: ${adType}\nالفئة: ${adTier}\nاسم المتجر: ${storeName}\nالمدينة: ${location}\nالسعر: ${totalPrice} ريال`;
-      const whatsappUrl = `https://wa.me/966500000000?text=${encodeURIComponent(message)}`;
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, "_blank");
 
     } catch (err: any) {

@@ -248,6 +248,7 @@ export type Database = {
           id: string
           launch_date: string | null
           updated_at: string
+          whatsapp_number: string
         }
         Insert: {
           featured_surcharge?: number
@@ -255,6 +256,7 @@ export type Database = {
           id?: string
           launch_date?: string | null
           updated_at?: string
+          whatsapp_number?: string
         }
         Update: {
           featured_surcharge?: number
@@ -262,6 +264,7 @@ export type Database = {
           id?: string
           launch_date?: string | null
           updated_at?: string
+          whatsapp_number?: string
         }
         Relationships: []
       }
