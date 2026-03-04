@@ -18,7 +18,27 @@ const AdDetail = () => {
   const { views, likes, liked, toggleLike } = useAdStats(adId);
 
   useEffect(() => {
-    if (ad) recordView(ad.id);
+    if (ad) {
+      recordView(ad.id);
+      // Update OG meta tags dynamically for link previews
+      document.title = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`;
+      const setMeta = (property: string, content: string) => {
+        let el = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
+        if (!el) {
+          el = document.createElement("meta");
+          el.setAttribute("property", property);
+          document.head.appendChild(el);
+        }
+        el.content = content;
+      };
+      setMeta("og:title", `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`);
+      setMeta("og:description", `${ad.shopName} | ${ad.city} - ${ad.description || ad.offer}`);
+      setMeta("og:url", `${window.location.origin}/ad/${ad.id}`);
+      if (ad.images?.[0]) setMeta("og:image", ad.images[0]);
+    }
+    return () => {
+      document.title = "تطبيق لمحة للتسويق";
+    };
   }, [ad]);
 
   if (isLoading) {
@@ -63,15 +83,17 @@ const AdDetail = () => {
           <button
             onClick={async () => {
               const url = `${window.location.origin}/ad/${ad.id}`;
+              const shareText = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer} 🔥\n${ad.shopName} | ${ad.city}`;
               try {
                 if (navigator.share) {
                   await navigator.share({
-                    title: ad.shopName,
+                    title: `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`,
+                    text: shareText,
                     url
                   });
                 } else {
-                  await navigator.clipboard.writeText(url);
-                  toast({ title: "تم النسخ", description: "تم نسخ رابط الإعلان" });
+                  await navigator.clipboard.writeText(`${shareText}\n${url}`);
+                  toast({ title: "تم النسخ", description: "تم نسخ رابط الإعلان مع الوصف" });
                 }
               } catch {}
             }}
