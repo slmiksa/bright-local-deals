@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from "react";
-import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera } from "lucide-react";
+import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera, Loader2, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { useCities } from "@/hooks/useAds";
@@ -69,6 +69,8 @@ const AddAdPage = () => {
   const [storeName, setStoreName] = useState("");
   const [location, setLocation] = useState("");
   const [adTier, setAdTier] = useState<"عادي" | "متميز">("عادي");
+  const [submitting, setSubmitting] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<number | null>(null);
 
   const [mainImage, setMainImage] = useState<{ file: File; preview: string } | null>(null);
   const [extraImages, setExtraImages] = useState<{ file: File; preview: string }[]>([]);
@@ -97,10 +99,7 @@ const AddAdPage = () => {
     if (!files) return;
     const newImages = Array.from(files)
       .slice(0, 10 - extraImages.length)
-      .map((file) => ({
-        file,
-        preview: URL.createObjectURL(file),
-      }));
+      .map((file) => ({ file, preview: URL.createObjectURL(file) }));
     setExtraImages((prev) => [...prev, ...newImages]);
   };
 
@@ -111,27 +110,112 @@ const AddAdPage = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const uploadImage = async (file: File, requestId: string, index: number) => {
+    const ext = file.name.split(".").pop();
+    const path = `${requestId}/${index}-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("ad-request-images").upload(path, file);
+    if (error) throw error;
+    const { data: urlData } = supabase.storage.from("ad-request-images").getPublicUrl(path);
+    return urlData.publicUrl;
+  };
+
+  const handleSubmit = async () => {
     if (!adType || !storeName || !location) {
       toast({ title: "تنبيه", description: "يرجى تعبئة جميع الحقول", variant: "destructive" });
       return;
     }
-
     if (!selectedPlan) {
       toast({ title: "تنبيه", description: "يرجى اختيار باقة أسعار متاحة", variant: "destructive" });
       return;
     }
-
     if (!mainImage) {
       toast({ title: "تنبيه", description: "يرجى اختيار الصورة الأساسية", variant: "destructive" });
       return;
     }
 
-    const imagesCount = 1 + extraImages.length;
-    const message = `طلب إعلان جديد:\nنوع الإعلان: ${adType}\nالفئة: ${adTier}\nاسم المتجر: ${storeName}\nالعنوان: ${location}\nالسعر: ${totalPrice} ريال\nعدد الصور: ${imagesCount} (الصورة الأساسية + ${extraImages.length} صور إضافية)\n\nيرجى إرسال الصور بعد هذه الرسالة`;
-    const whatsappUrl = `https://wa.me/966500000000?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
+    setSubmitting(true);
+    try {
+      // 1. Create the ad request
+      const { data: request, error: reqError } = await supabase
+        .from("ad_requests")
+        .insert({
+          ad_type: adType,
+          ad_tier: adTier,
+          store_name: storeName,
+          city: location,
+          total_price: totalPrice ?? 0,
+        })
+        .select("id, order_number")
+        .single();
+
+      if (reqError || !request) throw reqError || new Error("فشل إنشاء الطلب");
+
+      // 2. Upload images
+      const mainUrl = await uploadImage(mainImage.file, request.id, 0);
+      await supabase.from("ad_request_images").insert({
+        request_id: request.id,
+        image_url: mainUrl,
+        is_main: true,
+        sort_order: 0,
+      });
+
+      for (let i = 0; i < extraImages.length; i++) {
+        const url = await uploadImage(extraImages[i].file, request.id, i + 1);
+        await supabase.from("ad_request_images").insert({
+          request_id: request.id,
+          image_url: url,
+          is_main: false,
+          sort_order: i + 1,
+        });
+      }
+
+      setOrderNumber(request.order_number);
+
+      // 3. Send WhatsApp with order number
+      const message = `طلب إعلان جديد #${request.order_number}\nنوع الإعلان: ${adType}\nالفئة: ${adTier}\nاسم المتجر: ${storeName}\nالمدينة: ${location}\nالسعر: ${totalPrice} ريال`;
+      const whatsappUrl = `https://wa.me/966500000000?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, "_blank");
+
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: "خطأ", description: "حدث خطأ أثناء إرسال الطلب، حاول مرة أخرى", variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  // Success state
+  if (orderNumber) {
+    return (
+      <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
+        <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
+          <div className="px-5 py-3.5 flex items-center gap-3">
+            <button onClick={() => navigate(-1)} className="touch-target">
+              <ArrowRight className="w-5 h-5 text-foreground" />
+            </button>
+            <h1 className="text-lg font-bold text-foreground">تم إرسال الطلب</h1>
+          </div>
+        </div>
+        <div className="px-5 pt-16 flex flex-col items-center text-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+            <CheckCircle className="w-8 h-8 text-primary" />
+          </div>
+          <h2 className="text-xl font-black text-foreground">تم استلام طلبك بنجاح!</h2>
+          <div className="bg-card border border-border rounded-2xl p-5 w-full">
+            <p className="text-[13px] text-muted-foreground mb-1">رقم الطلب</p>
+            <p className="text-3xl font-black text-primary">#{orderNumber}</p>
+          </div>
+          <p className="text-[13px] text-muted-foreground">احتفظ برقم الطلب للمتابعة. سيتم التواصل معك لتأكيد الطلب.</p>
+          <button
+            onClick={() => navigate("/")}
+            className="w-full bg-primary text-primary-foreground rounded-2xl py-4 font-bold text-[15px] active:scale-[0.97] transition-transform mt-4"
+          >
+            العودة للرئيسية
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
@@ -145,6 +229,7 @@ const AddAdPage = () => {
       </div>
 
       <div className="px-5 pt-6 space-y-6">
+        {/* Pricing display */}
         <div>
           <h2 className="text-[15px] font-bold text-foreground mb-3">أسعار الإعلانات</h2>
           {pricingLoading ? (
@@ -153,7 +238,7 @@ const AddAdPage = () => {
             </div>
           ) : pricingPlans.length === 0 ? (
             <div className="bg-card border border-border rounded-2xl p-4 text-center text-[13px] text-muted-foreground">
-              لا توجد باقات أسعار حالياً، الرجاء إضافتها من لوحة التحكم.
+              لا توجد باقات أسعار حالياً
             </div>
           ) : (
             <div className="space-y-3">
@@ -188,21 +273,16 @@ const AddAdPage = () => {
           )}
         </div>
 
+        {/* Form */}
         <div className="space-y-4 pt-2">
           <h2 className="text-[15px] font-bold text-foreground">طلب إعلان</h2>
 
           <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">نوع الإعلان</label>
-            <select
-              value={adType}
-              onChange={(e) => setAdType(e.target.value)}
-              className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring appearance-none"
-            >
+            <select value={adType} onChange={(e) => setAdType(e.target.value)} className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring appearance-none">
               <option value="">اختر نوع الإعلان</option>
               {adTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
+                <option key={type} value={type}>{type}</option>
               ))}
             </select>
           </div>
@@ -238,13 +318,12 @@ const AddAdPage = () => {
             <select value={location} onChange={(e) => setLocation(e.target.value)} className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring appearance-none">
               <option value="">اختر المدينة</option>
               {cities.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
+                <option key={c} value={c}>{c}</option>
               ))}
             </select>
           </div>
 
+          {/* Main image */}
           <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">
               الصورة الأساسية <span className="text-[11px] text-muted-foreground font-normal">(تظهر كغلاف للإعلان)</span>
@@ -253,24 +332,13 @@ const AddAdPage = () => {
             {mainImage ? (
               <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border-2 border-primary">
                 <img src={mainImage.preview} alt="الصورة الأساسية" className="w-full h-full object-cover" />
-                <button
-                  type="button"
-                  onClick={() => {
-                    URL.revokeObjectURL(mainImage.preview);
-                    setMainImage(null);
-                  }}
-                  className="absolute top-2 left-2 w-7 h-7 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform"
-                >
+                <button type="button" onClick={() => { URL.revokeObjectURL(mainImage.preview); setMainImage(null); }} className="absolute top-2 left-2 w-7 h-7 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform">
                   <X className="w-4 h-4 text-primary-foreground" />
                 </button>
                 <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-lg">صورة الغلاف</div>
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={() => mainInputRef.current?.click()}
-                className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 flex flex-col items-center justify-center gap-2 active:bg-primary/10 transition-colors"
-              >
+              <button type="button" onClick={() => mainInputRef.current?.click()} className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 flex flex-col items-center justify-center gap-2 active:bg-primary/10 transition-colors">
                 <Camera className="w-8 h-8 text-primary/60" />
                 <span className="text-[13px] font-bold text-primary/70">اختر صورة الغلاف</span>
                 <span className="text-[11px] text-muted-foreground">تظهر في بطاقة الإعلان</span>
@@ -278,6 +346,7 @@ const AddAdPage = () => {
             )}
           </div>
 
+          {/* Extra images */}
           <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">
               صور إضافية <span className="text-[11px] text-muted-foreground font-normal">(تظهر داخل تفاصيل الإعلان)</span>
@@ -287,21 +356,13 @@ const AddAdPage = () => {
               {extraImages.map((img, i) => (
                 <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-border">
                   <img src={img.preview} alt={`صورة ${i + 1}`} className="w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeExtraImage(i)}
-                    className="absolute top-1 left-1 w-6 h-6 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform"
-                  >
+                  <button type="button" onClick={() => removeExtraImage(i)} className="absolute top-1 left-1 w-6 h-6 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform">
                     <X className="w-3.5 h-3.5 text-primary-foreground" />
                   </button>
                 </div>
               ))}
               {extraImages.length < 10 && (
-                <button
-                  type="button"
-                  onClick={() => extraInputRef.current?.click()}
-                  className="aspect-square rounded-xl border-2 border-dashed border-border bg-secondary/30 flex flex-col items-center justify-center gap-1 active:bg-secondary/50 transition-colors"
-                >
+                <button type="button" onClick={() => extraInputRef.current?.click()} className="aspect-square rounded-xl border-2 border-dashed border-border bg-secondary/30 flex flex-col items-center justify-center gap-1 active:bg-secondary/50 transition-colors">
                   <ImagePlus className="w-5 h-5 text-muted-foreground" />
                   <span className="text-[10px] text-muted-foreground">إضافة</span>
                 </button>
@@ -310,6 +371,7 @@ const AddAdPage = () => {
             {extraImages.length > 0 && <p className="text-[11px] text-muted-foreground mt-1.5">{extraImages.length} / 10 صور</p>}
           </div>
 
+          {/* Price summary */}
           {totalPrice !== null && selectedPlan && (
             <div className="bg-card rounded-2xl border border-border p-4 space-y-2">
               <h3 className="text-[13px] font-bold text-foreground">ملخص السعر</h3>
@@ -332,8 +394,20 @@ const AddAdPage = () => {
             </div>
           )}
 
-          <button onClick={handleSubmit} className="touch-target w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-2xl py-4 font-bold text-[15px] active:scale-[0.97] transition-transform shadow-elevated mt-2">
-            <Send className="w-5 h-5" /> أرسل طلب الإعلان
+          <button
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="touch-target w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-2xl py-4 font-bold text-[15px] active:scale-[0.97] transition-transform shadow-elevated mt-2 disabled:opacity-60"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" /> جاري الإرسال...
+              </>
+            ) : (
+              <>
+                <Send className="w-5 h-5" /> أرسل طلب الإعلان
+              </>
+            )}
           </button>
           <p className="text-center text-muted-foreground text-[11px] pb-4">سيتم التواصل معك لتأكيد الطلب</p>
         </div>

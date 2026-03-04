@@ -27,10 +27,12 @@ import {
   DollarSign,
   Timer,
   FileText,
+  ClipboardList,
 } from "lucide-react";
 
 const menuItems = [
   { title: "الرئيسية", url: "/admin", icon: LayoutDashboard },
+  { title: "طلبات الإعلانات", url: "/admin/requests", icon: ClipboardList },
   { title: "الإعلانات", url: "/admin/ads", icon: Megaphone },
   { title: "التصنيفات", url: "/admin/categories", icon: FolderOpen },
   { title: "المدن", url: "/admin/cities", icon: MapPin },

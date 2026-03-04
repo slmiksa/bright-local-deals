@@ -76,6 +76,77 @@ export type Database = {
         }
         Relationships: []
       }
+      ad_request_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_main: boolean
+          request_id: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_main?: boolean
+          request_id: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_main?: boolean
+          request_id?: string
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_request_images_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "ad_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_requests: {
+        Row: {
+          ad_tier: string
+          ad_type: string
+          city: string
+          created_at: string
+          id: string
+          order_number: number
+          status: string
+          store_name: string
+          total_price: number
+        }
+        Insert: {
+          ad_tier?: string
+          ad_type: string
+          city: string
+          created_at?: string
+          id?: string
+          order_number?: number
+          status?: string
+          store_name: string
+          total_price?: number
+        }
+        Update: {
+          ad_tier?: string
+          ad_type?: string
+          city?: string
+          created_at?: string
+          id?: string
+          order_number?: number
+          status?: string
+          store_name?: string
+          total_price?: number
+        }
+        Relationships: []
+      }
       ad_stats: {
         Row: {
           ad_id: number
