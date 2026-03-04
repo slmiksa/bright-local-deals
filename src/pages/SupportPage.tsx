@@ -1,5 +1,6 @@
-import { Headphones, MessageCircle, Phone, Mail, ArrowRight, FileText } from "lucide-react";
+import { Headphones, MessageCircle, Phone, Mail, ArrowRight, FileText, HelpCircle, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const contactOptions = [
   {
@@ -78,6 +79,85 @@ const SupportPage = () => {
             <p className="text-[12px] text-muted-foreground">اطلع على شروط وسياسات الاستخدام</p>
           </div>
         </button>
+
+        {/* FAQ Section */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 px-1">
+            <HelpCircle className="w-5 h-5 text-primary" />
+            <h3 className="text-[15px] font-bold text-foreground">الأسئلة المتكررة</h3>
+          </div>
+          <Accordion type="single" collapsible className="space-y-2">
+            <AccordionItem value="1" className="bg-card rounded-2xl border border-border px-4 [&[data-state=open]]:pb-2">
+              <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">ما هو تطبيق عروض؟</AccordionTrigger>
+              <AccordionContent className="text-[12px] text-muted-foreground text-right leading-relaxed">
+                تطبيق عروض هو منصة إلكترونية تجمع أفضل العروض والخصومات من مختلف المتاجر والمحلات في مدينتك، ليسهّل عليك الوصول لأحدث العروض وتوفير المال.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="2" className="bg-card rounded-2xl border border-border px-4 [&[data-state=open]]:pb-2">
+              <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">كيف أقدر أضيف إعلان لمتجري؟</AccordionTrigger>
+              <AccordionContent className="text-[12px] text-muted-foreground text-right leading-relaxed">
+                اضغط على زر "أضف إعلانك" في الصفحة الرئيسية، ثم عبّئ بيانات متجرك والعرض المطلوب وارفع الصور، وبعدها أرسل الطلب عبر الواتساب. سيتم مراجعة طلبك ونشره خلال وقت قصير.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="3" className="bg-card rounded-2xl border border-border px-4 [&[data-state=open]]:pb-2">
+              <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">كم تكلفة الإعلان؟</AccordionTrigger>
+              <AccordionContent className="text-[12px] text-muted-foreground text-right leading-relaxed">
+                تختلف الأسعار حسب نوع الإعلان ومدته. يمكنك الاطلاع على باقات الأسعار المتوفرة أثناء تعبئة نموذج الإعلان. كما يوجد خيار الإعلان المميز الذي يظهر في أعلى الصفحة مقابل رسوم إضافية.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="4" className="bg-card rounded-2xl border border-border px-4 [&[data-state=open]]:pb-2">
+              <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">كم يستغرق نشر الإعلان بعد الطلب؟</AccordionTrigger>
+              <AccordionContent className="text-[12px] text-muted-foreground text-right leading-relaxed">
+                عادةً يتم مراجعة الطلب ونشر الإعلان خلال ٢٤ ساعة كحد أقصى من تأكيد الدفع. في بعض الحالات قد يتم النشر خلال ساعات قليلة.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="5" className="bg-card rounded-2xl border border-border px-4 [&[data-state=open]]:pb-2">
+              <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">هل أقدر أعدّل إعلاني بعد النشر؟</AccordionTrigger>
+              <AccordionContent className="text-[12px] text-muted-foreground text-right leading-relaxed">
+                نعم، يمكنك التواصل معنا عبر الواتساب وإرسال رقم الطلب مع التعديلات المطلوبة وسنقوم بتحديث الإعلان في أقرب وقت.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="6" className="bg-card rounded-2xl border border-border px-4 [&[data-state=open]]:pb-2">
+              <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">كيف أغيّر المدينة لعرض عروض مدينتي؟</AccordionTrigger>
+              <AccordionContent className="text-[12px] text-muted-foreground text-right leading-relaxed">
+                من الصفحة الرئيسية، اضغط على اسم المدينة في الأعلى واختر مدينتك من القائمة. سيتم تحديث العروض تلقائياً لعرض عروض المدينة المختارة.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="7" className="bg-card rounded-2xl border border-border px-4 [&[data-state=open]]:pb-2">
+              <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">هل التطبيق مجاني للمستخدمين؟</AccordionTrigger>
+              <AccordionContent className="text-[12px] text-muted-foreground text-right leading-relaxed">
+                نعم، تصفح العروض والخصومات مجاني تماماً لجميع المستخدمين. الرسوم تكون فقط على أصحاب المتاجر الراغبين في نشر إعلاناتهم.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="8" className="bg-card rounded-2xl border border-border px-4 [&[data-state=open]]:pb-2">
+              <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">ما هو الإعلان المميز؟</AccordionTrigger>
+              <AccordionContent className="text-[12px] text-muted-foreground text-right leading-relaxed">
+                الإعلان المميز يظهر في قسم "المميز" بالصفحة الرئيسية مع سلايدر خاص، مما يمنح إعلانك ظهوراً أكبر ووصولاً أوسع للعملاء مقارنة بالإعلان العادي.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="9" className="bg-card rounded-2xl border border-border px-4 [&[data-state=open]]:pb-2">
+              <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">كيف أتواصل مع صاحب العرض؟</AccordionTrigger>
+              <AccordionContent className="text-[12px] text-muted-foreground text-right leading-relaxed">
+                عند فتح تفاصيل أي إعلان، ستجد زر التواصل عبر الهاتف أو الواتساب للتواصل مباشرة مع صاحب المتجر أو العرض.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="10" className="bg-card rounded-2xl border border-border px-4 [&[data-state=open]]:pb-2">
+              <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">كيف أتابع حالة طلب إعلاني؟</AccordionTrigger>
+              <AccordionContent className="text-[12px] text-muted-foreground text-right leading-relaxed">
+                عند إرسال طلب الإعلان، ستحصل على رقم طلب خاص بك. يمكنك التواصل معنا عبر الواتساب وإرسال رقم الطلب للاستفسار عن حالته.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
 
         <p className="text-center text-muted-foreground text-[11px] pt-4">
           أوقات العمل: من السبت إلى الخميس ٩ ص - ٩ م
