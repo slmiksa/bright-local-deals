@@ -101,7 +101,7 @@ const AdminPricing = () => {
     const durationDays = Math.max(1, Math.floor(parseNumericInput(form.duration_days) || 30));
     const sortOrder = Math.floor(parseNumericInput(form.sort_order) || 0);
 
-    if (!form.name.trim() || !Number.isFinite(price) || price <= 0) {
+    if (!form.name.trim() || !Number.isFinite(price) || price < 0) {
       toast({ title: "خطأ", description: "يرجى إدخال اسم الباقة وسعر صحيح", variant: "destructive" });
       return;
     }
@@ -263,7 +263,7 @@ const AdminPricing = () => {
                 <h3 className="font-bold text-foreground text-sm">{item.name}</h3>
                 {item.description && <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>}
                 <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
-                  <span className="font-bold text-primary text-base">{item.price} ريال</span>
+                  <span className="font-bold text-primary text-base">{item.price === 0 ? "مجاني" : `${item.price} ريال`}</span>
                   <span>{item.duration_days} يوم</span>
                 </div>
               </div>
