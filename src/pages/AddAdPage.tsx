@@ -152,6 +152,7 @@ const AddAdPage = () => {
           store_name: storeName,
           city: location,
           total_price: totalPrice ?? 0,
+          email: wantsEmail ? email : null,
         })
         .select("id, order_number")
         .single();
