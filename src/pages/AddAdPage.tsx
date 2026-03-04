@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from "react";
-import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera, Loader2, CheckCircle } from "lucide-react";
+import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera, Loader2, CheckCircle, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { useCities } from "@/hooks/useAds";
@@ -74,6 +74,8 @@ const AddAdPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
 
+  const [wantsEmail, setWantsEmail] = useState(false);
+  const [email, setEmail] = useState("");
   const [mainImage, setMainImage] = useState<{ file: File; preview: string } | null>(null);
   const [extraImages, setExtraImages] = useState<{ file: File; preview: string }[]>([]);
   const mainInputRef = useRef<HTMLInputElement>(null);
@@ -130,6 +132,10 @@ const AddAdPage = () => {
       toast({ title: "تنبيه", description: "يرجى اختيار باقة أسعار متاحة", variant: "destructive" });
       return;
     }
+    if (wantsEmail && !email) {
+      toast({ title: "تنبيه", description: "يرجى إدخال البريد الإلكتروني", variant: "destructive" });
+      return;
+    }
     if (!mainImage) {
       toast({ title: "تنبيه", description: "يرجى اختيار الصورة الأساسية", variant: "destructive" });
       return;
@@ -146,6 +152,7 @@ const AddAdPage = () => {
           store_name: storeName,
           city: location,
           total_price: totalPrice ?? 0,
+          email: wantsEmail ? email : null,
         })
         .select("id, order_number")
         .single();
@@ -177,6 +184,23 @@ const AddAdPage = () => {
       const message = `طلب إعلان جديد #${request.order_number}\nنوع الإعلان: ${adType}\nالفئة: ${adTier}\nاسم المتجر: ${storeName}\nالمدينة: ${location}\nالسعر: ${totalPrice} ريال`;
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, "_blank");
+
+      // 4. Send email notifications
+      try {
+        await supabase.functions.invoke("send-ad-notification", {
+          body: {
+            orderNumber: request.order_number,
+            adType,
+            adTier,
+            storeName,
+            city: location,
+            totalPrice,
+            customerEmail: wantsEmail ? email : null,
+          },
+        });
+      } catch (emailErr) {
+        console.error("Email notification error:", emailErr);
+      }
 
     } catch (err: any) {
       console.error(err);
@@ -373,7 +397,35 @@ const AddAdPage = () => {
             {extraImages.length > 0 && <p className="text-[11px] text-muted-foreground mt-1.5">{extraImages.length} / 10 صور</p>}
           </div>
 
-          {/* Price summary */}
+          {/* Email notification */}
+          <div className="bg-card rounded-2xl border border-border p-4 space-y-3">
+            <button
+              type="button"
+              onClick={() => setWantsEmail(!wantsEmail)}
+              className="flex items-center gap-3 w-full"
+            >
+              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${wantsEmail ? "bg-primary border-primary" : "border-muted-foreground/40"}`}>
+                {wantsEmail && <span className="text-primary-foreground text-[11px] font-bold">✓</span>}
+              </div>
+              <div className="flex items-center gap-2 flex-1">
+                <Mail className={`w-4 h-4 ${wantsEmail ? "text-primary" : "text-muted-foreground"}`} />
+                <span className={`text-[13px] font-bold ${wantsEmail ? "text-foreground" : "text-muted-foreground"}`}>
+                  أريد إشعاري عبر الإيميل عند قبول إعلاني
+                </span>
+              </div>
+            </button>
+            {wantsEmail && (
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@email.com"
+                dir="ltr"
+                className="w-full bg-background rounded-xl px-4 py-3 text-[14px] text-foreground placeholder:text-muted-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring text-left"
+              />
+            )}
+          </div>
+
           {totalPrice !== null && selectedPlan && (
             <div className="bg-card rounded-2xl border border-border p-4 space-y-2">
               <h3 className="text-[13px] font-bold text-foreground">ملخص السعر</h3>
