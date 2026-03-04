@@ -117,6 +117,7 @@ export type Database = {
           ad_type: string
           city: string
           created_at: string
+          email: string | null
           id: string
           order_number: number
           status: string
@@ -128,6 +129,7 @@ export type Database = {
           ad_type: string
           city: string
           created_at?: string
+          email?: string | null
           id?: string
           order_number?: number
           status?: string
@@ -139,6 +141,7 @@ export type Database = {
           ad_type?: string
           city?: string
           created_at?: string
+          email?: string | null
           id?: string
           order_number?: number
           status?: string

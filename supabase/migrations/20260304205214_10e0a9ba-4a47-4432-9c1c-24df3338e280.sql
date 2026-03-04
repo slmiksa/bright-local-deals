@@ -1,0 +1,1 @@
+ALTER TABLE public.ad_requests ADD COLUMN email text DEFAULT NULL;
