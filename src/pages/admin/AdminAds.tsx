@@ -407,6 +407,38 @@ const AdminAds = () => {
                 </label>
               </div>
 
+              {/* Date Range */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">تاريخ البداية</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className={cn("w-full h-10 px-3 rounded-xl bg-background text-sm border border-border flex items-center gap-2 text-right", !form.start_date && "text-muted-foreground")}>
+                        <CalendarIcon className="w-4 h-4 shrink-0" />
+                        {form.start_date ? format(form.start_date, "yyyy/MM/dd") : "اختر تاريخ"}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={form.start_date || undefined} onSelect={(d) => setForm(f => ({ ...f, start_date: d || null }))} initialFocus className={cn("p-3 pointer-events-auto")} />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">تاريخ الانتهاء</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className={cn("w-full h-10 px-3 rounded-xl bg-background text-sm border border-border flex items-center gap-2 text-right", !form.end_date && "text-muted-foreground")}>
+                        <CalendarIcon className="w-4 h-4 shrink-0" />
+                        {form.end_date ? format(form.end_date, "yyyy/MM/dd") : "بدون انتهاء"}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={form.end_date || undefined} onSelect={(d) => setForm(f => ({ ...f, end_date: d || null }))} initialFocus className={cn("p-3 pointer-events-auto")} />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.featured} onChange={(e) => setForm(f => ({...f, featured: e.target.checked}))} className="w-4 h-4 rounded border-border text-primary" />
