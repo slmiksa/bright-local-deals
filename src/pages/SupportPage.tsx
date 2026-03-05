@@ -173,9 +173,14 @@ const SupportPage = () => {
           </Accordion>
         </div>
 
-        <p className="text-center pt-4 text-primary text-sm font-extrabold">
-          أوقات العمل: من السبت إلى الخميس ٩ ص - ٩ م
-        </p>
+        <a
+          href="https://trndsky.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block text-center pt-4 text-primary text-sm font-extrabold active:opacity-70 transition-opacity"
+        >
+          تطوير وبرمجة شركة TRNDSKY
+        </a>
       </div>
     </div>);
 
