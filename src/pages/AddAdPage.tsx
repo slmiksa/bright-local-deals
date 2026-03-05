@@ -73,6 +73,7 @@ const AddAdPage = () => {
   const [adTier, setAdTier] = useState<"عادي" | "متميز">("عادي");
   const [submitting, setSubmitting] = useState(false);
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
+  const [whatsappLink, setWhatsappLink] = useState<string>("");
 
   const [wantsEmail, setWantsEmail] = useState(false);
   const [email, setEmail] = useState("");
@@ -237,10 +238,10 @@ const AddAdPage = () => {
 
       setOrderNumber(request.order_number);
 
-      // 3. Send WhatsApp with order number
+      // 3. Build WhatsApp URL for later use
       const message = `طلب إعلان جديد #${request.order_number}\nنوع الإعلان: ${adType}\nالفئة: ${adTier}\nاسم المتجر: ${storeName}\nالمدينة: ${location}\nالسعر: ${totalPrice} ريال`;
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, "_blank");
+      setWhatsappLink(whatsappUrl);
 
       // 4. Send email notifications
       try {
@@ -289,9 +290,20 @@ const AddAdPage = () => {
             <p className="text-3xl font-black text-primary">#{orderNumber}</p>
           </div>
           <p className="text-[13px] text-muted-foreground">احتفظ برقم الطلب للمتابعة. سيتم التواصل معك لتأكيد الطلب.</p>
+          {whatsappLink && (
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 bg-[#25D366] text-white rounded-2xl py-4 font-bold text-[15px] active:scale-[0.97] transition-transform mt-4"
+            >
+              <Send className="w-5 h-5" />
+              أرسل الطلب عبر الواتساب
+            </a>
+          )}
           <button
             onClick={() => navigate("/")}
-            className="w-full bg-primary text-primary-foreground rounded-2xl py-4 font-bold text-[15px] active:scale-[0.97] transition-transform mt-4"
+            className="w-full bg-primary text-primary-foreground rounded-2xl py-4 font-bold text-[15px] active:scale-[0.97] transition-transform mt-2"
           >
             العودة للرئيسية
           </button>
