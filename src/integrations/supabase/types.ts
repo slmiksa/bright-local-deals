@@ -352,6 +352,42 @@ export type Database = {
         }
         Relationships: []
       }
+      support_contacts: {
+        Row: {
+          active: boolean
+          contact_type: string
+          contact_value: string
+          created_at: string
+          description: string
+          icon_color: string
+          id: string
+          sort_order: number | null
+          title: string
+        }
+        Insert: {
+          active?: boolean
+          contact_type?: string
+          contact_value: string
+          created_at?: string
+          description: string
+          icon_color?: string
+          id?: string
+          sort_order?: number | null
+          title: string
+        }
+        Update: {
+          active?: boolean
+          contact_type?: string
+          contact_value?: string
+          created_at?: string
+          description?: string
+          icon_color?: string
+          id?: string
+          sort_order?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
       terms_policies: {
         Row: {
           content: string

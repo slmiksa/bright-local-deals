@@ -29,6 +29,7 @@ import {
   FileText,
   ClipboardList,
   MonitorSmartphone,
+  Headphones,
 } from "lucide-react";
 
 const menuItems = [
@@ -41,6 +42,7 @@ const menuItems = [
   { title: "العد التنازلي", url: "/admin/countdown", icon: Timer },
   { title: "سياسة الخصوصية", url: "/admin/privacy", icon: FileText },
   { title: "الإعلانات المنبثقة", url: "/admin/popup-ads", icon: MonitorSmartphone },
+  { title: "أزرار التواصل", url: "/admin/support", icon: Headphones },
   { title: "الإحصائيات", url: "/admin/stats", icon: BarChart3 },
   { title: "الإعدادات", url: "/admin/settings", icon: Settings },
 ];

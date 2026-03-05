@@ -35,6 +35,7 @@ import AdminTerms from "./pages/admin/AdminTerms";
 import AdminRequests from "./pages/admin/AdminRequests";
 import AdminRequestDetail from "./pages/admin/AdminRequestDetail";
 import AdminPopupAds from "./pages/admin/AdminPopupAds";
+import AdminSupport from "./pages/admin/AdminSupport";
 import PopupAd from "./components/PopupAd";
 
 const queryClient = new QueryClient({
@@ -93,6 +94,7 @@ const App = () => {
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="privacy" element={<AdminTerms />} />
                   <Route path="popup-ads" element={<AdminPopupAds />} />
+                  <Route path="support" element={<AdminSupport />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />

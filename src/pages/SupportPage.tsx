@@ -1,33 +1,44 @@
-import { Headphones, MessageCircle, Phone, Mail, ArrowRight, FileText, HelpCircle, ChevronDown } from "lucide-react";
+import { Headphones, MessageCircle, Phone, Mail, ArrowRight, FileText, HelpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-const contactOptions = [
-  {
-    icon: MessageCircle,
-    title: "واتساب",
-    desc: "تواصل معنا عبر الواتساب",
-    action: () => window.open("https://wa.me/966500000000", "_blank"),
-    color: "bg-green-500/10 text-green-600",
-  },
-  {
-    icon: Phone,
-    title: "اتصال مباشر",
-    desc: "اتصل بنا مباشرة",
-    action: () => window.open("tel:+966500000000"),
-    color: "bg-blue-500/10 text-blue-600",
-  },
-  {
-    icon: Mail,
-    title: "البريد الإلكتروني",
-    desc: "أرسل لنا بريد إلكتروني",
-    action: () => window.open("mailto:support@example.com"),
-    color: "bg-orange-500/10 text-orange-600",
-  },
-];
+type SupportContact = {
+  id: string;
+  title: string;
+  description: string;
+  contact_type: string;
+  contact_value: string;
+  icon_color: string;
+  sort_order: number;
+  active: boolean;
+};
+
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  whatsapp: MessageCircle,
+  phone: Phone,
+  email: Mail,
+};
+
+const getAction = (type: string, value: string) => {
+  switch (type) {
+    case "whatsapp": return () => window.open(`https://wa.me/${value}`, "_blank");
+    case "phone": return () => window.open(`tel:${value}`);
+    case "email": return () => window.open(`mailto:${value}`);
+    default: return () => {};
+  }
+};
 
 const SupportPage = () => {
   const navigate = useNavigate();
+  const [contacts, setContacts] = useState<SupportContact[]>([]);
+
+  useEffect(() => {
+    supabase.from("support_contacts").select("*").eq("active", true).order("sort_order").then(({ data }) => {
+      if (data) setContacts(data as SupportContact[]);
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
@@ -50,21 +61,24 @@ const SupportPage = () => {
         </div>
 
         <div className="space-y-3">
-          {contactOptions.map((opt) => (
-            <button
-              key={opt.title}
-              onClick={opt.action}
-              className="w-full flex items-center gap-4 p-4 bg-card rounded-2xl border border-border active:scale-[0.98] transition-transform"
-            >
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${opt.color}`}>
-                <opt.icon className="w-6 h-6" />
-              </div>
-              <div className="text-right flex-1">
-                <p className="text-[14px] font-bold text-foreground">{opt.title}</p>
-                <p className="text-[12px] text-muted-foreground">{opt.desc}</p>
-              </div>
-            </button>
-          ))}
+          {contacts.map((contact) => {
+            const Icon = iconMap[contact.contact_type] || MessageCircle;
+            return (
+              <button
+                key={contact.id}
+                onClick={getAction(contact.contact_type, contact.contact_value)}
+                className="w-full flex items-center gap-4 p-4 bg-card rounded-2xl border border-border active:scale-[0.98] transition-transform"
+              >
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${contact.icon_color}`}>
+                  <Icon className="w-6 h-6" />
+                </div>
+                <div className="text-right flex-1">
+                  <p className="text-[14px] font-bold text-foreground">{contact.title}</p>
+                  <p className="text-[12px] text-muted-foreground">{contact.description}</p>
+                </div>
+              </button>
+            );
+          })}
         </div>
 
         <button
