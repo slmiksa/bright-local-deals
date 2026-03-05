@@ -237,10 +237,10 @@ const AddAdPage = () => {
 
       setOrderNumber(request.order_number);
 
-      // 3. Send WhatsApp with order number
+      // 3. Build WhatsApp URL for later use
       const message = `طلب إعلان جديد #${request.order_number}\nنوع الإعلان: ${adType}\nالفئة: ${adTier}\nاسم المتجر: ${storeName}\nالمدينة: ${location}\nالسعر: ${totalPrice} ريال`;
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, "_blank");
+      setWhatsappLink(whatsappUrl);
 
       // 4. Send email notifications
       try {
