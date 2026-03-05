@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, Star, Sparkles, MapPin, Store, Tag, DollarSign, Clock, Image as ImageIcon } from "lucide-react";
+import { ArrowRight, Star, Sparkles, MapPin, Store, Tag, DollarSign, Clock, Image as ImageIcon, Play } from "lucide-react";
 import { useState } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
 
@@ -88,17 +88,21 @@ const AdminRequestDetail = () => {
         <InfoCard icon={Clock} label="الحالة" value={statusLabels[request.status] || request.status} />
       </div>
 
-      {/* Main image */}
+      {/* Main media */}
       {mainImage && (
         <div>
           <h2 className="text-[14px] font-bold text-foreground mb-2 flex items-center gap-1.5">
-            <ImageIcon className="w-4 h-4 text-primary" /> صورة الغلاف
+            <ImageIcon className="w-4 h-4 text-primary" /> {(mainImage as any).media_type === 'video' ? 'فيديو الغلاف' : 'صورة الغلاف'}
           </h2>
           <div
             className="w-full aspect-[4/3] rounded-2xl overflow-hidden border-2 border-primary cursor-pointer"
-            onClick={() => setLightboxIndex(0)}
+            onClick={() => (mainImage as any).media_type !== 'video' && setLightboxIndex(0)}
           >
-            <img src={mainImage.image_url} alt="صورة الغلاف" className="w-full h-full object-cover" />
+            {(mainImage as any).media_type === 'video' ? (
+              <video src={mainImage.image_url} className="w-full h-full object-cover" controls />
+            ) : (
+              <img src={mainImage.image_url} alt="صورة الغلاف" className="w-full h-full object-cover" />
+            )}
           </div>
         </div>
       )}
@@ -106,15 +110,24 @@ const AdminRequestDetail = () => {
       {/* Extra images */}
       {extraImages.length > 0 && (
         <div>
-          <h2 className="text-[14px] font-bold text-foreground mb-2">صور إضافية ({extraImages.length})</h2>
+          <h2 className="text-[14px] font-bold text-foreground mb-2">وسائط إضافية ({extraImages.length})</h2>
           <div className="grid grid-cols-3 gap-2">
             {extraImages.map((img, i) => (
               <div
                 key={img.id}
-                className="aspect-square rounded-xl overflow-hidden border border-border cursor-pointer hover:opacity-90 transition-opacity"
-                onClick={() => setLightboxIndex(i + (mainImage ? 1 : 0))}
+                className="aspect-square rounded-xl overflow-hidden border border-border cursor-pointer hover:opacity-90 transition-opacity relative"
+                onClick={() => (img as any).media_type !== 'video' && setLightboxIndex(i + (mainImage ? 1 : 0))}
               >
-                <img src={img.image_url} alt={`صورة ${i + 1}`} className="w-full h-full object-cover" />
+                {(img as any).media_type === 'video' ? (
+                  <>
+                    <video src={img.image_url} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-foreground/30">
+                      <Play className="w-6 h-6 text-primary-foreground fill-primary-foreground" />
+                    </div>
+                  </>
+                ) : (
+                  <img src={img.image_url} alt={`صورة ${i + 1}`} className="w-full h-full object-cover" />
+                )}
               </div>
             ))}
           </div>
