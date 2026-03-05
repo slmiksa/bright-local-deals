@@ -104,7 +104,7 @@ const SupportPage = () => {
             <AccordionItem value="1" className="bg-card rounded-2xl border border-border px-4 [&[data-state=open]]:pb-2">
               <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">ما هو تطبيق لمحة؟</AccordionTrigger>
               <AccordionContent className="text-[12px] text-muted-foreground text-right leading-relaxed">
-                تطبيق عروض هو منصة إلكترونية تجمع أفضل العروض والخصومات من مختلف المتاجر والمحلات في مدينتك، ليسهّل عليك الوصول لأحدث العروض وتوفير المال.
+                تطبيق لمحة  هو  تجمع أفضل العروض والخصومات من مختلف المتاجر والمحلات في مدينتك، ليسهّل عليك الوصول لأحدث العروض وتوفير المال.
               </AccordionContent>
             </AccordionItem>
 
