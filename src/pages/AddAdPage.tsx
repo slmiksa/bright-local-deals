@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from "react";
-import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera, Loader2, CheckCircle, Mail, Video, Play } from "lucide-react";
+import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera, Loader2, CheckCircle, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { useCities } from "@/hooks/useAds";
@@ -77,13 +77,10 @@ const AddAdPage = () => {
 
   const [wantsEmail, setWantsEmail] = useState(false);
   const [email, setEmail] = useState("");
-  const [mainMedia, setMainMedia] = useState<{ file: File; preview: string; type: 'image' | 'video' } | null>(null);
+  const [mainImage, setMainImage] = useState<{ file: File; preview: string } | null>(null);
   const [extraImages, setExtraImages] = useState<{ file: File; preview: string }[]>([]);
-  const [extraVideo, setExtraVideo] = useState<{ file: File; preview: string } | null>(null);
   const mainInputRef = useRef<HTMLInputElement>(null);
   const extraInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
-  const mainVideoInputRef = useRef<HTMLInputElement>(null);
 
   const selectedPlan = useMemo(
     () => pricingPlans.find((plan) => plan.name === adType) || null,
@@ -98,19 +95,8 @@ const AddAdPage = () => {
   const handleMainImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (mainMedia) URL.revokeObjectURL(mainMedia.preview);
-    setMainMedia({ file, preview: URL.createObjectURL(file), type: 'image' });
-  };
-
-  const handleMainVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 50 * 1024 * 1024) {
-      toast({ title: "تنبيه", description: "حجم الفيديو يجب أن لا يتجاوز 50 ميقا", variant: "destructive" });
-      return;
-    }
-    if (mainMedia) URL.revokeObjectURL(mainMedia.preview);
-    setMainMedia({ file, preview: URL.createObjectURL(file), type: 'video' });
+    if (mainImage) URL.revokeObjectURL(mainImage.preview);
+    setMainImage({ file, preview: URL.createObjectURL(file) });
   };
 
   const handleExtraImages = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,17 +106,6 @@ const AddAdPage = () => {
       .slice(0, 10 - extraImages.length)
       .map((file) => ({ file, preview: URL.createObjectURL(file) }));
     setExtraImages((prev) => [...prev, ...newImages]);
-  };
-
-  const handleExtraVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 50 * 1024 * 1024) {
-      toast({ title: "تنبيه", description: "حجم الفيديو يجب أن لا يتجاوز 50 ميقا", variant: "destructive" });
-      return;
-    }
-    if (extraVideo) URL.revokeObjectURL(extraVideo.preview);
-    setExtraVideo({ file, preview: URL.createObjectURL(file) });
   };
 
   const removeExtraImage = (index: number) => {
@@ -149,15 +124,6 @@ const AddAdPage = () => {
     return urlData.publicUrl;
   };
 
-  const uploadVideo = async (file: File, requestId: string, index: number) => {
-    const ext = file.name.split(".").pop();
-    const path = `${requestId}/${index}-${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("ad-request-videos").upload(path, file);
-    if (error) throw error;
-    const { data: urlData } = supabase.storage.from("ad-request-videos").getPublicUrl(path);
-    return urlData.publicUrl;
-  };
-
   const handleSubmit = async () => {
     if (!adType || !storeName || !location) {
       toast({ title: "تنبيه", description: "يرجى تعبئة جميع الحقول", variant: "destructive" });
@@ -171,8 +137,8 @@ const AddAdPage = () => {
       toast({ title: "تنبيه", description: "يرجى إدخال البريد الإلكتروني", variant: "destructive" });
       return;
     }
-    if (!mainMedia) {
-      toast({ title: "تنبيه", description: "يرجى اختيار الصورة أو الفيديو الأساسي", variant: "destructive" });
+    if (!mainImage) {
+      toast({ title: "تنبيه", description: "يرجى اختيار صورة الغلاف", variant: "destructive" });
       return;
     }
 
@@ -194,22 +160,14 @@ const AddAdPage = () => {
 
       if (reqError || !request) throw reqError || new Error("فشل إنشاء الطلب");
 
-      // 2. Upload main media
-      let mainUrl: string;
-      let mainMediaType: string;
-      if (mainMedia.type === 'video') {
-        mainUrl = await uploadVideo(mainMedia.file, request.id, 0);
-        mainMediaType = 'video';
-      } else {
-        mainUrl = await uploadImage(mainMedia.file, request.id, 0);
-        mainMediaType = 'image';
-      }
+      // 2. Upload main image
+      const mainUrl = await uploadImage(mainImage.file, request.id, 0);
       await supabase.from("ad_request_images").insert({
         request_id: request.id,
         image_url: mainUrl,
         is_main: true,
         sort_order: 0,
-        media_type: mainMediaType,
+        media_type: 'image',
       });
 
       // 3. Upload extra images
@@ -221,18 +179,6 @@ const AddAdPage = () => {
           is_main: false,
           sort_order: i + 1,
           media_type: 'image',
-        });
-      }
-
-      // 4. Upload extra video if exists
-      if (extraVideo) {
-        const videoUrl = await uploadVideo(extraVideo.file, request.id, extraImages.length + 1);
-        await supabase.from("ad_request_images").insert({
-          request_id: request.id,
-          image_url: videoUrl,
-          is_main: false,
-          sort_order: extraImages.length + 1,
-          media_type: 'video',
         });
       }
 
@@ -418,38 +364,27 @@ const AddAdPage = () => {
             </select>
           </div>
 
-          {/* Main media */}
+          {/* Main image */}
           <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">
-              الوسائط الأساسية <span className="text-[11px] text-muted-foreground font-normal">(صورة أو فيديو يظهر كغلاف)</span>
+              صورة الغلاف <span className="text-[11px] text-muted-foreground font-normal">(تظهر كغلاف للإعلان)</span>
             </label>
             <input ref={mainInputRef} type="file" accept="image/*" className="hidden" onChange={handleMainImage} />
-            <input ref={mainVideoInputRef} type="file" accept="video/*" className="hidden" onChange={handleMainVideo} />
-            {mainMedia ? (
+            {mainImage ? (
               <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border-2 border-primary">
-                {mainMedia.type === 'video' ? (
-                  <video src={mainMedia.preview} className="w-full h-full object-cover" controls />
-                ) : (
-                  <img src={mainMedia.preview} alt="الغلاف" className="w-full h-full object-cover" />
-                )}
-                <button type="button" onClick={() => { URL.revokeObjectURL(mainMedia.preview); setMainMedia(null); }} className="absolute top-2 left-2 w-7 h-7 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform">
+                <img src={mainImage.preview} alt="الغلاف" className="w-full h-full object-cover" />
+                <button type="button" onClick={() => { URL.revokeObjectURL(mainImage.preview); setMainImage(null); }} className="absolute top-2 left-2 w-7 h-7 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform">
                   <X className="w-4 h-4 text-primary-foreground" />
                 </button>
                 <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-lg">
-                  {mainMedia.type === 'video' ? 'فيديو الغلاف' : 'صورة الغلاف'}
+                  صورة الغلاف
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2">
-                <button type="button" onClick={() => mainInputRef.current?.click()} className="aspect-[4/3] rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 flex flex-col items-center justify-center gap-2 active:bg-primary/10 transition-colors">
-                  <Camera className="w-7 h-7 text-primary/60" />
-                  <span className="text-[12px] font-bold text-primary/70">صورة غلاف</span>
-                </button>
-                <button type="button" onClick={() => mainVideoInputRef.current?.click()} className="aspect-[4/3] rounded-2xl border-2 border-dashed border-accent/40 bg-accent/5 flex flex-col items-center justify-center gap-2 active:bg-accent/10 transition-colors">
-                  <Video className="w-7 h-7 text-accent/60" />
-                  <span className="text-[12px] font-bold text-accent/70">فيديو غلاف</span>
-                </button>
-              </div>
+              <button type="button" onClick={() => mainInputRef.current?.click()} className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 flex flex-col items-center justify-center gap-2 active:bg-primary/10 transition-colors">
+                <Camera className="w-7 h-7 text-primary/60" />
+                <span className="text-[12px] font-bold text-primary/70">اختر صورة الغلاف</span>
+              </button>
             )}
           </div>
 
@@ -476,28 +411,6 @@ const AddAdPage = () => {
               )}
             </div>
             {extraImages.length > 0 && <p className="text-[11px] text-muted-foreground mt-1.5">{extraImages.length} / 10 صور</p>}
-          </div>
-
-          {/* Extra video */}
-          <div>
-            <label className="block text-[13px] font-bold text-foreground mb-1.5">
-              فيديو إضافي <span className="text-[11px] text-muted-foreground font-normal">(اختياري - يظهر داخل تفاصيل الإعلان)</span>
-            </label>
-            <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={handleExtraVideo} />
-            {extraVideo ? (
-              <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-border">
-                <video src={extraVideo.preview} className="w-full h-full object-cover" controls />
-                <button type="button" onClick={() => { URL.revokeObjectURL(extraVideo.preview); setExtraVideo(null); }} className="absolute top-2 left-2 w-7 h-7 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform">
-                  <X className="w-4 h-4 text-primary-foreground" />
-                </button>
-              </div>
-            ) : (
-              <button type="button" onClick={() => videoInputRef.current?.click()} className="w-full py-4 rounded-2xl border-2 border-dashed border-border bg-secondary/30 flex items-center justify-center gap-2 active:bg-secondary/50 transition-colors">
-                <Video className="w-5 h-5 text-muted-foreground" />
-                <span className="text-[12px] font-bold text-muted-foreground">إضافة فيديو</span>
-                <span className="text-[10px] text-muted-foreground">(حتى 50 ميقا)</span>
-              </button>
-            )}
           </div>
 
           {/* Email notification */}
