@@ -69,6 +69,7 @@ const AddAdPage = () => {
   const adTypes = useMemo(() => pricingPlans.map((plan) => plan.name), [pricingPlans]);
   const [adType, setAdType] = useState("");
   const [storeName, setStoreName] = useState("");
+  const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [adTier, setAdTier] = useState<"عادي" | "متميز">("عادي");
   const [submitting, setSubmitting] = useState(false);
@@ -125,8 +126,8 @@ const AddAdPage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!adType || !storeName || !location) {
-      toast({ title: "تنبيه", description: "يرجى تعبئة جميع الحقول", variant: "destructive" });
+    if (!adType || !storeName || !location || !phone) {
+      toast({ title: "تنبيه", description: "يرجى تعبئة جميع الحقول المطلوبة", variant: "destructive" });
       return;
     }
     if (!selectedPlan) {
@@ -152,9 +153,10 @@ const AddAdPage = () => {
           ad_tier: adTier,
           store_name: storeName,
           city: location,
+          phone,
           total_price: totalPrice ?? 0,
           email: wantsEmail ? email : null,
-        })
+        } as any)
         .select("id, order_number")
         .single();
 
@@ -352,6 +354,11 @@ const AddAdPage = () => {
           <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">اسم المتجر / النشاط</label>
             <input type="text" value={storeName} onChange={(e) => setStoreName(e.target.value)} placeholder="مثال: كافيه الديوان" className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground placeholder:text-muted-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring" />
+          </div>
+
+          <div>
+            <label className="block text-[13px] font-bold text-foreground mb-1.5">رقم التواصل</label>
+            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="05XXXXXXXX" dir="ltr" className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground placeholder:text-muted-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring text-left" />
           </div>
 
           <div>
