@@ -126,6 +126,7 @@ export type Database = {
           email: string | null
           id: string
           order_number: number
+          phone: string | null
           status: string
           store_name: string
           total_price: number
@@ -138,6 +139,7 @@ export type Database = {
           email?: string | null
           id?: string
           order_number?: number
+          phone?: string | null
           status?: string
           store_name: string
           total_price?: number
@@ -150,6 +152,7 @@ export type Database = {
           email?: string | null
           id?: string
           order_number?: number
+          phone?: string | null
           status?: string
           store_name?: string
           total_price?: number
