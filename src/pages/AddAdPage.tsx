@@ -97,8 +97,19 @@ const AddAdPage = () => {
   const handleMainImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (mainImage) URL.revokeObjectURL(mainImage.preview);
-    setMainImage({ file, preview: URL.createObjectURL(file) });
+    if (mainMedia) URL.revokeObjectURL(mainMedia.preview);
+    setMainMedia({ file, preview: URL.createObjectURL(file), type: 'image' });
+  };
+
+  const handleMainVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 50 * 1024 * 1024) {
+      toast({ title: "تنبيه", description: "حجم الفيديو يجب أن لا يتجاوز 50 ميقا", variant: "destructive" });
+      return;
+    }
+    if (mainMedia) URL.revokeObjectURL(mainMedia.preview);
+    setMainMedia({ file, preview: URL.createObjectURL(file), type: 'video' });
   };
 
   const handleExtraImages = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,6 +119,17 @@ const AddAdPage = () => {
       .slice(0, 10 - extraImages.length)
       .map((file) => ({ file, preview: URL.createObjectURL(file) }));
     setExtraImages((prev) => [...prev, ...newImages]);
+  };
+
+  const handleExtraVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 50 * 1024 * 1024) {
+      toast({ title: "تنبيه", description: "حجم الفيديو يجب أن لا يتجاوز 50 ميقا", variant: "destructive" });
+      return;
+    }
+    if (extraVideo) URL.revokeObjectURL(extraVideo.preview);
+    setExtraVideo({ file, preview: URL.createObjectURL(file) });
   };
 
   const removeExtraImage = (index: number) => {
@@ -123,6 +145,15 @@ const AddAdPage = () => {
     const { error } = await supabase.storage.from("ad-request-images").upload(path, file);
     if (error) throw error;
     const { data: urlData } = supabase.storage.from("ad-request-images").getPublicUrl(path);
+    return urlData.publicUrl;
+  };
+
+  const uploadVideo = async (file: File, requestId: string, index: number) => {
+    const ext = file.name.split(".").pop();
+    const path = `${requestId}/${index}-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("ad-request-videos").upload(path, file);
+    if (error) throw error;
+    const { data: urlData } = supabase.storage.from("ad-request-videos").getPublicUrl(path);
     return urlData.publicUrl;
   };
 
