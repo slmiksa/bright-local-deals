@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Eye, Sparkles, ChevronLeft } from "lucide-react";
+import { Eye, Sparkles, ChevronLeft, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useFeaturedAds } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
@@ -13,7 +13,8 @@ const FeaturedSlider = () => {
 
   const slides = featured.slice(0, 5).map((ad) => ({
     id: ad.id,
-    image: ad.images[0],
+    image: ad.images[0] || null,
+    firstMedia: ad.media?.[0] || null,
     title: ad.offer,
     subtitle: ad.shopName
   }));
@@ -59,11 +60,30 @@ const FeaturedSlider = () => {
             className="snap-center shrink-0 w-[88%] rounded-3xl overflow-hidden relative cursor-pointer group"
             style={{ aspectRatio: "3/4" }}
             onClick={() => navigate(`/ad/${slide.id}`)}>
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-active:scale-105"
-              loading="lazy" />
+            {slide.firstMedia?.type === 'video' ? (
+              <>
+                <video
+                  src={slide.firstMedia.url}
+                  className="w-full h-full object-cover"
+                  muted
+                  playsInline
+                  preload="metadata"
+                  loading="lazy" />
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <Play className="w-12 h-12 text-white/80 fill-white/80 drop-shadow-lg" />
+                </div>
+              </>
+            ) : slide.image ? (
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="w-full h-full object-cover transition-transform duration-500 group-active:scale-105"
+                loading="lazy" />
+            ) : (
+              <div className="w-full h-full bg-muted flex items-center justify-center">
+                <span className="text-muted-foreground">لا توجد صور</span>
+              </div>
+            )}
             <div
               className="absolute inset-0 rounded-3xl pointer-events-none"
               style={{
