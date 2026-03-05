@@ -42,12 +42,16 @@ const AdminSettings = () => {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({ email: newEmail.trim() });
-    if (error) {
-      toast({ title: "خطأ", description: error.message, variant: "destructive" });
+    const { data, error } = await supabase.functions.invoke("update-admin-email", {
+      body: { newEmail: newEmail.trim() },
+    });
+    if (error || data?.error) {
+      toast({ title: "خطأ", description: data?.error || error?.message, variant: "destructive" });
     } else {
-      toast({ title: "تم", description: "تم إرسال رابط التأكيد إلى البريد الجديد" });
+      toast({ title: "تم", description: "تم تغيير البريد الإلكتروني بنجاح" });
       setNewEmail("");
+      // Refresh session to reflect new email
+      await supabase.auth.refreshSession();
     }
     setLoading(false);
   };
