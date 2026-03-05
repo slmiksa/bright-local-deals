@@ -406,26 +406,38 @@ const AddAdPage = () => {
             </select>
           </div>
 
-          {/* Main image */}
+          {/* Main media */}
           <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">
-              الصورة الأساسية <span className="text-[11px] text-muted-foreground font-normal">(تظهر كغلاف للإعلان)</span>
+              الوسائط الأساسية <span className="text-[11px] text-muted-foreground font-normal">(صورة أو فيديو يظهر كغلاف)</span>
             </label>
             <input ref={mainInputRef} type="file" accept="image/*" className="hidden" onChange={handleMainImage} />
-            {mainImage ? (
+            <input ref={mainVideoInputRef} type="file" accept="video/*" className="hidden" onChange={handleMainVideo} />
+            {mainMedia ? (
               <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border-2 border-primary">
-                <img src={mainImage.preview} alt="الصورة الأساسية" className="w-full h-full object-cover" />
-                <button type="button" onClick={() => { URL.revokeObjectURL(mainImage.preview); setMainImage(null); }} className="absolute top-2 left-2 w-7 h-7 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform">
+                {mainMedia.type === 'video' ? (
+                  <video src={mainMedia.preview} className="w-full h-full object-cover" controls />
+                ) : (
+                  <img src={mainMedia.preview} alt="الغلاف" className="w-full h-full object-cover" />
+                )}
+                <button type="button" onClick={() => { URL.revokeObjectURL(mainMedia.preview); setMainMedia(null); }} className="absolute top-2 left-2 w-7 h-7 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform">
                   <X className="w-4 h-4 text-primary-foreground" />
                 </button>
-                <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-lg">صورة الغلاف</div>
+                <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-lg">
+                  {mainMedia.type === 'video' ? 'فيديو الغلاف' : 'صورة الغلاف'}
+                </div>
               </div>
             ) : (
-              <button type="button" onClick={() => mainInputRef.current?.click()} className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 flex flex-col items-center justify-center gap-2 active:bg-primary/10 transition-colors">
-                <Camera className="w-8 h-8 text-primary/60" />
-                <span className="text-[13px] font-bold text-primary/70">اختر صورة الغلاف</span>
-                <span className="text-[11px] text-muted-foreground">تظهر في بطاقة الإعلان</span>
-              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button type="button" onClick={() => mainInputRef.current?.click()} className="aspect-[4/3] rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 flex flex-col items-center justify-center gap-2 active:bg-primary/10 transition-colors">
+                  <Camera className="w-7 h-7 text-primary/60" />
+                  <span className="text-[12px] font-bold text-primary/70">صورة غلاف</span>
+                </button>
+                <button type="button" onClick={() => mainVideoInputRef.current?.click()} className="aspect-[4/3] rounded-2xl border-2 border-dashed border-accent/40 bg-accent/5 flex flex-col items-center justify-center gap-2 active:bg-accent/10 transition-colors">
+                  <Video className="w-7 h-7 text-accent/60" />
+                  <span className="text-[12px] font-bold text-accent/70">فيديو غلاف</span>
+                </button>
+              </div>
             )}
           </div>
 
@@ -447,11 +459,33 @@ const AddAdPage = () => {
               {extraImages.length < 10 && (
                 <button type="button" onClick={() => extraInputRef.current?.click()} className="aspect-square rounded-xl border-2 border-dashed border-border bg-secondary/30 flex flex-col items-center justify-center gap-1 active:bg-secondary/50 transition-colors">
                   <ImagePlus className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-[10px] text-muted-foreground">إضافة</span>
+                  <span className="text-[10px] text-muted-foreground">إضافة صور</span>
                 </button>
               )}
             </div>
             {extraImages.length > 0 && <p className="text-[11px] text-muted-foreground mt-1.5">{extraImages.length} / 10 صور</p>}
+          </div>
+
+          {/* Extra video */}
+          <div>
+            <label className="block text-[13px] font-bold text-foreground mb-1.5">
+              فيديو إضافي <span className="text-[11px] text-muted-foreground font-normal">(اختياري - يظهر داخل تفاصيل الإعلان)</span>
+            </label>
+            <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={handleExtraVideo} />
+            {extraVideo ? (
+              <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-border">
+                <video src={extraVideo.preview} className="w-full h-full object-cover" controls />
+                <button type="button" onClick={() => { URL.revokeObjectURL(extraVideo.preview); setExtraVideo(null); }} className="absolute top-2 left-2 w-7 h-7 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform">
+                  <X className="w-4 h-4 text-primary-foreground" />
+                </button>
+              </div>
+            ) : (
+              <button type="button" onClick={() => videoInputRef.current?.click()} className="w-full py-4 rounded-2xl border-2 border-dashed border-border bg-secondary/30 flex items-center justify-center gap-2 active:bg-secondary/50 transition-colors">
+                <Video className="w-5 h-5 text-muted-foreground" />
+                <span className="text-[12px] font-bold text-muted-foreground">إضافة فيديو</span>
+                <span className="text-[10px] text-muted-foreground">(حتى 50 ميقا)</span>
+              </button>
+            )}
           </div>
 
           {/* Email notification */}
