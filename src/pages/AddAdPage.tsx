@@ -76,10 +76,13 @@ const AddAdPage = () => {
 
   const [wantsEmail, setWantsEmail] = useState(false);
   const [email, setEmail] = useState("");
-  const [mainImage, setMainImage] = useState<{ file: File; preview: string } | null>(null);
+  const [mainMedia, setMainMedia] = useState<{ file: File; preview: string; type: 'image' | 'video' } | null>(null);
   const [extraImages, setExtraImages] = useState<{ file: File; preview: string }[]>([]);
+  const [extraVideo, setExtraVideo] = useState<{ file: File; preview: string } | null>(null);
   const mainInputRef = useRef<HTMLInputElement>(null);
   const extraInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const mainVideoInputRef = useRef<HTMLInputElement>(null);
 
   const selectedPlan = useMemo(
     () => pricingPlans.find((plan) => plan.name === adType) || null,
