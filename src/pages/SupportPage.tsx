@@ -15,18 +15,18 @@ type SupportContact = {
   active: boolean;
 };
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+const iconMap: Record<string, React.ComponentType<{className?: string;}>> = {
   whatsapp: MessageCircle,
   phone: Phone,
-  email: Mail,
+  email: Mail
 };
 
 const getAction = (type: string, value: string) => {
   switch (type) {
-    case "whatsapp": return () => window.open(`https://wa.me/${value}`, "_blank");
-    case "phone": return () => window.open(`tel:${value}`);
-    case "email": return () => window.open(`mailto:${value}`);
-    default: return () => {};
+    case "whatsapp":return () => window.open(`https://wa.me/${value}`, "_blank");
+    case "phone":return () => window.open(`tel:${value}`);
+    case "email":return () => window.open(`mailto:${value}`);
+    default:return () => {};
   }
 };
 
@@ -67,8 +67,8 @@ const SupportPage = () => {
               <button
                 key={contact.id}
                 onClick={getAction(contact.contact_type, contact.contact_value)}
-                className="w-full flex items-center gap-4 p-4 bg-card rounded-2xl border border-border active:scale-[0.98] transition-transform"
-              >
+                className="w-full flex items-center gap-4 p-4 bg-card rounded-2xl border border-border active:scale-[0.98] transition-transform">
+                
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${contact.icon_color}`}>
                   <Icon className="w-6 h-6" />
                 </div>
@@ -76,15 +76,15 @@ const SupportPage = () => {
                   <p className="text-[14px] font-bold text-foreground">{contact.title}</p>
                   <p className="text-[12px] text-muted-foreground">{contact.description}</p>
                 </div>
-              </button>
-            );
+              </button>);
+
           })}
         </div>
 
         <button
           onClick={() => navigate("/privacy")}
-          className="w-full flex items-center gap-4 p-4 bg-card rounded-2xl border border-border active:scale-[0.98] transition-transform"
-        >
+          className="w-full flex items-center gap-4 p-4 bg-card rounded-2xl border border-border active:scale-[0.98] transition-transform">
+          
           <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-purple-500/10 text-purple-600">
             <FileText className="w-6 h-6" />
           </div>
@@ -102,9 +102,9 @@ const SupportPage = () => {
           </div>
           <Accordion type="single" collapsible className="space-y-2">
             <AccordionItem value="1" className="bg-card rounded-2xl border border-border px-4 [&[data-state=open]]:pb-2">
-              <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">ما هو تطبيق لمحة؟</AccordionTrigger>
+              <AccordionTrigger className="text-[13px] font-semibold text-foreground text-right hover:no-underline py-3">ما هو تطبيق عروض؟</AccordionTrigger>
               <AccordionContent className="text-[12px] text-muted-foreground text-right leading-relaxed">
-                تطبيق لمحة  هو  تجمع أفضل العروض والخصومات من مختلف المتاجر والمحلات في مدينتك، ليسهّل عليك الوصول لأحدث العروض وتوفير المال.
+                تطبيق عروض هو منصة إلكترونية تجمع أفضل العروض والخصومات من مختلف المتاجر والمحلات في مدينتك، ليسهّل عليك الوصول لأحدث العروض وتوفير المال.
               </AccordionContent>
             </AccordionItem>
 
@@ -173,17 +173,12 @@ const SupportPage = () => {
           </Accordion>
         </div>
 
-        <a
-          href="https://trndsky.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block text-center text-muted-foreground text-[11px] pt-4 active:opacity-70 transition-opacity"
-        >
-          تطوير وبرمجة شركة TRNDSKY
-        </a>
+        <p className="text-center pt-4 text-primary text-sm font-extrabold">
+          أوقات العمل: من السبت إلى الخميس ٩ ص - ٩ م
+        </p>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default SupportPage;
