@@ -67,8 +67,7 @@ const FeaturedSlider = () => {
                   className="w-full h-full object-cover"
                   muted
                   playsInline
-                  preload="metadata"
-                  loading="lazy" />
+                  preload="metadata" />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <Play className="w-12 h-12 text-white/80 fill-white/80 drop-shadow-lg" />
                 </div>
