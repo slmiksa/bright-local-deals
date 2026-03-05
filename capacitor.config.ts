@@ -27,6 +27,9 @@ const config: CapacitorConfig = {
       resize: 'body',
       resizeOnFullScreen: true,
     },
+    Camera: {
+      presentationStyle: 'fullscreen',
+    },
   },
 };
 
