@@ -126,7 +126,7 @@ const AddAdPage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!adType || !storeName || !location || !phone) {
+    if (!adType || !storeName || !location || !phone?.trim()) {
       toast({ title: "تنبيه", description: "يرجى تعبئة جميع الحقول المطلوبة", variant: "destructive" });
       return;
     }
@@ -357,8 +357,8 @@ const AddAdPage = () => {
           </div>
 
           <div>
-            <label className="block text-[13px] font-bold text-foreground mb-1.5">رقم التواصل</label>
-            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="05XXXXXXXX" dir="ltr" className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground placeholder:text-muted-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring text-left" />
+            <label className="block text-[13px] font-bold text-foreground mb-1.5">رقم التواصل <span className="text-destructive">*</span></label>
+            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="05XXXXXXXX" required dir="ltr" className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground placeholder:text-muted-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring text-left" />
           </div>
 
           <div>
