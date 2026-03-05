@@ -1,23 +1,29 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Phone, Images, Eye, Heart } from "lucide-react";
+import { Phone, Images, Eye, Heart, Play } from "lucide-react";
 import ImageLightbox from "./ImageLightbox";
 import { useAdStats } from "@/hooks/useAdStats";
+import { AdMedia } from "@/hooks/useAds";
 
 interface AdCardProps {
   id: number;
   images: string[];
+  media?: AdMedia[];
   shopName: string;
   offer: string;
   featured?: boolean;
 }
 
-const AdCard = ({ id, images, shopName, offer, featured }: AdCardProps) => {
+const AdCard = ({ id, images, media = [], shopName, offer, featured }: AdCardProps) => {
   const navigate = useNavigate();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [imgIndex, setImgIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { views, likes, liked, toggleLike } = useAdStats(id);
+
+  // Use media array if available, fallback to images
+  const mediaItems = media.length > 0 ? media : images.map(url => ({ url, type: 'image' as const }));
+  const lightboxImages = images.length > 0 ? images : mediaItems.filter(m => m.type === 'image').map(m => m.url);
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
@@ -25,6 +31,29 @@ const AdCard = ({ id, images, shopName, offer, featured }: AdCardProps) => {
     const cardWidth = el.clientWidth;
     const index = Math.round(el.scrollLeft / cardWidth);
     setImgIndex(Math.abs(index));
+  };
+
+  const renderMediaItem = (m: AdMedia, i: number) => {
+    if (m.type === 'video') {
+      return (
+        <div key={i} className="w-full h-full shrink-0 snap-center relative cursor-pointer" onClick={() => navigate(`/ad/${id}`)}>
+          <video src={m.url} className="w-full h-full object-cover" muted playsInline preload="metadata" />
+          <div className="absolute inset-0 flex items-center justify-center bg-foreground/20 pointer-events-none">
+            <Play className="w-10 h-10 text-primary-foreground fill-primary-foreground drop-shadow-lg" />
+          </div>
+        </div>
+      );
+    }
+    return (
+      <img
+        key={i}
+        src={m.url}
+        alt={`${shopName} ${i + 1}`}
+        className="w-full h-full object-cover shrink-0 snap-center cursor-pointer"
+        loading="lazy"
+        onClick={() => { setImgIndex(i); setLightboxOpen(true); }}
+      />
+    );
   };
 
   return (
@@ -35,32 +64,21 @@ const AdCard = ({ id, images, shopName, offer, featured }: AdCardProps) => {
         }`}
       >
         <div className="relative aspect-[4/3] overflow-hidden">
-          {images.length > 1 ? (
+          {mediaItems.length > 1 ? (
             <div
               ref={scrollRef}
               onScroll={handleScroll}
               className="flex w-full h-full overflow-x-auto snap-x snap-mandatory hide-scrollbar"
               dir="ltr"
             >
-              {images.map((img, i) => (
-                <img
-                  key={i}
-                  src={img}
-                  alt={`${shopName} ${i + 1}`}
-                  className="w-full h-full object-cover shrink-0 snap-center cursor-pointer"
-                  loading="lazy"
-                  onClick={() => { setImgIndex(i); setLightboxOpen(true); }}
-                />
-              ))}
+              {mediaItems.map((m, i) => renderMediaItem(m, i))}
             </div>
+          ) : mediaItems.length === 1 ? (
+            renderMediaItem(mediaItems[0], 0)
           ) : (
-            <img
-              src={images[0]}
-              alt={shopName}
-              className="w-full h-full object-cover cursor-pointer"
-              loading="lazy"
-              onClick={() => { setImgIndex(0); setLightboxOpen(true); }}
-            />
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <span className="text-muted-foreground text-sm">لا توجد صور</span>
+            </div>
           )}
 
           {featured && (
@@ -69,10 +87,10 @@ const AdCard = ({ id, images, shopName, offer, featured }: AdCardProps) => {
             </span>
           )}
 
-          {images.length > 1 && (
+          {mediaItems.length > 1 && (
             <>
               <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none">
-                {images.map((_, i) => (
+                {mediaItems.map((_, i) => (
                   <div
                     key={i}
                     className={`h-1 rounded-full transition-all ${
@@ -83,7 +101,7 @@ const AdCard = ({ id, images, shopName, offer, featured }: AdCardProps) => {
               </div>
               <div className="absolute top-2 left-2 bg-foreground/50 backdrop-blur-sm text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-0.5 pointer-events-none">
                 <Images className="w-2.5 h-2.5" />
-                {images.length}
+                {mediaItems.length}
               </div>
             </>
           )}
@@ -120,8 +138,8 @@ const AdCard = ({ id, images, shopName, offer, featured }: AdCardProps) => {
         </div>
       </div>
 
-      {lightboxOpen && (
-        <ImageLightbox images={images} initialIndex={imgIndex} onClose={() => setLightboxOpen(false)} />
+      {lightboxOpen && lightboxImages.length > 0 && (
+        <ImageLightbox images={lightboxImages} initialIndex={imgIndex} onClose={() => setLightboxOpen(false)} />
       )}
     </>
   );

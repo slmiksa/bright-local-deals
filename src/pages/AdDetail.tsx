@@ -110,7 +110,7 @@ const AdDetail = () => {
           {ad.media.map((m, i) =>
             m.type === 'video' ? (
               <div key={i} className="w-full h-full shrink-0 snap-center relative">
-                <video src={m.url} className="w-full h-full object-cover" controls playsInline />
+                <video src={m.url} className="w-full h-full object-cover" controls playsInline preload="auto" />
               </div>
             ) : (
               <img key={i} src={m.url} alt={`${ad.shopName} ${i + 1}`} className="w-full h-full object-cover shrink-0 snap-center cursor-pointer" onClick={() => {setLightboxIndex(i);setLightboxOpen(true);}} />
