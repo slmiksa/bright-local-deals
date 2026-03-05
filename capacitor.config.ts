@@ -1,12 +1,9 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.82a916c512ed4a21815c51a771dd7b5b',
+  appId: 'com.trndsky.lamha',
   appName: 'لمحة',
   webDir: 'dist',
-  server: {
-    url: 'https://lamha.trndsky.com',
-  },
   ios: {
     contentInset: 'always',
     preferredContentMode: 'mobile',
