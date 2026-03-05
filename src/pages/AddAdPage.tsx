@@ -170,8 +170,8 @@ const AddAdPage = () => {
       toast({ title: "تنبيه", description: "يرجى إدخال البريد الإلكتروني", variant: "destructive" });
       return;
     }
-    if (!mainImage) {
-      toast({ title: "تنبيه", description: "يرجى اختيار الصورة الأساسية", variant: "destructive" });
+    if (!mainMedia) {
+      toast({ title: "تنبيه", description: "يرجى اختيار الصورة أو الفيديو الأساسي", variant: "destructive" });
       return;
     }
 
@@ -193,15 +193,25 @@ const AddAdPage = () => {
 
       if (reqError || !request) throw reqError || new Error("فشل إنشاء الطلب");
 
-      // 2. Upload images
-      const mainUrl = await uploadImage(mainImage.file, request.id, 0);
+      // 2. Upload main media
+      let mainUrl: string;
+      let mainMediaType: string;
+      if (mainMedia.type === 'video') {
+        mainUrl = await uploadVideo(mainMedia.file, request.id, 0);
+        mainMediaType = 'video';
+      } else {
+        mainUrl = await uploadImage(mainMedia.file, request.id, 0);
+        mainMediaType = 'image';
+      }
       await supabase.from("ad_request_images").insert({
         request_id: request.id,
         image_url: mainUrl,
         is_main: true,
         sort_order: 0,
+        media_type: mainMediaType,
       });
 
+      // 3. Upload extra images
       for (let i = 0; i < extraImages.length; i++) {
         const url = await uploadImage(extraImages[i].file, request.id, i + 1);
         await supabase.from("ad_request_images").insert({
@@ -209,6 +219,19 @@ const AddAdPage = () => {
           image_url: url,
           is_main: false,
           sort_order: i + 1,
+          media_type: 'image',
+        });
+      }
+
+      // 4. Upload extra video if exists
+      if (extraVideo) {
+        const videoUrl = await uploadVideo(extraVideo.file, request.id, extraImages.length + 1);
+        await supabase.from("ad_request_images").insert({
+          request_id: request.id,
+          image_url: videoUrl,
+          is_main: false,
+          sort_order: extraImages.length + 1,
+          media_type: 'video',
         });
       }
 
