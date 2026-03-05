@@ -83,7 +83,7 @@ async function fetchAds(city?: string, category?: string, featured?: boolean): P
   const now = new Date().toISOString();
   let query = supabase
     .from("ads")
-    .select("*, ad_images(image_url, sort_order)")
+    .select("*, ad_images(image_url, sort_order, media_type)")
     .eq("active", true)
     .lte("start_date", now)
     .order("created_at", { ascending: false });
@@ -103,7 +103,7 @@ async function fetchAds(city?: string, category?: string, featured?: boolean): P
 async function fetchAdById(id: number): Promise<Ad | null> {
   const { data, error } = await supabase
     .from("ads")
-    .select("*, ad_images(image_url, sort_order)")
+    .select("*, ad_images(image_url, sort_order, media_type)")
     .eq("id", id)
     .single();
 
