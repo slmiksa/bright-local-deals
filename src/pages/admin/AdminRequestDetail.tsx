@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, Star, Sparkles, MapPin, Store, Tag, DollarSign, Clock, Image as ImageIcon, Play } from "lucide-react";
+import { ArrowRight, Star, Sparkles, MapPin, Store, Tag, DollarSign, Clock, Image as ImageIcon, Play, Phone } from "lucide-react";
 import { useState } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
 
@@ -84,6 +84,7 @@ const AdminRequestDetail = () => {
         <InfoCard icon={Tag} label="نوع الإعلان" value={request.ad_type} />
         <InfoCard icon={request.ad_tier === "متميز" ? Sparkles : Star} label="فئة الإعلان" value={request.ad_tier} />
         <InfoCard icon={MapPin} label="المدينة" value={request.city} />
+        <InfoCard icon={Phone} label="رقم التواصل" value={(request as any).phone || "غير محدد"} />
         <InfoCard icon={DollarSign} label="السعر" value={`${request.total_price} ريال`} highlight />
         <InfoCard icon={Clock} label="الحالة" value={statusLabels[request.status] || request.status} />
       </div>
