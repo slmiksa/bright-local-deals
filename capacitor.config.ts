@@ -5,8 +5,7 @@ const config: CapacitorConfig = {
   appName: 'لمحة',
   webDir: 'dist',
   server: {
-    url: 'https://82a916c5-12ed-4a21-815c-51a771dd7b5b.lovableproject.com?forceHideBadge=true',
-    cleartext: true,
+    url: 'https://lamha.trndsky.com',
   },
   ios: {
     contentInset: 'always',
