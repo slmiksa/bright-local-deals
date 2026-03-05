@@ -126,7 +126,7 @@ const AddAdPage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!adType || !storeName || !location || !phone) {
+    if (!adType || !storeName || !location || !phone?.trim()) {
       toast({ title: "تنبيه", description: "يرجى تعبئة جميع الحقول المطلوبة", variant: "destructive" });
       return;
     }
