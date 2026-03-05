@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, X, Check, Search, Upload, Image as ImageIcon, CalendarIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, Search, Upload, Image as ImageIcon, CalendarIcon, Video, Play } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { resolveImageUrl } from "@/data/imageMap";
 import { format } from "date-fns";
@@ -23,7 +23,7 @@ interface DbAd {
   active: boolean | null;
   start_date: string | null;
   end_date: string | null;
-  ad_images: { id: string; image_url: string; sort_order: number | null }[];
+  ad_images: { id: string; image_url: string; sort_order: number | null; media_type?: string }[];
 }
 
 interface Category {
@@ -56,15 +56,15 @@ const AdminAds = () => {
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [search, setSearch] = useState("");
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [existingImages, setExistingImages] = useState<{ id: string; url: string }[]>([]);
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  const [existingMedia, setExistingMedia] = useState<{ id: string; url: string; media_type: string }[]>([]);
   const [uploading, setUploading] = useState(false);
 
   const fetchAds = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase
       .from("ads")
-      .select("*, ad_images(id, image_url, sort_order)")
+      .select("*, ad_images(id, image_url, sort_order, media_type)")
       .order("id", { ascending: false });
     setAds((data as unknown as DbAd[]) || []);
     setLoading(false);
@@ -100,51 +100,63 @@ const AdminAds = () => {
       start_date: ad.start_date ? new Date(ad.start_date) : null,
       end_date: ad.end_date ? new Date(ad.end_date) : null,
     });
-    setExistingImages(
+    setExistingMedia(
       ad.ad_images
         .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
-        .map(i => ({ id: i.id, url: i.image_url }))
+        .map(i => ({ id: i.id, url: i.image_url, media_type: i.media_type || 'image' }))
     );
-    setImageFiles([]);
+    setMediaFiles([]);
     setShowForm(true);
   };
 
   const openNew = () => {
     setEditId(null);
     setForm(emptyForm);
-    setImageFiles([]);
-    setExistingImages([]);
+    setMediaFiles([]);
+    setExistingMedia([]);
     setShowForm(true);
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video' = 'image') => {
     if (e.target.files) {
-      setImageFiles(prev => [...prev, ...Array.from(e.target.files!)]);
+      const files = Array.from(e.target.files);
+      if (type === 'video') {
+        const oversized = files.find(f => f.size > 50 * 1024 * 1024);
+        if (oversized) {
+          toast({ title: "خطأ", description: "حجم الفيديو يجب أن يكون أقل من 50 ميجابايت", variant: "destructive" });
+          return;
+        }
+      }
+      setMediaFiles(prev => [...prev, ...files]);
     }
   };
 
-  const removeNewImage = (index: number) => {
-    setImageFiles(prev => prev.filter((_, i) => i !== index));
+  const removeNewMedia = (index: number) => {
+    setMediaFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const removeExistingImage = (id: string) => {
-    setExistingImages(prev => prev.filter(img => img.id !== id));
+  const removeExistingMedia = (id: string) => {
+    setExistingMedia(prev => prev.filter(img => img.id !== id));
   };
 
-  const uploadImages = async (adId: number): Promise<string[]> => {
-    const urls: string[] = [];
-    for (const file of imageFiles) {
+  const isVideoFile = (file: File) => file.type.startsWith('video/');
+
+  const uploadMedia = async (adId: number): Promise<{ url: string; media_type: string }[]> => {
+    const results: { url: string; media_type: string }[] = [];
+    for (const file of mediaFiles) {
+      const isVideo = isVideoFile(file);
+      const bucket = isVideo ? "ad-videos" : "ad-images";
       const ext = file.name.split('.').pop();
       const path = `${adId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error } = await supabase.storage.from("ad-images").upload(path, file);
+      const { error } = await supabase.storage.from(bucket).upload(path, file);
       if (error) {
-        toast({ title: "خطأ في رفع الصورة", description: error.message, variant: "destructive" });
+        toast({ title: `خطأ في رفع ${isVideo ? 'الفيديو' : 'الصورة'}`, description: error.message, variant: "destructive" });
         continue;
       }
-      const { data: urlData } = supabase.storage.from("ad-images").getPublicUrl(path);
-      urls.push(urlData.publicUrl);
+      const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path);
+      results.push({ url: urlData.publicUrl, media_type: isVideo ? 'video' : 'image' });
     }
-    return urls;
+    return results;
   };
 
   const handleSave = async () => {
@@ -183,9 +195,9 @@ const AdminAds = () => {
     }
 
     if (adId) {
-      // Delete removed existing images
+      // Delete removed existing media
       if (editId) {
-        const keepIds = existingImages.map(i => i.id);
+        const keepIds = existingMedia.map(i => i.id);
         const originalAd = ads.find(a => a.id === editId);
         const removedImages = originalAd?.ad_images.filter(i => !keepIds.includes(i.id)) || [];
         for (const img of removedImages) {
@@ -193,12 +205,12 @@ const AdminAds = () => {
         }
       }
 
-      // Upload new images
-      const newUrls = await uploadImages(adId);
-      const startOrder = existingImages.length;
-      if (newUrls.length > 0) {
+      // Upload new media
+      const newMedia = await uploadMedia(adId);
+      const startOrder = existingMedia.length;
+      if (newMedia.length > 0) {
         await supabase.from("ad_images").insert(
-          newUrls.map((url, i) => ({ ad_id: adId!, image_url: url, sort_order: startOrder + i }))
+          newMedia.map((m, i) => ({ ad_id: adId!, image_url: m.url, sort_order: startOrder + i, media_type: m.media_type }))
         );
       }
     }
@@ -360,18 +372,24 @@ const AdminAds = () => {
                 </div>
               </div>
 
-              {/* Image Upload Section */}
+              {/* Media Upload Section */}
               <div>
-                <label className="block text-xs font-bold text-foreground mb-2">صور الإعلان</label>
+                <label className="block text-xs font-bold text-foreground mb-2">صور وفيديوهات الإعلان</label>
                 
-                {/* Existing images */}
-                {existingImages.length > 0 && (
+                {/* Existing media */}
+                {existingMedia.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-2">
-                    {existingImages.map((img) => (
-                      <div key={img.id} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border group">
-                        <img src={resolveImageUrl(img.url)} alt="" className="w-full h-full object-cover" />
+                    {existingMedia.map((m) => (
+                      <div key={m.id} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border group">
+                        {m.media_type === 'video' ? (
+                          <div className="w-full h-full bg-muted flex items-center justify-center">
+                            <Play className="w-6 h-6 text-muted-foreground" />
+                          </div>
+                        ) : (
+                          <img src={resolveImageUrl(m.url)} alt="" className="w-full h-full object-cover" />
+                        )}
                         <button
-                          onClick={() => removeExistingImage(img.id)}
+                          onClick={() => removeExistingMedia(m.id)}
                           className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="w-4 h-4 text-white" />
@@ -381,14 +399,20 @@ const AdminAds = () => {
                   </div>
                 )}
 
-                {/* New image previews */}
-                {imageFiles.length > 0 && (
+                {/* New media previews */}
+                {mediaFiles.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-2">
-                    {imageFiles.map((file, i) => (
+                    {mediaFiles.map((file, i) => (
                       <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-primary/30 group">
-                        <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
+                        {isVideoFile(file) ? (
+                          <div className="w-full h-full bg-muted flex items-center justify-center">
+                            <Play className="w-6 h-6 text-primary" />
+                          </div>
+                        ) : (
+                          <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
+                        )}
                         <button
-                          onClick={() => removeNewImage(i)}
+                          onClick={() => removeNewMedia(i)}
                           className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="w-4 h-4 text-white" />
@@ -398,18 +422,30 @@ const AdminAds = () => {
                   </div>
                 )}
 
-                {/* Upload button */}
-                <label className="flex items-center justify-center gap-2 w-full h-20 rounded-xl border-2 border-dashed border-border hover:border-primary/50 bg-background cursor-pointer transition-colors">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                  <Upload className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">اضغط لاختيار صور</span>
-                </label>
+                {/* Upload buttons */}
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="flex items-center justify-center gap-2 w-full h-16 rounded-xl border-2 border-dashed border-border hover:border-primary/50 bg-background cursor-pointer transition-colors">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handleFileSelect(e, 'image')}
+                      className="hidden"
+                    />
+                    <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">إضافة صور</span>
+                  </label>
+                  <label className="flex items-center justify-center gap-2 w-full h-16 rounded-xl border-2 border-dashed border-border hover:border-primary/50 bg-background cursor-pointer transition-colors">
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => handleFileSelect(e, 'video')}
+                      className="hidden"
+                    />
+                    <Video className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">إضافة فيديو</span>
+                  </label>
+                </div>
               </div>
 
               {/* Date Range */}
