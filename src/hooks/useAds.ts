@@ -2,9 +2,15 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { resolveImageUrl } from "@/data/imageMap";
 
+export interface AdMedia {
+  url: string;
+  type: 'image' | 'video';
+}
+
 export interface Ad {
   id: number;
   images: string[];
+  media: AdMedia[];
   shopName: string;
   offer: string;
   featured?: boolean;
@@ -46,16 +52,20 @@ interface DbAd {
   lat: number | null;
   lng: number | null;
   featured: boolean | null;
-  ad_images: { image_url: string; sort_order: number | null }[];
+  ad_images: { image_url: string; sort_order: number | null; media_type?: string }[];
 }
 
 function mapDbAdToAd(dbAd: DbAd): Ad {
-  const sortedImages = [...(dbAd.ad_images || [])].sort(
+  const sortedMedia = [...(dbAd.ad_images || [])].sort(
     (a, b) => (a.sort_order || 0) - (b.sort_order || 0)
   );
   return {
     id: dbAd.id,
-    images: sortedImages.map((img) => resolveImageUrl(img.image_url)),
+    images: sortedMedia.filter(m => (m.media_type || 'image') === 'image').map((img) => resolveImageUrl(img.image_url)),
+    media: sortedMedia.map((m) => ({
+      url: resolveImageUrl(m.image_url),
+      type: (m.media_type === 'video' ? 'video' : 'image') as 'image' | 'video',
+    })),
     shopName: dbAd.shop_name,
     offer: dbAd.offer,
     featured: dbAd.featured || false,
@@ -73,7 +83,7 @@ async function fetchAds(city?: string, category?: string, featured?: boolean): P
   const now = new Date().toISOString();
   let query = supabase
     .from("ads")
-    .select("*, ad_images(image_url, sort_order)")
+    .select("*, ad_images(image_url, sort_order, media_type)")
     .eq("active", true)
     .lte("start_date", now)
     .order("created_at", { ascending: false });
@@ -93,7 +103,7 @@ async function fetchAds(city?: string, category?: string, featured?: boolean): P
 async function fetchAdById(id: number): Promise<Ad | null> {
   const { data, error } = await supabase
     .from("ads")
-    .select("*, ad_images(image_url, sort_order)")
+    .select("*, ad_images(image_url, sort_order, media_type)")
     .eq("id", id)
     .single();
 

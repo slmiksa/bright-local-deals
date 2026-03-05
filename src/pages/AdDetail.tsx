@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images, Eye, Heart } from "lucide-react";
+import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images, Eye, Heart, Play } from "lucide-react";
 import { useAdById } from "@/hooks/useAds";
 import { useState, useRef, useEffect } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
@@ -104,29 +104,52 @@ const AdDetail = () => {
         </div>
       </div>
 
-      {/* Image Gallery */}
+      {/* Media Gallery */}
       <div className="relative aspect-[16/10] overflow-hidden">
         <div ref={scrollRef} onScroll={handleScroll} className="flex w-full h-full overflow-x-auto snap-x snap-mandatory hide-scrollbar" dir="ltr">
-          {ad.images.map((img, i) =>
-          <img key={i} src={img} alt={`${ad.shopName} ${i + 1}`} className="w-full h-full object-cover shrink-0 snap-center cursor-pointer" onClick={() => {setLightboxIndex(i);setLightboxOpen(true);}} />
+          {ad.media.map((m, i) =>
+            m.type === 'video' ? (
+              <div key={i} className="w-full h-full shrink-0 snap-center relative">
+                <video src={m.url} className="w-full h-full object-cover" controls playsInline />
+              </div>
+            ) : (
+              <img key={i} src={m.url} alt={`${ad.shopName} ${i + 1}`} className="w-full h-full object-cover shrink-0 snap-center cursor-pointer" onClick={() => {setLightboxIndex(i);setLightboxOpen(true);}} />
+            )
           )}
         </div>
         {ad.featured && <span className="absolute top-3 right-3 bg-gold text-primary-foreground text-[11px] font-bold px-3 py-1 rounded-xl shadow-elevated flex items-center gap-1 pointer-events-none"><Star className="w-3 h-3" /> مميز</span>}
-        {ad.images.length > 1 && <>
+        {ad.media.length > 1 && <>
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 pointer-events-none">
-            {ad.images.map((_, i) => <div key={i} className={`h-1.5 rounded-full transition-all ${i === imgIndex ? "w-5 bg-primary-foreground" : "w-1.5 bg-primary-foreground/50"}`} />)}
+            {ad.media.map((_, i) => <div key={i} className={`h-1.5 rounded-full transition-all ${i === imgIndex ? "w-5 bg-primary-foreground" : "w-1.5 bg-primary-foreground/50"}`} />)}
           </div>
           <div className="absolute top-3 left-3 bg-foreground/50 backdrop-blur-sm text-primary-foreground text-[11px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 pointer-events-none">
-            <Images className="w-3 h-3" /> {imgIndex + 1}/{ad.images.length}
+            <Images className="w-3 h-3" /> {imgIndex + 1}/{ad.media.length}
           </div>
         </>}
       </div>
 
       {/* Thumbnail strip */}
-      {ad.images.length > 1 && <div className="flex gap-2 px-5 mt-3 overflow-x-auto hide-scrollbar">
-        {ad.images.map((img, i) =>
-        <button key={i} onClick={() => {setLightboxIndex(i);setLightboxOpen(true);}} className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${i === imgIndex ? "border-primary" : "border-transparent opacity-60"}`}>
-            <img src={img} alt="" className="w-full h-full object-cover" />
+      {ad.media.length > 1 && <div className="flex gap-2 px-5 mt-3 overflow-x-auto hide-scrollbar">
+        {ad.media.map((m, i) =>
+        <button key={i} onClick={() => {
+          if (m.type === 'image') { setLightboxIndex(i); setLightboxOpen(true); }
+          else {
+            // Scroll to the video
+            if (scrollRef.current) {
+              scrollRef.current.scrollTo({ left: i * scrollRef.current.clientWidth, behavior: 'smooth' });
+            }
+          }
+        }} className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all relative ${i === imgIndex ? "border-primary" : "border-transparent opacity-60"}`}>
+            {m.type === 'video' ? (
+              <>
+                <video src={m.url} className="w-full h-full object-cover" muted />
+                <div className="absolute inset-0 flex items-center justify-center bg-foreground/20">
+                  <Play className="w-4 h-4 text-primary-foreground fill-primary-foreground" />
+                </div>
+              </>
+            ) : (
+              <img src={m.url} alt="" className="w-full h-full object-cover" />
+            )}
           </button>
         )}
       </div>}
