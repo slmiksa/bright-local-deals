@@ -1,0 +1,1 @@
+DELETE FROM public.support_contacts WHERE id IN ('b889865d-81b7-4075-92ca-cf0a03dc7f7b', '3abbaf46-c463-47ee-9b83-f0bdfe9c88c8');

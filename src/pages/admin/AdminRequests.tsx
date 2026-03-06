@@ -41,6 +41,22 @@ const AdminRequests = () => {
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const { error } = await supabase.from("ad_requests").update({ status }).eq("id", id);
       if (error) throw error;
+
+      // Send acceptance email if approved and customer has email
+      if (status === "approved") {
+        const req = requests.find((r) => r.id === id);
+        if (req?.email) {
+          supabase.functions.invoke("send-acceptance-notification", {
+            body: {
+              orderNumber: req.order_number,
+              storeName: req.store_name,
+              city: req.city,
+              adType: req.ad_type,
+              customerEmail: req.email,
+            },
+          }).catch(console.error);
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-ad-requests"] });
