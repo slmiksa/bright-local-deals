@@ -124,47 +124,45 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             </motion.div>
 
             {/* App name with reveal */}
-            <motion.div className="flex flex-col items-center gap-2">
+            <motion.div className="flex flex-col items-center gap-1 px-6">
               <motion.div className="overflow-hidden">
                 <motion.h1
-                  className="text-[52px] font-black tracking-tight leading-none"
+                  className="text-[28px] font-black tracking-tight leading-tight text-center"
                   style={{ 
                     color: "white",
-                    textShadow: "0 4px 30px hsla(0 0% 0% / 0.3)",
+                    textShadow: "0 2px 20px hsla(0 0% 0% / 0.2)",
                   }}
-                  initial={{ y: 60 }}
+                  initial={{ y: 40 }}
                   animate={{ y: 0 }}
                   transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
                 >
                   لمحة للتسويق الالكتروني
                 </motion.h1>
               </motion.div>
+
+              {/* Gold accent line */}
+              <motion.div
+                className="h-[1.5px] rounded-full my-2"
+                style={{ background: "linear-gradient(90deg, transparent, hsl(40 75% 52%), transparent)" }}
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: 60, opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.5, ease: "easeOut" }}
+              />
+
               <motion.div className="overflow-hidden">
                 <motion.p
-                  className="text-[18px] font-bold tracking-widest"
+                  className="text-[14px] font-semibold tracking-[0.25em] uppercase"
                   style={{ 
-                    color: "hsla(0 0% 100% / 0.8)",
-                    textShadow: "0 2px 10px hsla(0 0% 0% / 0.3)",
+                    color: "hsla(0 0% 100% / 0.65)",
                   }}
-                  initial={{ y: 40 }}
-                  animate={{ y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  initial={{ y: 30, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
                 >
                   Lamha Ads
                 </motion.p>
               </motion.div>
             </motion.div>
-
-            {/* Gold accent line */}
-            <motion.div
-              className="h-[2px] rounded-full my-4"
-              style={{ background: "linear-gradient(90deg, transparent, hsl(40 75% 52%), transparent)" }}
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 80, opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.5, ease: "easeOut" }}
-            />
-
-            {/* Subtitle removed - now integrated with main name */}
           </motion.div>
 
           {/* Phase 1: Animated tagline */}
