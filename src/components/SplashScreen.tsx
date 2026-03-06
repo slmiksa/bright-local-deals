@@ -124,19 +124,35 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             </motion.div>
 
             {/* App name with reveal */}
-            <motion.div className="overflow-hidden">
-              <motion.h1
-                className="text-[52px] font-black tracking-tight leading-none"
-                style={{ 
-                  color: "white",
-                  textShadow: "0 4px 30px hsla(0 0% 0% / 0.3)",
-                }}
-                initial={{ y: 60 }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              >
-                لمحة
-              </motion.h1>
+            <motion.div className="flex flex-col items-center gap-2">
+              <motion.div className="overflow-hidden">
+                <motion.h1
+                  className="text-[52px] font-black tracking-tight leading-none"
+                  style={{ 
+                    color: "white",
+                    textShadow: "0 4px 30px hsla(0 0% 0% / 0.3)",
+                  }}
+                  initial={{ y: 60 }}
+                  animate={{ y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  لمحة للتسويق الالكتروني
+                </motion.h1>
+              </motion.div>
+              <motion.div className="overflow-hidden">
+                <motion.p
+                  className="text-[18px] font-bold tracking-widest"
+                  style={{ 
+                    color: "hsla(0 0% 100% / 0.8)",
+                    textShadow: "0 2px 10px hsla(0 0% 0% / 0.3)",
+                  }}
+                  initial={{ y: 40 }}
+                  animate={{ y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  Lamha Ads
+                </motion.p>
+              </motion.div>
             </motion.div>
 
             {/* Gold accent line */}
@@ -148,18 +164,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
               transition={{ delay: 0.6, duration: 0.5, ease: "easeOut" }}
             />
 
-            {/* Subtitle */}
-            <motion.div className="overflow-hidden">
-              <motion.p
-                className="text-[15px] font-semibold tracking-wide"
-                style={{ color: "hsla(0 0% 100% / 0.7)" }}
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-              >
-                للتسويق الإلكتروني
-              </motion.p>
-            </motion.div>
+            {/* Subtitle removed - now integrated with main name */}
           </motion.div>
 
           {/* Phase 1: Animated tagline */}
