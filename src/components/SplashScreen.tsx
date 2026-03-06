@@ -164,18 +164,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
               transition={{ delay: 0.6, duration: 0.5, ease: "easeOut" }}
             />
 
-            {/* Subtitle */}
-            <motion.div className="overflow-hidden">
-              <motion.p
-                className="text-[15px] font-semibold tracking-wide"
-                style={{ color: "hsla(0 0% 100% / 0.7)" }}
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-              >
-                للتسويق الإلكتروني
-              </motion.p>
-            </motion.div>
+            {/* Subtitle removed - now integrated with main name */}
           </motion.div>
 
           {/* Phase 1: Animated tagline */}
