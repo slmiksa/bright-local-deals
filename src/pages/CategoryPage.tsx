@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Smartphone, CupSoda, SprayCan, Lamp, ChefHat, PartyPopper } from "lucide-react";
+import { Smartphone, CupSoda, SprayCan, Lamp, ChefHat, PartyPopper } from "lucide-react";
 import AdCard from "@/components/AdCard";
 import { useAdsByCategory } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
@@ -38,9 +38,6 @@ const CategoryPage = () => {
     <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
       <TopBar />
       <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
-          <h1 className="text-[16px] font-bold text-foreground">{title}</h1>
-        </div>
-      </div>
 
       <div className="px-5 pt-5 grid grid-cols-2 gap-3">
         {ads.map((ad) => (
