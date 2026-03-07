@@ -15,6 +15,7 @@ const Index = () => {
   return (
     <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto relative" key={city}>
       <TopBar />
+      <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
       <CountdownTimer />
       <FeaturedSlider />
       <EventsSlider />
