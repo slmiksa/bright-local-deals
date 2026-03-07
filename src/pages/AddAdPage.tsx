@@ -257,14 +257,8 @@ const AddAdPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
-      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
-        <div className="px-5 py-3.5 flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="touch-target">
-            <ArrowRight className="w-5 h-5 text-foreground" />
-          </button>
-          <h1 className="text-lg font-bold text-foreground">إضافة إعلان</h1>
-        </div>
-      </div>
+      <TopBar />
+      <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
 
       <div className="px-5 pt-6 space-y-6">
         {/* Pricing display */}
