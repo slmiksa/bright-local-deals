@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { useAdStats, recordView } from "@/hooks/useAdStats";
 import { toast } from "@/hooks/use-toast";
+import TopBar from "@/components/TopBar";
 
 const AdDetail = () => {
   const { id } = useParams();
@@ -43,9 +44,13 @@ const AdDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center max-w-[430px] mx-auto">
-        <div className="text-center p-8">
-          <p className="text-muted-foreground text-lg">جاري التحميل...</p>
+      <div className="min-h-screen bg-background max-w-[430px] mx-auto">
+        <TopBar />
+        <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
+        <div className="flex items-center justify-center pb-28">
+          <div className="text-center p-8">
+            <p className="text-muted-foreground text-lg">جاري التحميل...</p>
+          </div>
         </div>
       </div>);
 
