@@ -5,7 +5,6 @@ const config: CapacitorConfig = {
   appName: 'لمحة',
   webDir: 'dist',
   ios: {
-    contentInset: 'always',
     preferredContentMode: 'mobile',
     backgroundColor: '#f2efe9',
     scheme: 'lamha',
