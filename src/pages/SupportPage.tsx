@@ -45,8 +45,6 @@ const SupportPage = () => {
     <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
       <TopBar />
       <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
-        </div>
-      </div>
 
       <div className="px-5 pt-8 space-y-6">
         <div className="flex flex-col items-center text-center gap-3">
@@ -82,7 +80,7 @@ const SupportPage = () => {
           onClick={() => navigate("/privacy")}
           className="w-full flex items-center gap-4 p-4 bg-card rounded-2xl border border-border active:scale-[0.98] transition-transform">
           
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-purple-500/10 text-purple-600">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-secondary text-secondary-foreground">
             <FileText className="w-6 h-6" />
           </div>
           <div className="text-right flex-1">

@@ -5,6 +5,7 @@ import { toast } from "@/hooks/use-toast";
 import { useCities } from "@/hooks/useAds";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import TopBar from "@/components/TopBar";
 
 type PricingPlan = {
   id: string;
