@@ -58,10 +58,14 @@ const AdDetail = () => {
 
   if (!ad) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center max-w-[430px] mx-auto">
-        <div className="text-center p-8">
-          <p className="text-muted-foreground text-lg">الإعلان غير موجود</p>
-          <button onClick={() => navigate("/")} className="mt-4 text-primary font-bold">العودة للرئيسية</button>
+      <div className="min-h-screen bg-background max-w-[430px] mx-auto">
+        <TopBar />
+        <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
+        <div className="flex items-center justify-center pb-28">
+          <div className="text-center p-8">
+            <p className="text-muted-foreground text-lg">الإعلان غير موجود</p>
+            <button onClick={() => navigate("/")} className="mt-4 text-primary font-bold">العودة للرئيسية</button>
+          </div>
         </div>
       </div>);
 
