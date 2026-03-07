@@ -82,16 +82,32 @@ const AdDetail = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
-        <div className="px-4 py-3 flex items-center justify-between">
-          <button onClick={() => navigate(-1)} className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors">
-            <ArrowRight className="w-5 h-5 text-foreground" />
-          </button>
-          <h1 className="text-[15px] font-bold text-foreground">{ad.shopName}</h1>
-          <button
-            onClick={async () => {
-              const url = `${window.location.origin}/ad/${ad.id}`;
+      <TopBar />
+      <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
+      {/* Horizontal image carousel */}
+      <div className="relative w-full bg-foreground/5 overflow-hidden" style={{ height: "280px" }}>
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="w-full h-full overflow-x-auto scroll-smooth snap-x snap-mandatory hide-scrollbar flex"
+        >
+          {ad.images.length > 0 ? (
+            ad.images.map((img, i) => (
+              <div key={i} className="w-full h-full snap-start shrink-0 flex items-center justify-center bg-foreground/5">
+                <img
+                  src={img}
+                  alt={`${ad.shopName} - ${i + 1}`}
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={() => { setLightboxOpen(true); setLightboxIndex(i); }}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Images className="w-12 h-12 text-muted-foreground/30" />
+            </div>
+          )}
+        </div>
               const shareText = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer} 🔥\n${ad.shopName} | ${ad.city}`;
               try {
                 if (navigator.share) {
