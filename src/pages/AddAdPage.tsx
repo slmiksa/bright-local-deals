@@ -5,7 +5,6 @@ import { toast } from "@/hooks/use-toast";
 import { useCities } from "@/hooks/useAds";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import TopBar from "@/components/TopBar";
 
 type PricingPlan = {
   id: string;
@@ -221,8 +220,14 @@ const AddAdPage = () => {
   if (orderNumber) {
     return (
       <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
-        <TopBar />
-        <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
+        <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
+          <div className="px-5 py-3.5 flex items-center gap-3">
+            <button onClick={() => navigate(-1)} className="touch-target">
+              <ArrowRight className="w-5 h-5 text-foreground" />
+            </button>
+            <h1 className="text-lg font-bold text-foreground">تم إرسال الطلب</h1>
+          </div>
+        </div>
         <div className="px-5 pt-16 flex flex-col items-center text-center gap-4">
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
             <CheckCircle className="w-8 h-8 text-primary" />
@@ -257,8 +262,14 @@ const AddAdPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
-      <TopBar />
-      <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
+      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
+        <div className="px-5 py-3.5 flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="touch-target">
+            <ArrowRight className="w-5 h-5 text-foreground" />
+          </button>
+          <h1 className="text-lg font-bold text-foreground">إضافة إعلان</h1>
+        </div>
+      </div>
 
       <div className="px-5 pt-6 space-y-6">
         {/* Pricing display */}

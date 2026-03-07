@@ -2,7 +2,6 @@ import { Headphones, MessageCircle, Phone, Mail, ArrowRight, FileText, HelpCircl
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import TopBar from "@/components/TopBar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 type SupportContact = {
@@ -43,8 +42,14 @@ const SupportPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
-      <TopBar />
-      <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
+      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
+        <div className="px-5 py-3.5 flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="touch-target">
+            <ArrowRight className="w-5 h-5 text-foreground" />
+          </button>
+          <h1 className="text-lg font-bold text-foreground">الدعم الفني</h1>
+        </div>
+      </div>
 
       <div className="px-5 pt-8 space-y-6">
         <div className="flex flex-col items-center text-center gap-3">
@@ -80,7 +85,7 @@ const SupportPage = () => {
           onClick={() => navigate("/privacy")}
           className="w-full flex items-center gap-4 p-4 bg-card rounded-2xl border border-border active:scale-[0.98] transition-transform">
           
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-secondary text-secondary-foreground">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-purple-500/10 text-purple-600">
             <FileText className="w-6 h-6" />
           </div>
           <div className="text-right flex-1">

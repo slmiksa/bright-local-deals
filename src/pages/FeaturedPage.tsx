@@ -3,7 +3,6 @@ import AdCard from "@/components/AdCard";
 import { useFeaturedAds } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
 import PullToRefresh from "@/components/PullToRefresh";
-import TopBar from "@/components/TopBar";
 
 const FeaturedPage = () => {
   const { city } = useCity();
@@ -11,8 +10,12 @@ const FeaturedPage = () => {
 
   return (
     <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
-      <TopBar />
-      <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
+      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
+        <div className="px-5 py-3.5 flex items-center gap-2">
+          <Star className="w-5 h-5 text-gold" />
+          <h1 className="text-lg font-bold text-foreground">الإعلانات المميزة</h1>
+        </div>
+      </div>
 
       <div className="px-5 pt-5 grid grid-cols-2 gap-3">
         {featured.map((ad) => (

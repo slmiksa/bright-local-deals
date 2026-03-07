@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Smartphone, CupSoda, SprayCan, Lamp, ChefHat, PartyPopper, ChevronLeft } from "lucide-react";
 import PullToRefresh from "@/components/PullToRefresh";
-import TopBar from "@/components/TopBar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -26,8 +25,11 @@ const CategoriesPage = () => {
 
   return (
     <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
-      <TopBar />
-      <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
+      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
+        <div className="px-5 py-3.5">
+          <h1 className="text-lg font-bold text-foreground">التصنيفات</h1>
+        </div>
+      </div>
 
       <div className="px-5 pt-4 space-y-2.5">
         {categories.map((cat) => {

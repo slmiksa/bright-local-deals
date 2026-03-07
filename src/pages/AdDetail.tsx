@@ -5,7 +5,6 @@ import { useState, useRef, useEffect } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { useAdStats, recordView } from "@/hooks/useAdStats";
 import { toast } from "@/hooks/use-toast";
-import TopBar from "@/components/TopBar";
 
 const AdDetail = () => {
   const { id } = useParams();
@@ -21,6 +20,7 @@ const AdDetail = () => {
   useEffect(() => {
     if (ad) {
       recordView(ad.id);
+      // Update OG meta tags dynamically for link previews
       document.title = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`;
       const setMeta = (property: string, content: string) => {
         let el = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
@@ -43,31 +43,23 @@ const AdDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background max-w-[430px] mx-auto">
-        <TopBar />
-        <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
-        <div className="flex items-center justify-center pb-28">
-          <div className="text-center p-8">
-            <p className="text-muted-foreground text-lg">جاري التحميل...</p>
-          </div>
+      <div className="min-h-screen bg-background flex items-center justify-center max-w-[430px] mx-auto">
+        <div className="text-center p-8">
+          <p className="text-muted-foreground text-lg">جاري التحميل...</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   if (!ad) {
     return (
-      <div className="min-h-screen bg-background max-w-[430px] mx-auto">
-        <TopBar />
-        <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
-        <div className="flex items-center justify-center pb-28">
-          <div className="text-center p-8">
-            <p className="text-muted-foreground text-lg">الإعلان غير موجود</p>
-            <button onClick={() => navigate("/")} className="mt-4 text-primary font-bold">العودة للرئيسية</button>
-          </div>
+      <div className="min-h-screen bg-background flex items-center justify-center max-w-[430px] mx-auto">
+        <div className="text-center p-8">
+          <p className="text-muted-foreground text-lg">الإعلان غير موجود</p>
+          <button onClick={() => navigate("/")} className="mt-4 text-primary font-bold">العودة للرئيسية</button>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   const handleScroll = () => {
@@ -81,47 +73,86 @@ const AdDetail = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
-      <TopBar />
-      <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
-      
-      {/* Horizontal image carousel */}
-      <div className="relative w-full bg-foreground/5 overflow-hidden" style={{ height: "280px" }}>
-        <div
-          ref={scrollRef}
-          onScroll={handleScroll}
-          className="w-full h-full overflow-x-auto scroll-smooth snap-x snap-mandatory hide-scrollbar flex"
-        >
-          {ad.images.length > 0 ? (
-            ad.images.map((img, i) => (
-              <div key={i} className="w-full h-full snap-start shrink-0 flex items-center justify-center bg-foreground/5">
-                <img
-                  src={img}
-                  alt={`${ad.shopName} - ${i + 1}`}
-                  className="w-full h-full object-cover cursor-pointer"
-                  onClick={() => { setLightboxOpen(true); setLightboxIndex(i); }}
-                />
+      {/* Header */}
+      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
+        <div className="px-4 py-3 flex items-center justify-between">
+          <button onClick={() => navigate(-1)} className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors">
+            <ArrowRight className="w-5 h-5 text-foreground" />
+          </button>
+          <h1 className="text-[15px] font-bold text-foreground">{ad.shopName}</h1>
+          <button
+            onClick={async () => {
+              const url = `${window.location.origin}/ad/${ad.id}`;
+              const shareText = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer} 🔥\n${ad.shopName} | ${ad.city}`;
+              try {
+                if (navigator.share) {
+                  await navigator.share({
+                    title: `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`,
+                    text: shareText,
+                    url
+                  });
+                } else {
+                  await navigator.clipboard.writeText(`${shareText}\n${url}`);
+                  toast({ title: "تم النسخ", description: "تم نسخ رابط الإعلان مع الوصف" });
+                }
+              } catch {}
+            }}
+            className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors">
+
+            <Share2 className="w-[18px] h-[18px] text-foreground" />
+          </button>
+        </div>
+      </div>
+
+      {/* Media Gallery */}
+      <div className="relative aspect-[16/10] overflow-hidden">
+        <div ref={scrollRef} onScroll={handleScroll} className="flex w-full h-full overflow-x-auto snap-x snap-mandatory hide-scrollbar" dir="ltr">
+          {ad.media.map((m, i) =>
+            m.type === 'video' ? (
+              <div key={i} className="w-full h-full shrink-0 snap-center relative">
+                <video src={m.url} className="w-full h-full object-cover" controls playsInline preload="auto" />
               </div>
-            ))
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Images className="w-12 h-12 text-muted-foreground/30" />
-            </div>
+            ) : (
+              <img key={i} src={m.url} alt={`${ad.shopName} ${i + 1}`} className="w-full h-full object-cover shrink-0 snap-center cursor-pointer" onClick={() => {setLightboxIndex(i);setLightboxOpen(true);}} />
+            )
           )}
         </div>
-
-        {ad.images.length > 1 && (
-          <>
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 pointer-events-none">
-              {ad.images.map((_, i) => (
-                <div key={i} className={`h-1.5 rounded-full transition-all ${i === imgIndex ? "w-5 bg-primary-foreground" : "w-1.5 bg-primary-foreground/50"}`} />
-              ))}
-            </div>
-            <div className="absolute top-3 left-3 bg-foreground/50 backdrop-blur-sm text-primary-foreground text-[11px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 pointer-events-none">
-              <Images className="w-3 h-3" /> {imgIndex + 1}/{ad.images.length}
-            </div>
-          </>
-        )}
+        {ad.featured && <span className="absolute top-3 right-3 bg-gold text-primary-foreground text-[11px] font-bold px-3 py-1 rounded-xl shadow-elevated flex items-center gap-1 pointer-events-none"><Star className="w-3 h-3" /> مميز</span>}
+        {ad.media.length > 1 && <>
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 pointer-events-none">
+            {ad.media.map((_, i) => <div key={i} className={`h-1.5 rounded-full transition-all ${i === imgIndex ? "w-5 bg-primary-foreground" : "w-1.5 bg-primary-foreground/50"}`} />)}
+          </div>
+          <div className="absolute top-3 left-3 bg-foreground/50 backdrop-blur-sm text-primary-foreground text-[11px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 pointer-events-none">
+            <Images className="w-3 h-3" /> {imgIndex + 1}/{ad.media.length}
+          </div>
+        </>}
       </div>
+
+      {/* Thumbnail strip */}
+      {ad.media.length > 1 && <div className="flex gap-2 px-5 mt-3 overflow-x-auto hide-scrollbar">
+        {ad.media.map((m, i) =>
+        <button key={i} onClick={() => {
+          if (m.type === 'image') { setLightboxIndex(i); setLightboxOpen(true); }
+          else {
+            // Scroll to the video
+            if (scrollRef.current) {
+              scrollRef.current.scrollTo({ left: i * scrollRef.current.clientWidth, behavior: 'smooth' });
+            }
+          }
+        }} className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all relative ${i === imgIndex ? "border-primary" : "border-transparent opacity-60"}`}>
+            {m.type === 'video' ? (
+              <>
+                <video src={m.url} className="w-full h-full object-cover" muted />
+                <div className="absolute inset-0 flex items-center justify-center bg-foreground/20">
+                  <Play className="w-4 h-4 text-primary-foreground fill-primary-foreground" />
+                </div>
+              </>
+            ) : (
+              <img src={m.url} alt="" className="w-full h-full object-cover" />
+            )}
+          </button>
+        )}
+      </div>}
 
       {/* Info */}
       <div className="px-5 pt-5">
@@ -156,8 +187,8 @@ const AdDetail = () => {
         </div>
       </div>
       {lightboxOpen && <ImageLightbox images={ad.images} initialIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />}
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdDetail;
