@@ -80,27 +80,7 @@ const AdDetail = () => {
             <ArrowRight className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="text-[15px] font-bold text-foreground">{ad.shopName}</h1>
-          <button
-            onClick={async () => {
-              const url = `${window.location.origin}/ad/${ad.id}`;
-              const shareText = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer} 🔥\n${ad.shopName} | ${ad.city}`;
-              try {
-                if (navigator.share) {
-                  await navigator.share({
-                    title: `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`,
-                    text: shareText,
-                    url
-                  });
-                } else {
-                  await navigator.clipboard.writeText(`${shareText}\n${url}`);
-                  toast({ title: "تم النسخ", description: "تم نسخ رابط الإعلان مع الوصف" });
-                }
-              } catch {}
-            }}
-            className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors">
-
-            <Share2 className="w-[18px] h-[18px] text-foreground" />
-          </button>
+          <div className="w-10 h-10" />
         </div>
       </div>
 
