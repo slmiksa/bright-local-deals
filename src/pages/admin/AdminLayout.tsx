@@ -30,6 +30,7 @@ import {
   ClipboardList,
   MonitorSmartphone,
   Headphones,
+  GalleryHorizontalEnd,
 } from "lucide-react";
 
 const menuItems = [
