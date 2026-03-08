@@ -12,7 +12,7 @@ interface PopupAdData {
   link_type: string;
 }
 
-const POPUP_SESSION_KEY = "lamha_popup_seen";
+const POPUP_SEEN_KEY = "lamha_popup_seen_cities";
 
 const PopupAd = () => {
   const { city } = useCity();
@@ -23,14 +23,23 @@ const PopupAd = () => {
   useEffect(() => {
     if (!city) return;
 
-    // Check if already seen for this city in this session
-    const seen = sessionStorage.getItem(POPUP_SESSION_KEY);
-    if (seen === city) return;
+    // Get set of already-seen keys
+    const getSeenSet = (): Set<string> => {
+      try {
+        return new Set(JSON.parse(sessionStorage.getItem(POPUP_SEEN_KEY) || "[]"));
+      } catch { return new Set(); }
+    };
+
+    const seen = getSeenSet();
+    // If this city was already seen, skip
+    if (seen.has(city)) return;
+    // If "all" popup was already shown, skip
+    if (seen.has("__all__")) return;
 
     const fetchPopup = async () => {
       const { data } = await supabase
         .from("popup_ads")
-        .select("id, image_url, link_url, link_type")
+        .select("id, image_url, link_url, link_type, city")
         .in("city", [city, "all"])
         .eq("active", true)
         .order("created_at", { ascending: false })
@@ -40,12 +49,14 @@ const PopupAd = () => {
       if (data) {
         setPopup(data as PopupAdData);
         setVisible(true);
-        // Mark as seen for this city
-        sessionStorage.setItem(POPUP_SESSION_KEY, city);
+        // Mark as seen
+        const updated = getSeenSet();
+        updated.add(city);
+        if ((data as any).city === "all") updated.add("__all__");
+        sessionStorage.setItem(POPUP_SEEN_KEY, JSON.stringify([...updated]));
       }
     };
 
-    // Small delay so splash screen finishes first
     const timer = setTimeout(fetchPopup, 800);
     return () => clearTimeout(timer);
   }, [city]);
