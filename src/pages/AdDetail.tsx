@@ -184,8 +184,8 @@ const AdDetail = () => {
       
       {/* Share Dialog Fallback */}
       {showShareDialog && (
-        <div className="fixed inset-0 z-[100] bg-foreground/50 flex items-end justify-center" onClick={() => setShowShareDialog(false)}>
-          <div className="bg-card w-full max-w-[430px] rounded-t-3xl p-5 pb-8 animate-in slide-in-from-bottom" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] bg-foreground/50 flex items-center justify-center px-5" onClick={() => setShowShareDialog(false)}>
+          <div className="bg-card w-full max-w-[380px] rounded-2xl p-5 animate-in zoom-in-95 shadow-elevated" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-foreground text-[15px] flex items-center gap-2"><Link className="w-4 h-4 text-primary" /> مشاركة الإعلان</h3>
               <button type="button" onClick={() => setShowShareDialog(false)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
