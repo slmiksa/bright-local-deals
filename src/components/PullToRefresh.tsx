@@ -50,10 +50,15 @@ const PullToRefresh = ({ children, className = "" }: PullToRefreshProps) => {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
+      {/* Pull indicator - fixed position so it doesn't push content */}
       {(pullDistance > 0 || refreshing) && (
         <div
-          className="flex items-center justify-center overflow-hidden transition-all"
-          style={{ height: refreshing ? 48 : pullDistance }}
+          className="fixed left-0 right-0 z-[60] flex items-center justify-center max-w-[430px] mx-auto pointer-events-none"
+          style={{ 
+            top: 'calc(env(safe-area-inset-top, 0px) + 60px)',
+            height: refreshing ? 48 : pullDistance,
+            transition: refreshing ? 'height 0.3s ease' : undefined
+          }}
         >
           <div
             className={`w-5 h-5 border-2 border-primary border-t-transparent rounded-full ${refreshing ? "animate-spin" : ""}`}
