@@ -5,6 +5,7 @@ import EventsSlider from "@/components/EventsSlider";
 import AdSection from "@/components/AdSection";
 import PullToRefresh from "@/components/PullToRefresh";
 import CountdownTimer from "@/components/CountdownTimer";
+import BannerSlider from "@/components/BannerSlider";
 import { useAdsByCity } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
 
