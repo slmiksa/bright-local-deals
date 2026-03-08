@@ -43,7 +43,7 @@ const AdDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center max-w-[430px] mx-auto">
+      <div className="min-h-screen bg-background flex items-center justify-center max-w-[430px] mx-auto pb-28">
         <div className="text-center p-8">
           <p className="text-muted-foreground text-lg">جاري التحميل...</p>
         </div>
