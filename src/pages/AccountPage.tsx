@@ -9,7 +9,7 @@ const menuItems = [
 
 const AccountPage = () => {
   return (
-    <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">
+    <div className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto safe-top">
       <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
         <div className="px-5 py-3.5">
           <h1 className="text-lg font-bold text-foreground">حسابي</h1>
