@@ -169,9 +169,9 @@ const AdDetail = () => {
               e.stopPropagation();
               setShowShareDialog(true);
             }}
-            className="touch-target w-14 h-14 flex items-center justify-center bg-secondary text-foreground rounded-2xl active:scale-[0.97] transition-transform shadow-card"
+            className="touch-target flex-1 flex items-center justify-center gap-2 bg-secondary text-foreground rounded-2xl py-3.5 font-bold text-[14px] active:scale-[0.97] transition-transform shadow-card"
           >
-            <Share2 className="w-6 h-6" />
+            <Share2 className="w-5 h-5" /> مشاركة الإعلان
           </button>
         </div>
         
