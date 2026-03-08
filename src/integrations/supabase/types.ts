@@ -286,6 +286,39 @@ export type Database = {
         }
         Relationships: []
       }
+      banner_slides: {
+        Row: {
+          active: boolean
+          city: string
+          created_at: string
+          id: string
+          image_url: string
+          link_type: string
+          link_url: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          active?: boolean
+          city?: string
+          created_at?: string
+          id?: string
+          image_url: string
+          link_type?: string
+          link_url?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          active?: boolean
+          city?: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          link_type?: string
+          link_url?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
