@@ -12,7 +12,7 @@ interface PopupAdData {
   link_type: string;
 }
 
-const POPUP_SESSION_KEY = "lamha_popup_seen";
+const POPUP_SEEN_KEY = "lamha_popup_seen_cities";
 
 const PopupAd = () => {
   const { city } = useCity();
