@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images, Eye, Heart, Play, Copy, X, Link } from "lucide-react";
+import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images, Eye, Heart, Play, Copy, X, Link, CheckCircle2 } from "lucide-react";
 import { useAdById } from "@/hooks/useAds";
 import { useState, useRef, useEffect } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
@@ -17,6 +17,7 @@ const AdDetail = () => {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [imgIndex, setImgIndex] = useState(0);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [copied, setCopied] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { views, likes, liked, toggleLike } = useAdStats(adId);
 
@@ -184,48 +185,60 @@ const AdDetail = () => {
       
       {/* Share Dialog Fallback */}
       {showShareDialog && (
-        <div className="fixed inset-0 z-[100] bg-foreground/50 flex items-center justify-center px-5" onClick={() => setShowShareDialog(false)}>
-          <div className="bg-card w-full max-w-[380px] rounded-2xl p-5 animate-in zoom-in-95 shadow-elevated" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-foreground text-[15px] flex items-center gap-2"><Link className="w-4 h-4 text-primary" /> مشاركة الإعلان</h3>
-              <button type="button" onClick={() => setShowShareDialog(false)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-                <X className="w-4 h-4 text-muted-foreground" />
-              </button>
-            </div>
-            <div className="flex items-center gap-2 bg-secondary rounded-xl p-3">
-              <input
-                readOnly
-                value={`${window.location.origin}/ad/${ad.id}`}
-                className="flex-1 bg-transparent text-foreground text-[13px] outline-none select-all"
-                dir="ltr"
-                onFocus={(e) => e.target.select()}
-              />
-              <button
-                type="button"
-                onClick={async () => {
-                  const url = `${window.location.origin}/ad/${ad.id}`;
-                  const text = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer} 🔥\n${ad.shopName} | ${ad.city}\n${url}`;
-                  try {
-                    await navigator.clipboard.writeText(text);
-                    toast({ title: "تم النسخ ✅", description: "تم نسخ رابط الإعلان" });
-                    setShowShareDialog(false);
-                  } catch {
-                    // Fallback for older browsers
-                    const ta = document.createElement('textarea');
-                    ta.value = text;
-                    document.body.appendChild(ta);
-                    ta.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(ta);
-                    toast({ title: "تم النسخ ✅", description: "تم نسخ رابط الإعلان" });
-                    setShowShareDialog(false);
-                  }
-                }}
-                className="shrink-0 flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-2 rounded-xl font-bold text-[13px] active:scale-95 transition-transform"
-              >
-                <Copy className="w-4 h-4" /> نسخ
-              </button>
-            </div>
+        <div className="fixed inset-0 z-[100] bg-foreground/40 backdrop-blur-sm flex items-center justify-center px-5" onClick={() => { setShowShareDialog(false); setCopied(false); }}>
+          <div className="bg-card w-full max-w-[360px] rounded-3xl p-6 animate-in zoom-in-95 shadow-elevated border border-border" onClick={(e) => e.stopPropagation()}>
+            {copied ? (
+              <div className="flex flex-col items-center gap-3 py-4">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <CheckCircle2 className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="font-bold text-foreground text-[16px]">تم النسخ بنجاح</h3>
+                <p className="text-muted-foreground text-[13px]">تم نسخ رابط الإعلان مع الوصف</p>
+                <button type="button" onClick={() => { setShowShareDialog(false); setCopied(false); }} className="mt-2 bg-primary text-primary-foreground px-8 py-2.5 rounded-2xl font-bold text-[14px] active:scale-95 transition-transform">
+                  حسناً
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-5">
+                  <h3 className="font-bold text-foreground text-[16px] flex items-center gap-2"><Link className="w-4 h-4 text-primary" /> مشاركة الإعلان</h3>
+                  <button type="button" onClick={() => setShowShareDialog(false)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center active:scale-90 transition-transform">
+                    <X className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </div>
+                <div className="flex items-center gap-2 bg-secondary rounded-2xl p-3">
+                  <input
+                    readOnly
+                    value={`${window.location.origin}/ad/${ad.id}`}
+                    className="flex-1 bg-transparent text-foreground text-[12px] outline-none select-all"
+                    dir="ltr"
+                    onFocus={(e) => e.target.select()}
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const url = `${window.location.origin}/ad/${ad.id}`;
+                      const text = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer} 🔥\n${ad.shopName} | ${ad.city}\n${url}`;
+                      try {
+                        await navigator.clipboard.writeText(text);
+                      } catch {
+                        const ta = document.createElement('textarea');
+                        ta.value = text;
+                        document.body.appendChild(ta);
+                        ta.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(ta);
+                      }
+                      setCopied(true);
+                      setTimeout(() => { setShowShareDialog(false); setCopied(false); }, 2000);
+                    }}
+                    className="shrink-0 flex items-center gap-1.5 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-bold text-[13px] active:scale-95 transition-transform"
+                  >
+                    <Copy className="w-4 h-4" /> نسخ
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
