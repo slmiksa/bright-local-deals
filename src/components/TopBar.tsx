@@ -71,7 +71,7 @@ const TopBar = () => {
             className="absolute top-0 left-0 right-0 bg-card max-w-[430px] mx-auto animate-in slide-in-from-top duration-300"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-5 pt-4 pb-3 flex items-center gap-3">
+            <div className="px-5 pb-3 flex items-center gap-3" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
               <div className="flex-1 relative">
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
