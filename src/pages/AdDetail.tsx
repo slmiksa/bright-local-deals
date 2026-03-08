@@ -169,18 +169,21 @@ const AdDetail = () => {
               const url = `${window.location.origin}/ad/${ad.id}`;
               const shareText = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer} 🔥\n${ad.shopName} | ${ad.city}`;
               try {
-                if (navigator.share) {
-                  await navigator.share({
+                if (Capacitor.isNativePlatform()) {
+                  await Share.share({
                     title: `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`,
                     text: shareText,
-                    url
+                    url,
+                    dialogTitle: 'مشاركة الإعلان',
                   });
+                } else if (navigator.share) {
+                  await navigator.share({ title: `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`, text: shareText, url });
                 } else {
-                  await navigator.clipboard.writeText(`${shareText}\n${url}`);
-                  toast({ title: "تم النسخ", description: "تم نسخ رابط الإعلان مع الوصف" });
+                  setShowShareDialog(true);
                 }
               } catch (err) {
                 console.log('Share error:', err);
+                setShowShareDialog(true);
               }
             }}
             className="touch-target w-14 h-14 flex items-center justify-center bg-secondary text-foreground rounded-2xl active:scale-[0.97] transition-transform shadow-card"
