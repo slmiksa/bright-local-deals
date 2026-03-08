@@ -35,6 +35,7 @@ import AdminTerms from "./pages/admin/AdminTerms";
 import AdminRequests from "./pages/admin/AdminRequests";
 import AdminRequestDetail from "./pages/admin/AdminRequestDetail";
 import AdminPopupAds from "./pages/admin/AdminPopupAds";
+import AdminBannerSlides from "./pages/admin/AdminBannerSlides";
 import AdminSupport from "./pages/admin/AdminSupport";
 import PopupAd from "./components/PopupAd";
 
@@ -94,6 +95,7 @@ const App = () => {
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="privacy" element={<AdminTerms />} />
                   <Route path="popup-ads" element={<AdminPopupAds />} />
+                  <Route path="banner-slides" element={<AdminBannerSlides />} />
                   <Route path="support" element={<AdminSupport />} />
                 </Route>
 
