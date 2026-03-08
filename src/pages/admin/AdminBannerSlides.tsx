@@ -146,6 +146,7 @@ const AdminBannerSlides = () => {
                 <input type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
                 <Upload className="w-5 h-5 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">اضغط لاختيار صورة</span>
+                <span className="text-[11px] text-muted-foreground/60 block mt-1">المقاس المُوصى به: 800×400 بكسل (نسبة 2:1)</span>
               </label>
             )}
           </div>
