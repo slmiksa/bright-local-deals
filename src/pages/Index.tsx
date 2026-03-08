@@ -18,6 +18,7 @@ const Index = () => {
       <TopBar />
       <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
       <CountdownTimer />
+      <BannerSlider />
       <FeaturedSlider />
       <EventsSlider />
       <CategoriesRow />

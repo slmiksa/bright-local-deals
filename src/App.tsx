@@ -95,6 +95,7 @@ const App = () => {
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="privacy" element={<AdminTerms />} />
                   <Route path="popup-ads" element={<AdminPopupAds />} />
+                  <Route path="banner-slides" element={<AdminBannerSlides />} />
                   <Route path="support" element={<AdminSupport />} />
                 </Route>
 

@@ -42,6 +42,7 @@ const menuItems = [
   { title: "الأسعار", url: "/admin/pricing", icon: DollarSign },
   { title: "العد التنازلي", url: "/admin/countdown", icon: Timer },
   { title: "سياسة الخصوصية", url: "/admin/privacy", icon: FileText },
+  { title: "السلايد الإعلاني", url: "/admin/banner-slides", icon: GalleryHorizontalEnd },
   { title: "الإعلانات المنبثقة", url: "/admin/popup-ads", icon: MonitorSmartphone },
   { title: "أزرار التواصل", url: "/admin/support", icon: Headphones },
   { title: "الإحصائيات", url: "/admin/stats", icon: BarChart3 },
