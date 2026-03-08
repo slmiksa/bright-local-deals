@@ -31,7 +31,7 @@ const PopupAd = () => {
       const { data } = await supabase
         .from("popup_ads")
         .select("id, image_url, link_url, link_type")
-        .eq("city", city)
+        .in("city", [city, "all"])
         .eq("active", true)
         .order("created_at", { ascending: false })
         .limit(1)
