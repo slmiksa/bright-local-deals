@@ -1,10 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images, Eye, Heart, Play } from "lucide-react";
+import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images, Eye, Heart, Play, Copy, X, Link } from "lucide-react";
 import { useAdById } from "@/hooks/useAds";
 import { useState, useRef, useEffect } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { useAdStats, recordView } from "@/hooks/useAdStats";
 import { toast } from "@/hooks/use-toast";
+import { Capacitor } from "@capacitor/core";
+import { Share } from "@capacitor/share";
 
 const AdDetail = () => {
   const { id } = useParams();
@@ -14,6 +16,7 @@ const AdDetail = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [imgIndex, setImgIndex] = useState(0);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { views, likes, liked, toggleLike } = useAdStats(adId);
 
@@ -166,18 +169,21 @@ const AdDetail = () => {
               const url = `${window.location.origin}/ad/${ad.id}`;
               const shareText = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer} 🔥\n${ad.shopName} | ${ad.city}`;
               try {
-                if (navigator.share) {
-                  await navigator.share({
+                if (Capacitor.isNativePlatform()) {
+                  await Share.share({
                     title: `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`,
                     text: shareText,
-                    url
+                    url,
+                    dialogTitle: 'مشاركة الإعلان',
                   });
+                } else if (navigator.share) {
+                  await navigator.share({ title: `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`, text: shareText, url });
                 } else {
-                  await navigator.clipboard.writeText(`${shareText}\n${url}`);
-                  toast({ title: "تم النسخ", description: "تم نسخ رابط الإعلان مع الوصف" });
+                  setShowShareDialog(true);
                 }
               } catch (err) {
                 console.log('Share error:', err);
+                setShowShareDialog(true);
               }
             }}
             className="touch-target w-14 h-14 flex items-center justify-center bg-secondary text-foreground rounded-2xl active:scale-[0.97] transition-transform shadow-card"
@@ -193,6 +199,54 @@ const AdDetail = () => {
         </div>
       </div>
       {lightboxOpen && <ImageLightbox images={ad.images} initialIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />}
+      
+      {/* Share Dialog Fallback */}
+      {showShareDialog && (
+        <div className="fixed inset-0 z-[100] bg-foreground/50 flex items-end justify-center" onClick={() => setShowShareDialog(false)}>
+          <div className="bg-card w-full max-w-[430px] rounded-t-3xl p-5 pb-8 animate-in slide-in-from-bottom" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-foreground text-[15px] flex items-center gap-2"><Link className="w-4 h-4 text-primary" /> مشاركة الإعلان</h3>
+              <button type="button" onClick={() => setShowShareDialog(false)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="flex items-center gap-2 bg-secondary rounded-xl p-3">
+              <input
+                readOnly
+                value={`${window.location.origin}/ad/${ad.id}`}
+                className="flex-1 bg-transparent text-foreground text-[13px] outline-none select-all"
+                dir="ltr"
+                onFocus={(e) => e.target.select()}
+              />
+              <button
+                type="button"
+                onClick={async () => {
+                  const url = `${window.location.origin}/ad/${ad.id}`;
+                  const text = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer} 🔥\n${ad.shopName} | ${ad.city}\n${url}`;
+                  try {
+                    await navigator.clipboard.writeText(text);
+                    toast({ title: "تم النسخ ✅", description: "تم نسخ رابط الإعلان" });
+                    setShowShareDialog(false);
+                  } catch {
+                    // Fallback for older browsers
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    toast({ title: "تم النسخ ✅", description: "تم نسخ رابط الإعلان" });
+                    setShowShareDialog(false);
+                  }
+                }}
+                className="shrink-0 flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-2 rounded-xl font-bold text-[13px] active:scale-95 transition-transform"
+              >
+                <Copy className="w-4 h-4" /> نسخ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>);
 
 };
