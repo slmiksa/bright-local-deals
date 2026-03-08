@@ -17,6 +17,7 @@ const AdDetail = () => {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [imgIndex, setImgIndex] = useState(0);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [copied, setCopied] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { views, likes, liked, toggleLike } = useAdStats(adId);
 
