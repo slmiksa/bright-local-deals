@@ -41,18 +41,17 @@ const PopupAd = () => {
         .from("popup_ads")
         .select("id, image_url, link_url, link_type, city")
         .in("city", [city, "all"])
-        .eq("active", true)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
+        .eq("active", true);
 
-      if (data) {
-        setPopup(data as PopupAdData);
+      if (data && data.length > 0) {
+        // Pick a random one
+        const random = data[Math.floor(Math.random() * data.length)];
+        setPopup(random as PopupAdData);
         setVisible(true);
         // Mark as seen
         const updated = getSeenSet();
         updated.add(city);
-        if ((data as any).city === "all") updated.add("__all__");
+        if ((random as any).city === "all") updated.add("__all__");
         sessionStorage.setItem(POPUP_SEEN_KEY, JSON.stringify([...updated]));
       }
     };
