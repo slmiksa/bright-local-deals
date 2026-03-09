@@ -361,15 +361,33 @@ const AdminAds = () => {
                   <input value={form.address} onChange={(e) => setForm(f => ({...f, address: e.target.value}))} className="w-full h-10 px-3 rounded-xl bg-background text-foreground text-sm border border-border" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">خط العرض</label>
-                  <input value={form.lat} onChange={(e) => setForm(f => ({...f, lat: e.target.value}))} className="w-full h-10 px-3 rounded-xl bg-background text-foreground text-sm border border-border" dir="ltr" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">خط الطول</label>
-                  <input value={form.lng} onChange={(e) => setForm(f => ({...f, lng: e.target.value}))} className="w-full h-10 px-3 rounded-xl bg-background text-foreground text-sm border border-border" dir="ltr" />
-                </div>
+              {/* Location Toggle */}
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer mb-2">
+                  <input
+                    type="checkbox"
+                    checked={!!(form.lat || form.lng)}
+                    onChange={(e) => {
+                      if (!e.target.checked) {
+                        setForm(f => ({ ...f, lat: "", lng: "" }));
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-border text-primary"
+                  />
+                  <span className="text-xs font-bold text-foreground">إضافة موقع على الخريطة</span>
+                </label>
+                {(form.lat || form.lng || false) && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-foreground mb-1">خط العرض</label>
+                      <input value={form.lat} onChange={(e) => setForm(f => ({...f, lat: e.target.value}))} placeholder="مثال: 24.7136" className="w-full h-10 px-3 rounded-xl bg-background text-foreground text-sm border border-border" dir="ltr" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-foreground mb-1">خط الطول</label>
+                      <input value={form.lng} onChange={(e) => setForm(f => ({...f, lng: e.target.value}))} placeholder="مثال: 46.6753" className="w-full h-10 px-3 rounded-xl bg-background text-foreground text-sm border border-border" dir="ltr" />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Media Upload Section */}
