@@ -14,6 +14,7 @@ export interface Ad {
   shopName: string;
   offer: string;
   featured?: boolean;
+  doubleWidth?: boolean;
   category: string;
   city: string;
   phone: string;
