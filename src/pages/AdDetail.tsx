@@ -175,11 +175,13 @@ const AdDetail = () => {
           </button>
         </div>
         
+        {(ad.lat !== 0 && ad.lng !== 0 && ad.lat && ad.lng) && (
         <div className="mt-5 rounded-2xl overflow-hidden shadow-card bg-card">
           <div className="p-4 pb-2"><h3 className="font-bold text-[14px] text-foreground flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> الموقع على الخريطة</h3></div>
           <div className="aspect-[16/9] w-full"><iframe src={mapUrl} className="w-full h-full border-0" allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="موقع المتجر" /></div>
           <a href={`https://www.google.com/maps/dir/?api=1&destination=${ad.lat},${ad.lng}`} target="_blank" rel="noopener noreferrer" className="block text-center text-primary font-semibold text-[13px] py-3 active:bg-secondary transition-colors">فتح في خرائط قوقل ↗</a>
         </div>
+        )}
       </div>
       {lightboxOpen && <ImageLightbox images={ad.images} initialIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />}
       
