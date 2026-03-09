@@ -53,6 +53,7 @@ interface DbAd {
   lat: number | null;
   lng: number | null;
   featured: boolean | null;
+  double_width: boolean | null;
   ad_images: { image_url: string; sort_order: number | null; media_type?: string }[];
 }
 
