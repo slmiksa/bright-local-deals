@@ -164,10 +164,29 @@ const AdDetail = () => {
           </a>
           <button
             type="button"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.preventDefault();
               e.stopPropagation();
-              setShowShareDialog(true);
+              
+              const url = `${window.location.origin}/ad/${ad.id}`;
+              const title = `لمحة للتسويق - ${ad.shopName}`;
+              const text = `شاهد الجديد: ${ad.offer} 🔥`;
+
+              if (Capacitor.isNativePlatform()) {
+                try {
+                  await Share.share({ title, text, url, dialogTitle: 'مشاركة الإعلان' });
+                } catch (err) {
+                  setShowShareDialog(true);
+                }
+              } else if (navigator.share) {
+                try {
+                  await navigator.share({ title, text, url });
+                } catch (err) {
+                  setShowShareDialog(true);
+                }
+              } else {
+                setShowShareDialog(true);
+              }
             }}
             className="touch-target flex-1 flex items-center justify-center gap-2 bg-secondary text-foreground rounded-2xl py-3.5 font-bold text-[14px] active:scale-[0.97] transition-transform shadow-card"
           >
