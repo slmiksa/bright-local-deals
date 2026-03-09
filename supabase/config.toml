@@ -1,1 +1,13 @@
 project_id = "kqieahnbenrgjabqblac"
+
+[functions.send-acceptance-notification]
+verify_jwt = false
+
+[functions.send-ad-notification]
+verify_jwt = false
+
+[functions.update-admin-email]
+verify_jwt = false
+
+[functions.og-share]
+verify_jwt = false
