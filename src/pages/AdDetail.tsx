@@ -164,29 +164,10 @@ const AdDetail = () => {
           </a>
           <button
             type="button"
-            onClick={async (e) => {
+            onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              
-              const url = `https://kqieahnbenrgjabqblac.supabase.co/functions/v1/og-share?id=${ad.id}&redirect=${encodeURIComponent(window.location.origin + '/ad/' + ad.id)}`;
-              const title = `لمحة للتسويق - ${ad.shopName}`;
-              const text = `شاهد الجديد: ${ad.offer} 🔥`;
-
-              if (Capacitor.isNativePlatform()) {
-                try {
-                  await Share.share({ title, text, url, dialogTitle: 'مشاركة الإعلان' });
-                } catch (err) {
-                  setShowShareDialog(true);
-                }
-              } else if (navigator.share) {
-                try {
-                  await navigator.share({ title, text, url });
-                } catch (err) {
-                  setShowShareDialog(true);
-                }
-              } else {
-                setShowShareDialog(true);
-              }
+              setShowShareDialog(true);
             }}
             className="touch-target flex-1 flex items-center justify-center gap-2 bg-secondary text-foreground rounded-2xl py-3.5 font-bold text-[14px] active:scale-[0.97] transition-transform shadow-card"
           >
@@ -228,7 +209,7 @@ const AdDetail = () => {
                 <div className="flex items-center gap-2 bg-secondary rounded-2xl p-3">
                   <input
                     readOnly
-                    value={`https://kqieahnbenrgjabqblac.supabase.co/functions/v1/og-share?id=${ad.id}&redirect=${encodeURIComponent(window.location.origin + '/ad/' + ad.id)}`}
+                    value={`${window.location.origin}/ad/${ad.id}`}
                     className="flex-1 bg-transparent text-foreground text-[12px] outline-none select-all"
                     dir="ltr"
                     onFocus={(e) => e.target.select()}
@@ -236,12 +217,13 @@ const AdDetail = () => {
                   <button
                     type="button"
                     onClick={async () => {
-                      const url = `https://kqieahnbenrgjabqblac.supabase.co/functions/v1/og-share?id=${ad.id}&redirect=${encodeURIComponent(window.location.origin + '/ad/' + ad.id)}`;
+                      const url = `${window.location.origin}/ad/${ad.id}`;
+                      const text = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer} 🔥\n${ad.shopName} | ${ad.city}\n${url}`;
                       try {
-                        await navigator.clipboard.writeText(url);
+                        await navigator.clipboard.writeText(text);
                       } catch {
                         const ta = document.createElement('textarea');
-                        ta.value = url;
+                        ta.value = text;
                         document.body.appendChild(ta);
                         ta.select();
                         document.execCommand('copy');
