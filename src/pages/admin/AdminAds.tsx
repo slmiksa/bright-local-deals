@@ -181,6 +181,7 @@ const AdminAds = () => {
       lng: form.lng ? parseFloat(form.lng) : null,
       featured: form.featured,
       active: form.active,
+      double_width: form.double_width,
       start_date: form.start_date ? form.start_date.toISOString() : new Date().toISOString(),
       end_date: form.end_date ? form.end_date.toISOString() : null,
     };
