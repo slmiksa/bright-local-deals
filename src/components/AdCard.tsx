@@ -12,6 +12,7 @@ interface AdCardProps {
   shopName: string;
   offer: string;
   featured?: boolean;
+  doubleWidth?: boolean;
 }
 
 const AdCard = ({ id, images, media = [], shopName, offer, featured }: AdCardProps) => {

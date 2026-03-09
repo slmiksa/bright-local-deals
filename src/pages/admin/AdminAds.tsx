@@ -483,10 +483,14 @@ const AdminAds = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.featured} onChange={(e) => setForm(f => ({...f, featured: e.target.checked}))} className="w-4 h-4 rounded border-border text-primary" />
                   <span className="text-sm text-foreground">إعلان مميز ⭐</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={form.double_width} onChange={(e) => setForm(f => ({...f, double_width: e.target.checked}))} className="w-4 h-4 rounded border-border text-primary" />
+                  <span className="text-sm text-foreground">بلوكين (عرض مزدوج) 📐</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.active} onChange={(e) => setForm(f => ({...f, active: e.target.checked}))} className="w-4 h-4 rounded border-border text-primary" />

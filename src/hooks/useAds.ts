@@ -71,6 +71,7 @@ function mapDbAdToAd(dbAd: DbAd): Ad {
     shopName: dbAd.shop_name,
     offer: dbAd.offer,
     featured: dbAd.featured || false,
+    doubleWidth: dbAd.double_width || false,
     category: dbAd.category,
     city: dbAd.city,
     phone: dbAd.phone || "",

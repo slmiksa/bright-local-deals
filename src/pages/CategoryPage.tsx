@@ -54,7 +54,9 @@ const CategoryPage = () => {
 
       <div className="px-5 pt-5 grid grid-cols-2 gap-3">
         {ads.map((ad) => (
-          <AdCard key={ad.id} {...ad} />
+          <div key={ad.id} className={ad.doubleWidth ? "col-span-2" : ""}>
+            <AdCard {...ad} />
+          </div>
         ))}
       </div>
 
