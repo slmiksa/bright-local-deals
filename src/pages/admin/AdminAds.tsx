@@ -86,6 +86,7 @@ const AdminAds = () => {
 
   const openEdit = (ad: DbAd) => {
     setEditId(ad.id);
+    const hasLoc = !!(ad.lat || ad.lng);
     setForm({
       shop_name: ad.shop_name,
       offer: ad.offer,
@@ -96,6 +97,7 @@ const AdminAds = () => {
       address: ad.address || "",
       lat: String(ad.lat || ""),
       lng: String(ad.lng || ""),
+      hasLocation: hasLoc,
       featured: ad.featured || false,
       active: ad.active !== false,
       start_date: ad.start_date ? new Date(ad.start_date) : null,
