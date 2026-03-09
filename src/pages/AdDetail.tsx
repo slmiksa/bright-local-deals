@@ -228,7 +228,7 @@ const AdDetail = () => {
                 <div className="flex items-center gap-2 bg-secondary rounded-2xl p-3">
                   <input
                     readOnly
-                    value={`${window.location.origin}/ad/${ad.id}`}
+                    value={`https://kqieahnbenrgjabqblac.supabase.co/functions/v1/og-share?id=${ad.id}&redirect=${encodeURIComponent(window.location.origin + '/ad/' + ad.id)}`}
                     className="flex-1 bg-transparent text-foreground text-[12px] outline-none select-all"
                     dir="ltr"
                     onFocus={(e) => e.target.select()}
@@ -236,7 +236,7 @@ const AdDetail = () => {
                   <button
                     type="button"
                     onClick={async () => {
-                      const url = `${window.location.origin}/ad/${ad.id}`;
+                      const url = `https://kqieahnbenrgjabqblac.supabase.co/functions/v1/og-share?id=${ad.id}&redirect=${encodeURIComponent(window.location.origin + '/ad/' + ad.id)}`;
                       try {
                         await navigator.clipboard.writeText(url);
                       } catch {
