@@ -41,6 +41,7 @@ const emptyForm = {
   address: "",
   lat: "",
   lng: "",
+  hasLocation: false,
   featured: false,
   active: true,
   start_date: null as Date | null,
