@@ -98,6 +98,7 @@ const AdminAds = () => {
       lng: String(ad.lng || ""),
       featured: ad.featured || false,
       active: ad.active !== false,
+      double_width: (ad as any).double_width || false,
       start_date: ad.start_date ? new Date(ad.start_date) : null,
       end_date: ad.end_date ? new Date(ad.end_date) : null,
     });
