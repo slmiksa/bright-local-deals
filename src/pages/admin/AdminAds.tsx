@@ -41,6 +41,7 @@ const emptyForm = {
   address: "",
   lat: "",
   lng: "",
+  hasLocation: false,
   featured: false,
   active: true,
   start_date: null as Date | null,
@@ -85,6 +86,7 @@ const AdminAds = () => {
 
   const openEdit = (ad: DbAd) => {
     setEditId(ad.id);
+    const hasLoc = !!(ad.lat || ad.lng);
     setForm({
       shop_name: ad.shop_name,
       offer: ad.offer,
@@ -95,6 +97,7 @@ const AdminAds = () => {
       address: ad.address || "",
       lat: String(ad.lat || ""),
       lng: String(ad.lng || ""),
+      hasLocation: hasLoc,
       featured: ad.featured || false,
       active: ad.active !== false,
       start_date: ad.start_date ? new Date(ad.start_date) : null,
@@ -366,17 +369,21 @@ const AdminAds = () => {
                 <label className="flex items-center gap-2 cursor-pointer mb-2">
                   <input
                     type="checkbox"
-                    checked={!!(form.lat || form.lng)}
+                    checked={form.hasLocation}
                     onChange={(e) => {
-                      if (!e.target.checked) {
-                        setForm(f => ({ ...f, lat: "", lng: "" }));
-                      }
+                      const checked = e.target.checked;
+                      setForm(f => ({
+                        ...f,
+                        hasLocation: checked,
+                        lat: checked ? f.lat : "",
+                        lng: checked ? f.lng : "",
+                      }));
                     }}
                     className="w-4 h-4 rounded border-border text-primary"
                   />
                   <span className="text-xs font-bold text-foreground">إضافة موقع على الخريطة</span>
                 </label>
-                {(form.lat || form.lng || false) && (
+                {form.hasLocation && (
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-foreground mb-1">خط العرض</label>
