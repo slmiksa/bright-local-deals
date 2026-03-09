@@ -1,1 +1,0 @@
-ALTER TABLE public.ads ADD COLUMN double_width boolean NOT NULL DEFAULT false;

@@ -202,7 +202,6 @@ export type Database = {
           city: string
           created_at: string
           description: string | null
-          double_width: boolean
           end_date: string | null
           featured: boolean | null
           id: number
@@ -221,7 +220,6 @@ export type Database = {
           city: string
           created_at?: string
           description?: string | null
-          double_width?: boolean
           end_date?: string | null
           featured?: boolean | null
           id?: number
@@ -240,7 +238,6 @@ export type Database = {
           city?: string
           created_at?: string
           description?: string | null
-          double_width?: boolean
           end_date?: string | null
           featured?: boolean | null
           id?: number

@@ -14,7 +14,6 @@ export interface Ad {
   shopName: string;
   offer: string;
   featured?: boolean;
-  doubleWidth?: boolean;
   category: string;
   city: string;
   phone: string;
@@ -53,7 +52,6 @@ interface DbAd {
   lat: number | null;
   lng: number | null;
   featured: boolean | null;
-  double_width: boolean | null;
   ad_images: { image_url: string; sort_order: number | null; media_type?: string }[];
 }
 
@@ -71,7 +69,6 @@ function mapDbAdToAd(dbAd: DbAd): Ad {
     shopName: dbAd.shop_name,
     offer: dbAd.offer,
     featured: dbAd.featured || false,
-    doubleWidth: dbAd.double_width || false,
     category: dbAd.category,
     city: dbAd.city,
     phone: dbAd.phone || "",

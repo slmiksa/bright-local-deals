@@ -43,7 +43,6 @@ const emptyForm = {
   lng: "",
   featured: false,
   active: true,
-  double_width: false,
   start_date: null as Date | null,
   end_date: null as Date | null,
 };
@@ -98,7 +97,6 @@ const AdminAds = () => {
       lng: String(ad.lng || ""),
       featured: ad.featured || false,
       active: ad.active !== false,
-      double_width: (ad as any).double_width || false,
       start_date: ad.start_date ? new Date(ad.start_date) : null,
       end_date: ad.end_date ? new Date(ad.end_date) : null,
     });
@@ -181,7 +179,6 @@ const AdminAds = () => {
       lng: form.lng ? parseFloat(form.lng) : null,
       featured: form.featured,
       active: form.active,
-      double_width: form.double_width,
       start_date: form.start_date ? form.start_date.toISOString() : new Date().toISOString(),
       end_date: form.end_date ? form.end_date.toISOString() : null,
     };
@@ -483,14 +480,10 @@ const AdminAds = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.featured} onChange={(e) => setForm(f => ({...f, featured: e.target.checked}))} className="w-4 h-4 rounded border-border text-primary" />
                   <span className="text-sm text-foreground">إعلان مميز ⭐</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form.double_width} onChange={(e) => setForm(f => ({...f, double_width: e.target.checked}))} className="w-4 h-4 rounded border-border text-primary" />
-                  <span className="text-sm text-foreground">بلوكين (عرض مزدوج) 📐</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.active} onChange={(e) => setForm(f => ({...f, active: e.target.checked}))} className="w-4 h-4 rounded border-border text-primary" />
