@@ -168,7 +168,7 @@ const AdDetail = () => {
               e.preventDefault();
               e.stopPropagation();
               
-              const url = `${window.location.origin}/ad/${ad.id}`;
+              const url = `https://kqieahnbenrgjabqblac.supabase.co/functions/v1/og-share?id=${ad.id}&redirect=${encodeURIComponent(window.location.origin + '/ad/' + ad.id)}`;
               const title = `لمحة للتسويق - ${ad.shopName}`;
               const text = `شاهد الجديد: ${ad.offer} 🔥`;
 
