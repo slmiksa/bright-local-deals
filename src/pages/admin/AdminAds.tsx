@@ -43,6 +43,7 @@ const emptyForm = {
   lng: "",
   featured: false,
   active: true,
+  double_width: false,
   start_date: null as Date | null,
   end_date: null as Date | null,
 };
