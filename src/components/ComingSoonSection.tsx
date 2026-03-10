@@ -7,7 +7,7 @@ const ComingSoonSection = () => {
         {/* لقاءات لمحة الحصرية */}
         <div className="relative bg-card rounded-2xl border border-border p-4 flex flex-col items-center gap-2.5 opacity-75 select-none">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-md">
-            <Mic className="w-6 h-6 text-primary-foreground" />
+            <Podcast className="w-6 h-6 text-primary-foreground" />
           </div>
           <h3 className="text-[13px] font-bold text-foreground text-center leading-tight">
             لقاءات لمحة 
