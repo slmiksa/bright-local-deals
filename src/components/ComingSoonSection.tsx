@@ -1,4 +1,4 @@
-import { Video, Podcast } from "lucide-react";
+import { Clapperboard, Podcast } from "lucide-react";
 
 const ComingSoonSection = () => {
   return (
@@ -20,7 +20,7 @@ const ComingSoonSection = () => {
         {/* تغطيات لمحة المتميزة */}
         <div className="relative bg-card rounded-2xl border border-border p-4 flex flex-col items-center gap-2.5 opacity-75 select-none">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[hsl(var(--gold))] to-[hsl(40,65%,42%)] flex items-center justify-center shadow-md">
-            <Video className="w-6 h-6 text-primary-foreground" />
+            <Clapperboard className="w-6 h-6 text-primary-foreground" />
           </div>
           <h3 className="text-[13px] font-bold text-foreground text-center leading-tight">
             تغطيات لمحة 
