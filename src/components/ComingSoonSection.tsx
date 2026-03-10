@@ -1,4 +1,4 @@
-import { Video, Podcast } from "lucide-react";
+import { Clapperboard, Podcast } from "lucide-react";
 
 const ComingSoonSection = () => {
   return (
