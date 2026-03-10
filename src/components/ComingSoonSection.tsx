@@ -26,7 +26,7 @@ const ComingSoonSection = () => {
             تغطيات لمحة المتميزة
           </h3>
           <span className="text-[11px] font-bold text-[hsl(var(--gold))] bg-[hsl(var(--gold))/0.1] px-3 py-1 rounded-full">
-            قريباً جداً
+            قريباً 
           </span>
         </div>
       </div>
