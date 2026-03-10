@@ -13,7 +13,7 @@ const ComingSoonSection = () => {
             لقاءات لمحة الحصرية
           </h3>
           <span className="text-[11px] font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
-            قريباً جداً
+            قريباً
           </span>
         </div>
 
@@ -30,8 +30,8 @@ const ComingSoonSection = () => {
           </span>
         </div>
       </div>
-    </section>
-  );
+    </section>);
+
 };
 
 export default ComingSoonSection;
