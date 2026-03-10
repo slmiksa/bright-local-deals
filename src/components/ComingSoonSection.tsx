@@ -12,8 +12,8 @@ const ComingSoonSection = () => {
           <h3 className="text-[13px] font-bold text-foreground text-center leading-tight">
             لقاءات لمحة 
           </h3>
-          <span className="bg-primary/10 p-1.5 rounded-full">
-            <Clock className="w-4 h-4 text-primary" />
+          <span className="text-[11px] font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
+            قريباً
           </span>
         </div>
 
