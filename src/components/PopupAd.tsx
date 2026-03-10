@@ -111,9 +111,9 @@ const PopupAd = () => {
                 className="w-full object-contain max-h-[70vh]"
               />
               {popup.link_url && (
-                <div className="bg-primary text-primary-foreground text-center py-3 text-sm font-bold active:bg-primary/90 transition-colors">
+                <button type="button" onClick={handleClick} className="w-full bg-primary text-primary-foreground text-center py-3 text-sm font-bold active:bg-primary/90 transition-colors cursor-pointer">
                   عرض التفاصيل
-                </div>
+                </button>
               )}
             </div>
           </motion.div>
