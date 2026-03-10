@@ -23,7 +23,7 @@ const ComingSoonSection = () => {
             <Video className="w-6 h-6 text-primary-foreground" />
           </div>
           <h3 className="text-[13px] font-bold text-foreground text-center leading-tight">
-            تغطيات لمحة المتميزة
+            تغطيات لمحة 
           </h3>
           <span className="text-[11px] font-bold text-[hsl(var(--gold))] bg-[hsl(var(--gold))/0.1] px-3 py-1 rounded-full">
             قريباً 
