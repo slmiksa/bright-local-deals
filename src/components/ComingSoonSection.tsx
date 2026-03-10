@@ -10,7 +10,7 @@ const ComingSoonSection = () => {
             <Mic className="w-6 h-6 text-primary-foreground" />
           </div>
           <h3 className="text-[13px] font-bold text-foreground text-center leading-tight">
-            لقاءات لمحة الحصرية
+            لقاءات لمحة 
           </h3>
           <span className="text-[11px] font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
             قريباً
