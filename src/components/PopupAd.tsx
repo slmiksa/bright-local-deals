@@ -104,10 +104,7 @@ const PopupAd = () => {
             </button>
 
             {/* Image */}
-            <div
-              className={`rounded-2xl overflow-hidden shadow-2xl border border-border ${popup.link_url ? "cursor-pointer" : ""}`}
-              onClick={popup.link_url ? handleClick : undefined}
-            >
+            <div className="rounded-2xl overflow-hidden shadow-2xl border border-border">
               <img
                 src={popup.image_url}
                 alt="إعلان"
