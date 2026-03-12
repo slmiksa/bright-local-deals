@@ -8,6 +8,10 @@ import { toast } from "@/hooks/use-toast";
 import { Capacitor } from "@capacitor/core";
 import { Share } from "@capacitor/share";
 
+const APP_BASE_URL = "https://bright-local-deals.lovable.app";
+
+const getAdUrl = (adId: number) => `${APP_BASE_URL}/ad/${adId}`;
+
 const AdDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
