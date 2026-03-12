@@ -8,6 +8,10 @@ import { toast } from "@/hooks/use-toast";
 import { Capacitor } from "@capacitor/core";
 import { Share } from "@capacitor/share";
 
+const APP_BASE_URL = "https://bright-local-deals.lovable.app";
+
+const getAdUrl = (adId: number) => `${APP_BASE_URL}/ad/${adId}`;
+
 const AdDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -37,7 +41,7 @@ const AdDetail = () => {
       };
       setMeta("og:title", `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`);
       setMeta("og:description", `${ad.shopName} | ${ad.city} - ${ad.description || ad.offer}`);
-      setMeta("og:url", `${window.location.origin}/ad/${ad.id}`);
+      setMeta("og:url", getAdUrl(ad.id));
       if (ad.images?.[0]) setMeta("og:image", ad.images[0]);
     }
     return () => {
@@ -211,7 +215,7 @@ const AdDetail = () => {
                 <div className="flex items-center gap-2 bg-secondary rounded-2xl p-3">
                   <input
                     readOnly
-                    value={`${window.location.origin}/ad/${ad.id}`}
+                    value={getAdUrl(ad.id)}
                     className="flex-1 bg-transparent text-foreground text-[12px] outline-none select-all"
                     dir="ltr"
                     onFocus={(e) => e.target.select()}
@@ -219,7 +223,7 @@ const AdDetail = () => {
                   <button
                     type="button"
                     onClick={async () => {
-                      const url = `${window.location.origin}/ad/${ad.id}`;
+                      const url = getAdUrl(ad.id);
                       const text = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer} 🔥\n${ad.shopName} | ${ad.city}\n${url}`;
                       try {
                         await navigator.clipboard.writeText(text);
