@@ -8,7 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { Capacitor } from "@capacitor/core";
 import { Share } from "@capacitor/share";
 
-const APP_BASE_URL = "https://bright-local-deals.lovable.app";
+const APP_BASE_URL = "https://lamha.trndsky.com";
 
 const getAdUrl = (adId: number) => `${APP_BASE_URL}/ad/${adId}`;
 
