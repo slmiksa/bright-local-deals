@@ -215,7 +215,7 @@ const AdDetail = () => {
                 <div className="flex items-center gap-2 bg-secondary rounded-2xl p-3">
                   <input
                     readOnly
-                    value={`${window.location.origin}/ad/${ad.id}`}
+                    value={getAdUrl(ad.id)}
                     className="flex-1 bg-transparent text-foreground text-[12px] outline-none select-all"
                     dir="ltr"
                     onFocus={(e) => e.target.select()}
