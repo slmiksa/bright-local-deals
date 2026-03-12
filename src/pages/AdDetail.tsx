@@ -223,7 +223,7 @@ const AdDetail = () => {
                   <button
                     type="button"
                     onClick={async () => {
-                      const url = `${window.location.origin}/ad/${ad.id}`;
+                      const url = getAdUrl(ad.id);
                       const text = `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer} 🔥\n${ad.shopName} | ${ad.city}\n${url}`;
                       try {
                         await navigator.clipboard.writeText(text);
