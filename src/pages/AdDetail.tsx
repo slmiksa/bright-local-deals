@@ -41,7 +41,7 @@ const AdDetail = () => {
       };
       setMeta("og:title", `شاهد الجديد في تطبيق لمحة للتسويق - ${ad.offer}`);
       setMeta("og:description", `${ad.shopName} | ${ad.city} - ${ad.description || ad.offer}`);
-      setMeta("og:url", `${window.location.origin}/ad/${ad.id}`);
+      setMeta("og:url", getAdUrl(ad.id));
       if (ad.images?.[0]) setMeta("og:image", ad.images[0]);
     }
     return () => {
