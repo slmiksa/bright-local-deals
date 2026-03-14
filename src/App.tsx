@@ -38,6 +38,7 @@ import AdminPopupAds from "./pages/admin/AdminPopupAds";
 import AdminBannerSlides from "./pages/admin/AdminBannerSlides";
 import AdminSupport from "./pages/admin/AdminSupport";
 import PopupAd from "./components/PopupAd";
+import AppStoreBanner from "./components/AppStoreBanner";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -102,6 +103,7 @@ const App = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <BottomTabBar />
+              <AppStoreBanner />
             </BrowserRouter>
           </CityProvider>
           </AuthProvider>
