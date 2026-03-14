@@ -103,6 +103,7 @@ const App = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <BottomTabBar />
+              <AppStoreBanner />
             </BrowserRouter>
           </CityProvider>
           </AuthProvider>
