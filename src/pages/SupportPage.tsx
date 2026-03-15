@@ -177,8 +177,8 @@ const SupportPage = () => {
           href="https://trndsky.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="block text-center pt-4 text-primary text-sm font-extrabold active:opacity-70 transition-opacity"
-        >
+          className="block text-center pt-4 text-primary text-sm font-extrabold active:opacity-70 transition-opacity">
+          
           تطوير وبرمجة شركة TRNDSKY
         </a>
       </div>
