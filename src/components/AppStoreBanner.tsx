@@ -43,7 +43,7 @@ const AppStoreBanner = () => {
         <button
           onClick={() => {
             setVisible(false);
-            localStorage.setItem(DISMISSED_KEY, "1");
+            localStorage.setItem(DISMISSED_KEY, String(Date.now()));
           }}
           className="flex-shrink-0 p-1.5 rounded-full hover:bg-muted transition-colors"
           aria-label="إغلاق"
