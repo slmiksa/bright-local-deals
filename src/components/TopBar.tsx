@@ -169,6 +169,47 @@ const TopBar = () => {
           </div>
         </div>
       )}
+
+      {showNotifications && (
+        <div className="fixed inset-0 z-[100]" onClick={() => setShowNotifications(false)}>
+          <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" />
+          <div
+            className="absolute bottom-0 left-0 right-0 bg-card rounded-t-3xl max-w-[430px] mx-auto animate-in slide-in-from-bottom duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-1 bg-muted-foreground/30 rounded-full mx-auto mt-3" />
+            <div className="px-5 py-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-[16px] font-bold text-foreground">الإشعارات</h2>
+                {notifications.length > 0 && (
+                  <button onClick={clearAll} className="text-[12px] text-destructive font-medium active:opacity-70">
+                    مسح الكل
+                  </button>
+                )}
+              </div>
+              <div className="space-y-2 max-h-[50vh] overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <div className="text-center py-10">
+                    <Bell className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                    <p className="text-muted-foreground text-[14px]">لا توجد إشعارات</p>
+                  </div>
+                ) : (
+                  notifications.map((n) => (
+                    <div key={n.id} className="p-3 rounded-xl bg-secondary/50">
+                      <p className="text-[14px] font-bold text-foreground">{n.title}</p>
+                      {n.body && <p className="text-[12px] text-muted-foreground mt-0.5">{n.body}</p>}
+                      <p className="text-[10px] text-muted-foreground/60 mt-1">
+                        {new Date(n.timestamp).toLocaleDateString("ar-SA", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="safe-bottom" />
+          </div>
+        </div>
+      )}
     </>
   );
 };
