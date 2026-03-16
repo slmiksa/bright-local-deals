@@ -8,8 +8,10 @@ import { useNavigate } from "react-router-dom";
 const TopBar = () => {
   const { city, setCity } = useCity();
   const { data: cities = [], isLoading: citiesLoading } = useCities();
+  const { notifications, unreadCount, markAllRead, clearAll } = useNotifications();
   const [showCities, setShowCities] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [query, setQuery] = useState("");
   const { data: sections = [] } = useAdsByCity(city, { enabled: showSearch });
   const navigate = useNavigate();
