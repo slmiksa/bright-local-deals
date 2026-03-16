@@ -2,6 +2,7 @@ import { Search, MapPin, ChevronDown, X, Bell } from "lucide-react";
 import { useCity } from "@/contexts/CityContext";
 import { useCities, useAdsByCity } from "@/hooks/useAds";
 import { useNotifications } from "@/hooks/useNotifications";
+import { isNative } from "@/lib/capacitor";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
