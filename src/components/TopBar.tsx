@@ -1,18 +1,14 @@
-import { Search, MapPin, ChevronDown, X, Bell } from "lucide-react";
+import { Search, MapPin, ChevronDown, X } from "lucide-react";
 import { useCity } from "@/contexts/CityContext";
 import { useCities, useAdsByCity } from "@/hooks/useAds";
-import { useNotifications } from "@/hooks/useNotifications";
-import { isNative } from "@/lib/capacitor";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 const TopBar = () => {
   const { city, setCity } = useCity();
   const { data: cities = [], isLoading: citiesLoading } = useCities();
-  const { notifications, unreadCount, markAllRead, clearAll } = useNotifications();
   const [showCities, setShowCities] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [query, setQuery] = useState("");
   const { data: sections = [] } = useAdsByCity(city, { enabled: showSearch });
   const navigate = useNavigate();
@@ -58,19 +54,6 @@ const TopBar = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            {isNative && (
-              <button
-                onClick={() => { setShowNotifications(true); markAllRead(); }}
-                className="touch-target relative flex items-center justify-center w-10 h-10 rounded-xl bg-primary transition-colors active:opacity-80"
-              >
-                <Bell className="w-[18px] h-[18px] text-primary-foreground" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
-              </button>
-            )}
             <button
               onClick={() => { setShowSearch(true); setQuery(""); }}
               className="touch-target flex items-center justify-center w-10 h-10 rounded-xl bg-primary transition-colors active:opacity-80"
@@ -164,47 +147,6 @@ const TopBar = () => {
                       <span className="text-[14px]">{c}</span>
                       {c === city && <span className="mr-auto text-[11px] text-primary">✓ محدد</span>}
                     </button>
-                  ))
-                )}
-              </div>
-            </div>
-            <div className="safe-bottom" />
-          </div>
-        </div>
-      )}
-
-      {showNotifications && (
-        <div className="fixed inset-0 z-[100]" onClick={() => setShowNotifications(false)}>
-          <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" />
-          <div
-            className="absolute bottom-0 left-0 right-0 bg-card rounded-t-3xl max-w-[430px] mx-auto animate-in slide-in-from-bottom duration-300"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="w-10 h-1 bg-muted-foreground/30 rounded-full mx-auto mt-3" />
-            <div className="px-5 py-4">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-[16px] font-bold text-foreground">الإشعارات</h2>
-                {notifications.length > 0 && (
-                  <button onClick={clearAll} className="text-[12px] text-destructive font-medium active:opacity-70">
-                    مسح الكل
-                  </button>
-                )}
-              </div>
-              <div className="space-y-2 max-h-[50vh] overflow-y-auto">
-                {notifications.length === 0 ? (
-                  <div className="text-center py-10">
-                    <Bell className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-                    <p className="text-muted-foreground text-[14px]">لا توجد إشعارات</p>
-                  </div>
-                ) : (
-                  notifications.map((n) => (
-                    <div key={n.id} className="p-3 rounded-xl bg-secondary/50">
-                      <p className="text-[14px] font-bold text-foreground">{n.title}</p>
-                      {n.body && <p className="text-[12px] text-muted-foreground mt-0.5">{n.body}</p>}
-                      <p className="text-[10px] text-muted-foreground/60 mt-1">
-                        {new Date(n.timestamp).toLocaleDateString("ar-SA", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
-                      </p>
-                    </div>
                   ))
                 )}
               </div>
