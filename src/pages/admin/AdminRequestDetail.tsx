@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, Star, Sparkles, MapPin, Store, Tag, DollarSign, Clock, Image as ImageIcon, Play, Phone } from "lucide-react";
+import { ArrowRight, Star, Sparkles, MapPin, Store, Tag, DollarSign, Clock, Image as ImageIcon, Play, Phone, Download } from "lucide-react";
 import { useState } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
 
@@ -89,21 +89,52 @@ const AdminRequestDetail = () => {
         <InfoCard icon={Clock} label="الحالة" value={statusLabels[request.status] || request.status} />
       </div>
 
+      {/* Download all button */}
+      {images.length > 0 && (
+        <div className="flex items-center justify-between">
+          <h2 className="text-[14px] font-bold text-foreground">الوسائط ({images.length})</h2>
+          <button
+            onClick={() => {
+              images.forEach((img, i) => {
+                const link = document.createElement("a");
+                link.href = img.image_url;
+                link.download = `${request.order_number}_${i + 1}`;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.click();
+              });
+            }}
+            className="flex items-center gap-1.5 text-[12px] font-semibold text-primary hover:underline"
+          >
+            <Download className="w-4 h-4" />
+            تحميل الكل
+          </button>
+        </div>
+      )}
+
       {/* Main media */}
       {mainImage && (
         <div>
           <h2 className="text-[14px] font-bold text-foreground mb-2 flex items-center gap-1.5">
             <ImageIcon className="w-4 h-4 text-primary" /> {(mainImage as any).media_type === 'video' ? 'فيديو الغلاف' : 'صورة الغلاف'}
           </h2>
-          <div
-            className="w-full aspect-[4/3] rounded-2xl overflow-hidden border-2 border-primary cursor-pointer"
-            onClick={() => (mainImage as any).media_type !== 'video' && setLightboxIndex(0)}
-          >
-            {(mainImage as any).media_type === 'video' ? (
-              <video src={mainImage.image_url} className="w-full h-full object-cover" controls />
-            ) : (
-              <img src={mainImage.image_url} alt="صورة الغلاف" className="w-full h-full object-cover" />
-            )}
+          <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border-2 border-primary">
+            <div onClick={() => (mainImage as any).media_type !== 'video' && setLightboxIndex(0)} className="cursor-pointer">
+              {(mainImage as any).media_type === 'video' ? (
+                <video src={mainImage.image_url} className="w-full h-full object-cover" controls />
+              ) : (
+                <img src={mainImage.image_url} alt="صورة الغلاف" className="w-full h-full object-cover" />
+              )}
+            </div>
+            <a
+              href={mainImage.image_url}
+              download={`${request.order_number}_cover`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute top-2 left-2 w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
+            >
+              <Download className="w-4 h-4 text-white" />
+            </a>
           </div>
         </div>
       )}
@@ -116,19 +147,32 @@ const AdminRequestDetail = () => {
             {extraImages.map((img, i) => (
               <div
                 key={img.id}
-                className="aspect-square rounded-xl overflow-hidden border border-border cursor-pointer hover:opacity-90 transition-opacity relative"
-                onClick={() => (img as any).media_type !== 'video' && setLightboxIndex(i + (mainImage ? 1 : 0))}
+                className="aspect-square rounded-xl overflow-hidden border border-border hover:opacity-90 transition-opacity relative"
               >
-                {(img as any).media_type === 'video' ? (
-                  <>
-                    <video src={img.image_url} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 flex items-center justify-center bg-foreground/30">
-                      <Play className="w-6 h-6 text-primary-foreground fill-primary-foreground" />
-                    </div>
-                  </>
-                ) : (
-                  <img src={img.image_url} alt={`صورة ${i + 1}`} className="w-full h-full object-cover" />
-                )}
+                <div
+                  className="cursor-pointer w-full h-full"
+                  onClick={() => (img as any).media_type !== 'video' && setLightboxIndex(i + (mainImage ? 1 : 0))}
+                >
+                  {(img as any).media_type === 'video' ? (
+                    <>
+                      <video src={img.image_url} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-foreground/30 pointer-events-none">
+                        <Play className="w-6 h-6 text-primary-foreground fill-primary-foreground" />
+                      </div>
+                    </>
+                  ) : (
+                    <img src={img.image_url} alt={`صورة ${i + 1}`} className="w-full h-full object-cover" />
+                  )}
+                </div>
+                <a
+                  href={img.image_url}
+                  download={`${request.order_number}_${i + 1}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute top-1 left-1 w-7 h-7 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-colors z-10"
+                >
+                  <Download className="w-3.5 h-3.5 text-white" />
+                </a>
               </div>
             ))}
           </div>
