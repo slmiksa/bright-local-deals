@@ -97,6 +97,7 @@ const AdminAds = () => {
       city: ad.city,
       phone: ad.phone || "",
       address: ad.address || "",
+      website: ad.website || "",
       lat: String(ad.lat || ""),
       lng: String(ad.lng || ""),
       hasLocation: hasLoc,
