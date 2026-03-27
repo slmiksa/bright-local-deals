@@ -273,6 +273,7 @@ export type Database = {
           id: string
           launch_date: string | null
           min_required_version: string | null
+          store_url: string | null
           update_message: string | null
           updated_at: string
           whatsapp_number: string
@@ -284,6 +285,7 @@ export type Database = {
           id?: string
           launch_date?: string | null
           min_required_version?: string | null
+          store_url?: string | null
           update_message?: string | null
           updated_at?: string
           whatsapp_number?: string
@@ -295,6 +297,7 @@ export type Database = {
           id?: string
           launch_date?: string | null
           min_required_version?: string | null
+          store_url?: string | null
           update_message?: string | null
           updated_at?: string
           whatsapp_number?: string

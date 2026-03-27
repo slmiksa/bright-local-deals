@@ -42,7 +42,7 @@ import PopupAd from "./components/PopupAd";
 import AppStoreBanner from "./components/AppStoreBanner";
 import ForceUpdateModal from "./components/ForceUpdateModal";
 import AdminAppVersion from "./pages/admin/AdminAppVersion";
-import { APP_VERSION, compareVersions } from "./lib/version";
+import { APP_VERSION, APP_STORE_URL, compareVersions } from "./lib/version";
 import { isNative } from "./lib/capacitor";
 import { supabase } from "./integrations/supabase/client";
 
@@ -64,19 +64,23 @@ const App = () => {
   });
   const handleSplashFinish = useCallback(() => setShowSplash(false), []);
 
-  const [forceUpdateData, setForceUpdateData] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
+  const [forceUpdateData, setForceUpdateData] = useState<{ show: boolean; message: string; storeUrl: string }>({ show: false, message: "", storeUrl: "" });
 
   useEffect(() => {
     if (!isNative) return;
     const checkVersion = async () => {
       const { data } = await supabase
         .from("app_settings")
-        .select("min_required_version, update_message, force_update")
+        .select("min_required_version, update_message, force_update, store_url")
         .eq("id", "default")
         .single();
       if (data?.force_update && data.min_required_version) {
         if (compareVersions(APP_VERSION, data.min_required_version) < 0) {
-          setForceUpdateData({ show: true, message: data.update_message || "يرجى تحديث التطبيق" });
+          setForceUpdateData({
+            show: true,
+            message: data.update_message || "يرجى تحديث التطبيق",
+            storeUrl: (data as any).store_url || APP_STORE_URL,
+          });
         }
       }
     };
@@ -91,7 +95,7 @@ const App = () => {
           <CityProvider>
             <Toaster />
             <Sonner />
-            {forceUpdateData.show && <ForceUpdateModal message={forceUpdateData.message} />}
+            {forceUpdateData.show && <ForceUpdateModal message={forceUpdateData.message} storeUrl={forceUpdateData.storeUrl} />}
             {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
             <BrowserRouter>
               <ScrollToTop />

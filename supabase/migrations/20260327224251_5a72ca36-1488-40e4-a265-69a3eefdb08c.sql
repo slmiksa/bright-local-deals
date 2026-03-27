@@ -1,0 +1,1 @@
+ALTER TABLE public.app_settings ADD COLUMN IF NOT EXISTS store_url text DEFAULT 'https://apps.apple.com/sa/app/lamha-ads/id6760237672?l=ar';
