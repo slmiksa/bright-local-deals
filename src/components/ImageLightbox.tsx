@@ -47,25 +47,27 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
         justifyContent: "center",
       }}
     >
-      {/* Close button */}
+      {/* Close button - positioned safely below notch */}
       <button
         onClick={handleClose}
         style={{
           position: "absolute",
-          top: 16,
+          top: 60,
           left: 16,
-          width: 40,
-          height: 40,
-          borderRadius: "50%",
-          backgroundColor: "rgba(255,255,255,0.15)",
-          border: "none",
+          width: 44,
+          height: 44,
+          borderRadius: 14,
+          backgroundColor: "rgba(255,255,255,0.2)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
+          border: "1px solid rgba(255,255,255,0.15)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           cursor: "pointer",
         }}
       >
-        <X style={{ width: 20, height: 20, color: "white" }} />
+        <X style={{ width: 22, height: 22, color: "white" }} />
       </button>
 
       {/* Image */}
@@ -157,7 +159,7 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
 
       <p style={{
         position: "absolute",
-        top: 20,
+        top: 64,
         right: 20,
         color: "rgba(255,255,255,0.7)",
         fontSize: 13,
