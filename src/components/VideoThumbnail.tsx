@@ -16,12 +16,10 @@ const VideoThumbnail = ({ src, alt, className = "", onClick }: VideoThumbnailPro
       {poster ? (
         <img src={poster} alt={alt} className="w-full h-full object-cover" />
       ) : (
-        <div className="w-full h-full bg-muted flex items-center justify-center">
-          <Play className="w-8 h-8 text-muted-foreground" />
-        </div>
+        <div className="w-full h-full bg-muted" />
       )}
-      <div className="absolute inset-0 flex items-center justify-center bg-foreground/20 pointer-events-none">
-        <Play className="w-10 h-10 text-primary-foreground fill-primary-foreground drop-shadow-lg" />
+      <div className="absolute bottom-2 left-2 bg-foreground/60 backdrop-blur-sm rounded-full p-1 pointer-events-none">
+        <Play className="w-3 h-3 text-primary-foreground fill-primary-foreground" />
       </div>
     </div>
   );
