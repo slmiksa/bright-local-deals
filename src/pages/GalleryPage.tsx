@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import { X, ArrowLeft, Heart, Eye, Volume2, VolumeX, Share2 } from "lucide-react";
+import { X, ArrowLeft, Heart, Eye, Volume2, VolumeX, Share2, Copy, Check } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useVideoAds } from "@/hooks/useVideoAds";
 import { useCity } from "@/contexts/CityContext";
@@ -50,6 +50,8 @@ const GalleryPage = () => {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const shuffled = useMemo(() => {
     if (!videos.length) return [];
@@ -171,23 +173,22 @@ const GalleryPage = () => {
 
   const activeAdId = tripled.length ? tripled[activeIndex % tripled.length]?.adId : null;
 
-  const handleShare = useCallback(async () => {
-    if (!activeAdId) return;
-    const url = `${SHARE_DOMAIN}/gallery/${activeAdId}`;
+  const shareUrl = activeAdId ? `${SHARE_DOMAIN}/gallery/${activeAdId}` : "";
+
+  const handleShare = useCallback(() => {
+    setCopied(false);
+    setShowShareModal(true);
+  }, []);
+
+  const handleCopyLink = useCallback(async () => {
     try {
-      if (navigator.share) {
-        await navigator.share({ url });
-      } else {
-        await navigator.clipboard.writeText(url);
-        toast({ title: "تم نسخ الرابط" });
-      }
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch {
-      try {
-        await navigator.clipboard.writeText(url);
-        toast({ title: "تم نسخ الرابط" });
-      } catch {}
+      toast({ title: "تعذر نسخ الرابط" });
     }
-  }, [activeAdId]);
+  }, [shareUrl]);
 
   // Check if video is near active (within 2) for src loading
   const isNearActive = (idx: number) => Math.abs(idx - activeIndex) <= 2;
@@ -295,6 +296,38 @@ const GalleryPage = () => {
           </div>
         ))}
       </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div
+          className="fixed inset-0 z-[120] flex items-end justify-center"
+          onClick={() => setShowShareModal(false)}
+        >
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div
+            className="relative w-full max-w-md mx-4 mb-8 bg-[#1c1c1e] rounded-2xl p-5 animate-in slide-in-from-bottom duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-white text-base font-bold text-center mb-4">مشاركة الفيديو</h3>
+            <div className="flex items-center gap-2 bg-black/40 rounded-xl p-3 mb-4" dir="ltr">
+              <p className="text-white/80 text-sm flex-1 truncate select-text">{shareUrl}</p>
+              <button
+                onClick={handleCopyLink}
+                className="shrink-0 flex items-center gap-1.5 bg-white text-black text-sm font-bold px-4 py-2 rounded-lg active:scale-95 transition-transform"
+              >
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copied ? "تم" : "نسخ"}
+              </button>
+            </div>
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="w-full text-white/60 text-sm py-2"
+            >
+              إلغاء
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
