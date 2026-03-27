@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from "react";
-import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera, Loader2, CheckCircle, Mail } from "lucide-react";
+import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera, Loader2, CheckCircle, Mail, Video, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { useCities } from "@/hooks/useAds";
@@ -80,8 +80,10 @@ const AddAdPage = () => {
   const [email, setEmail] = useState("");
   const [mainImage, setMainImage] = useState<{ file: File; preview: string } | null>(null);
   const [extraImages, setExtraImages] = useState<{ file: File; preview: string }[]>([]);
+  const [videos, setVideos] = useState<{ file: File; preview: string }[]>([]);
   const mainInputRef = useRef<HTMLInputElement>(null);
   const extraInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const selectedPlan = useMemo(
     () => pricingPlans.find((plan) => plan.name === adType) || null,
@@ -111,6 +113,41 @@ const AddAdPage = () => {
 
   const removeExtraImage = (index: number) => {
     setExtraImages((prev) => {
+      URL.revokeObjectURL(prev[index].preview);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
+  const handleVideos = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const remaining = 3 - videos.length;
+    if (remaining <= 0) return;
+    
+    const newFiles = Array.from(files).slice(0, remaining);
+    
+    newFiles.forEach((file) => {
+      // Validate duration
+      const videoEl = document.createElement("video");
+      videoEl.preload = "metadata";
+      videoEl.onloadedmetadata = () => {
+        URL.revokeObjectURL(videoEl.src);
+        if (videoEl.duration > 180) {
+          toast({ title: "تنبيه", description: `الفيديو "${file.name}" يتجاوز 3 دقائق`, variant: "destructive" });
+          return;
+        }
+        setVideos((prev) => {
+          if (prev.length >= 3) return prev;
+          return [...prev, { file, preview: URL.createObjectURL(file) }];
+        });
+      };
+      videoEl.src = URL.createObjectURL(file);
+    });
+    e.target.value = "";
+  };
+
+  const removeVideo = (index: number) => {
+    setVideos((prev) => {
       URL.revokeObjectURL(prev[index].preview);
       return prev.filter((_, i) => i !== index);
     });
@@ -181,6 +218,18 @@ const AddAdPage = () => {
           is_main: false,
           sort_order: i + 1,
           media_type: 'image',
+        });
+      }
+
+      // 4. Upload videos
+      for (let i = 0; i < videos.length; i++) {
+        const url = await uploadImage(videos[i].file, request.id, extraImages.length + i + 1);
+        await supabase.from("ad_request_images").insert({
+          request_id: request.id,
+          image_url: url,
+          is_main: false,
+          sort_order: extraImages.length + i + 1,
+          media_type: 'video',
         });
       }
 
@@ -418,6 +467,34 @@ const AddAdPage = () => {
               )}
             </div>
             {extraImages.length > 0 && <p className="text-[11px] text-muted-foreground mt-1.5">{extraImages.length} / 10 صور</p>}
+          </div>
+
+          {/* Videos */}
+          <div>
+            <label className="block text-[13px] font-bold text-foreground mb-1.5">
+              فيديو <span className="text-[11px] text-muted-foreground font-normal">(اختياري - أقصى مدة 3 دقائق)</span>
+            </label>
+            <input ref={videoInputRef} type="file" accept="video/*" multiple className="hidden" onChange={handleVideos} />
+            <div className="grid grid-cols-3 gap-2">
+              {videos.map((vid, i) => (
+                <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-border">
+                  <video src={vid.preview} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-foreground/20">
+                    <Play className="w-6 h-6 text-primary-foreground fill-primary-foreground" />
+                  </div>
+                  <button type="button" onClick={() => removeVideo(i)} className="absolute top-1 left-1 w-6 h-6 bg-foreground/60 backdrop-blur-sm rounded-full flex items-center justify-center active:scale-90 transition-transform">
+                    <X className="w-3.5 h-3.5 text-primary-foreground" />
+                  </button>
+                </div>
+              ))}
+              {videos.length < 3 && (
+                <button type="button" onClick={() => videoInputRef.current?.click()} className="aspect-square rounded-xl border-2 border-dashed border-border bg-secondary/30 flex flex-col items-center justify-center gap-1 active:bg-secondary/50 transition-colors">
+                  <Video className="w-5 h-5 text-muted-foreground" />
+                  <span className="text-[10px] text-muted-foreground">إضافة فيديو</span>
+                </button>
+              )}
+            </div>
+            {videos.length > 0 && <p className="text-[11px] text-muted-foreground mt-1.5">{videos.length} / 3 فيديوهات</p>}
           </div>
 
           {/* Email notification */}
