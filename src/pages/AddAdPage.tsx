@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from "react";
-import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera, Loader2, CheckCircle, Mail } from "lucide-react";
+import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera, Loader2, CheckCircle, Mail, Video, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { useCities } from "@/hooks/useAds";
@@ -80,8 +80,10 @@ const AddAdPage = () => {
   const [email, setEmail] = useState("");
   const [mainImage, setMainImage] = useState<{ file: File; preview: string } | null>(null);
   const [extraImages, setExtraImages] = useState<{ file: File; preview: string }[]>([]);
+  const [videos, setVideos] = useState<{ file: File; preview: string }[]>([]);
   const mainInputRef = useRef<HTMLInputElement>(null);
   const extraInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const selectedPlan = useMemo(
     () => pricingPlans.find((plan) => plan.name === adType) || null,
@@ -111,6 +113,41 @@ const AddAdPage = () => {
 
   const removeExtraImage = (index: number) => {
     setExtraImages((prev) => {
+      URL.revokeObjectURL(prev[index].preview);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
+  const handleVideos = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const remaining = 3 - videos.length;
+    if (remaining <= 0) return;
+    
+    const newFiles = Array.from(files).slice(0, remaining);
+    
+    newFiles.forEach((file) => {
+      // Validate duration
+      const videoEl = document.createElement("video");
+      videoEl.preload = "metadata";
+      videoEl.onloadedmetadata = () => {
+        URL.revokeObjectURL(videoEl.src);
+        if (videoEl.duration > 180) {
+          toast({ title: "تنبيه", description: `الفيديو "${file.name}" يتجاوز 3 دقائق`, variant: "destructive" });
+          return;
+        }
+        setVideos((prev) => {
+          if (prev.length >= 3) return prev;
+          return [...prev, { file, preview: URL.createObjectURL(file) }];
+        });
+      };
+      videoEl.src = URL.createObjectURL(file);
+    });
+    e.target.value = "";
+  };
+
+  const removeVideo = (index: number) => {
+    setVideos((prev) => {
       URL.revokeObjectURL(prev[index].preview);
       return prev.filter((_, i) => i !== index);
     });
