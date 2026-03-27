@@ -1,9 +1,8 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import { X, ArrowLeft, Heart, Eye, Volume2, VolumeX } from "lucide-react";
+import { X, ArrowLeft, Volume2, VolumeX } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useVideoAds } from "@/hooks/useVideoAds";
 import { useCity } from "@/contexts/CityContext";
-import { useAdStats, recordView } from "@/hooks/useAdStats";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -13,30 +12,6 @@ function shuffle<T>(arr: T[]): T[] {
   }
   return a;
 }
-
-const GalleryInteractions = ({ adId }: { adId: number }) => {
-  const { views, likes, liked, toggleLike } = useAdStats(adId);
-
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <button
-        onClick={(e) => { e.stopPropagation(); toggleLike(); }}
-        className="flex flex-col items-center gap-1 active:scale-90 transition-transform"
-      >
-        <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-          <Heart className={`w-6 h-6 transition-colors ${liked ? "fill-red-500 text-red-500" : "text-white"}`} />
-        </div>
-        <span className="text-white text-xs font-bold drop-shadow">{likes}</span>
-      </button>
-      <div className="flex flex-col items-center gap-1">
-        <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-          <Eye className="w-5 h-5 text-white/80" />
-        </div>
-        <span className="text-white/80 text-xs font-bold drop-shadow">{views}</span>
-      </div>
-    </div>
-  );
-};
 
 const GalleryPage = () => {
   const navigate = useNavigate();
@@ -133,19 +108,8 @@ const GalleryPage = () => {
     });
   }, [activeIndex, tripled, isMuted]);
 
-  // Record view when active video changes
-  const lastRecordedRef = useRef<string>("");
-  useEffect(() => {
-    if (!tripled.length) return;
-    const realIdx = activeIndex % len;
-    const video = shuffled[realIdx];
-    if (!video) return;
-    const key = `${video.adId}-${realIdx}`;
-    if (lastRecordedRef.current !== key) {
-      lastRecordedRef.current = key;
-      recordView(video.adId);
-    }
-  }, [activeIndex, shuffled, len, tripled]);
+
+
 
   const setVideoRef = useCallback(
     (idx: number) => (el: HTMLVideoElement | null) => {
@@ -156,7 +120,7 @@ const GalleryPage = () => {
 
   const goBack = () => navigate(-1);
 
-  const activeAdId = tripled.length ? tripled[activeIndex % tripled.length]?.adId : null;
+  
 
   // Check if video is near active (within 2) for src loading
   const isNearActive = (idx: number) => Math.abs(idx - activeIndex) <= 2;
@@ -192,25 +156,14 @@ const GalleryPage = () => {
         <X className="w-5 h-5 text-white" />
       </button>
 
-      {/* Side interactions */}
-      {activeAdId && (
-        <div
-          className="absolute right-3 z-[110] flex flex-col items-center gap-4"
-          style={{ bottom: "calc(env(safe-area-inset-bottom, 24px) + 120px)" }}
-        >
-          {/* Mute toggle */}
-          <button
-            onClick={() => setIsMuted(prev => !prev)}
-            className="flex flex-col items-center gap-1 active:scale-90 transition-transform"
-          >
-            <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-              {isMuted ? <VolumeX className="w-5 h-5 text-white/80" /> : <Volume2 className="w-5 h-5 text-white" />}
-            </div>
-          </button>
-
-          <GalleryInteractions key={activeAdId} adId={activeAdId} />
-        </div>
-      )}
+      {/* Mute toggle */}
+      <button
+        onClick={() => setIsMuted(prev => !prev)}
+        className="absolute right-3 z-[110] w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform"
+        style={{ bottom: "calc(env(safe-area-inset-bottom, 24px) + 140px)" }}
+      >
+        {isMuted ? <VolumeX className="w-5 h-5 text-white/80" /> : <Volume2 className="w-5 h-5 text-white" />}
+      </button>
 
       {/* Video feed */}
       <div
