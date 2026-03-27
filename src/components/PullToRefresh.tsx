@@ -29,12 +29,12 @@ const PullToRefresh = ({ children, className = "" }: PullToRefreshProps) => {
     if (!pulling) return;
     const diff = e.touches[0].clientY - startY.current;
     if (diff > 0) {
-      setPullDistance(Math.min(diff * 0.4, 80));
+      setPullDistance(Math.min(diff * 0.4, 110));
     }
   }, [pulling]);
 
   const onTouchEnd = useCallback(() => {
-    if (pullDistance > 60) {
+    if (pullDistance > 75) {
       setRefreshing(true);
       setTimeout(() => window.location.reload(), 600);
     }
@@ -42,7 +42,7 @@ const PullToRefresh = ({ children, className = "" }: PullToRefreshProps) => {
     setPullDistance(0);
   }, [pullDistance]);
 
-  const progress = Math.min(pullDistance / 60, 1);
+  const progress = Math.min(pullDistance / 75, 1);
 
   return (
     <div
