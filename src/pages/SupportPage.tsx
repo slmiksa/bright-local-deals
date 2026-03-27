@@ -1,8 +1,9 @@
-import { Headphones, MessageCircle, Phone, Mail, ArrowRight, FileText, HelpCircle } from "lucide-react";
+import { Headphones, MessageCircle, Phone, Mail, ArrowRight, FileText, HelpCircle, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Capacitor } from "@capacitor/core";
 
 type SupportContact = {
   id: string;
