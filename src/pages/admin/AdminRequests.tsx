@@ -176,21 +176,27 @@ const AdminRequests = () => {
       )}
 
       <AlertDialog open={!!confirmAction} onOpenChange={(open) => !open && setConfirmAction(null)}>
-        <AlertDialogContent dir="rtl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>
+        <AlertDialogContent dir="rtl" className="max-w-[340px] rounded-2xl p-6">
+          <AlertDialogHeader className="text-center sm:text-center">
+            <div className="mx-auto mb-3 w-14 h-14 rounded-full flex items-center justify-center bg-destructive/10">
+              {confirmAction?.type === "delete" ? (
+                <Trash2 className="w-7 h-7 text-destructive" />
+              ) : (
+                <XCircle className="w-7 h-7 text-destructive" />
+              )}
+            </div>
+            <AlertDialogTitle className="text-[17px]">
               {confirmAction?.type === "delete" ? "تأكيد الحذف" : "تأكيد الرفض"}
             </AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-[13px] leading-relaxed">
               {confirmAction?.type === "delete"
                 ? `هل أنت متأكد من حذف الطلب #${confirmAction?.orderNum}؟ لا يمكن التراجع عن هذا الإجراء.`
                 : `هل أنت متأكد من رفض الطلب #${confirmAction?.orderNum}؟`}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex gap-2 flex-row-reverse sm:flex-row-reverse">
-            <AlertDialogCancel>لا، إلغاء</AlertDialogCancel>
+          <div className="flex flex-col gap-2 mt-4">
             <AlertDialogAction
-              className={confirmAction?.type === "delete" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : "bg-red-600 text-white hover:bg-red-700"}
+              className="w-full rounded-xl py-3 text-[14px] font-bold bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
                 if (!confirmAction) return;
                 if (confirmAction.type === "delete") {
@@ -203,7 +209,10 @@ const AdminRequests = () => {
             >
               نعم، {confirmAction?.type === "delete" ? "احذف" : "ارفض"}
             </AlertDialogAction>
-          </AlertDialogFooter>
+            <AlertDialogCancel className="w-full rounded-xl py-3 text-[14px] font-bold mt-0">
+              لا، إلغاء
+            </AlertDialogCancel>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </div>
