@@ -19,11 +19,9 @@ const AdSection = ({ id, title, ads }: AdSectionProps) => {
     <section id={id} className="pt-7">
       <div className="flex items-center justify-between px-5 mb-3">
         <div className="flex items-center gap-2">
-          {Icon && (
-            <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-              <Icon className="w-4 h-4 text-primary-foreground" />
-            </div>
-          )}
+          <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+            <Icon className="w-4 h-4 text-primary-foreground" />
+          </div>
           <h2 className="font-bold text-base text-foreground">{title}</h2>
         </div>
         <button
