@@ -26,8 +26,8 @@ const SearchPage = () => {
   }, [query, allAdsInCity]);
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
-      {/* Search header */}
+    <div className="min-h-screen bg-background pt-[calc(env(safe-area-inset-top,0px)+60px)]" dir="rtl">
+      {/* Search header - below the main TopBar */}
       <div className="px-4 pt-4 pb-3">
         <div className="flex items-center gap-3">
           <button
