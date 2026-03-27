@@ -20,7 +20,7 @@ const GalleryPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
 
   const shuffled = useMemo(() => (videos.length ? shuffle(videos) : []), [videos]);
 
