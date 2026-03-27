@@ -1,11 +1,10 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import { X, ArrowLeft, Heart, Eye } from "lucide-react";
+import { X, ArrowLeft, Heart, Eye, Volume2, VolumeX } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useVideoAds } from "@/hooks/useVideoAds";
 import { useCity } from "@/contexts/CityContext";
 import { useAdStats, recordView } from "@/hooks/useAdStats";
 
-// Fisher-Yates shuffle
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -15,7 +14,6 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-// Side interaction bar for the active video
 const GalleryInteractions = ({ adId }: { adId: number }) => {
   const { views, likes, liked, toggleLike } = useAdStats(adId);
 
@@ -47,11 +45,10 @@ const GalleryPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
 
-  // Shuffle once when videos load
   const shuffled = useMemo(() => (videos.length ? shuffle(videos) : []), [videos]);
 
-  // Triple the list for infinite loop illusion
   const tripled = useMemo(() => {
     if (!shuffled.length) return [];
     return [...shuffled, ...shuffled, ...shuffled];
@@ -63,7 +60,6 @@ const GalleryPage = () => {
   useEffect(() => {
     if (!len || !containerRef.current) return;
     const container = containerRef.current;
-    // Jump to the start of the middle copy (index = len)
     requestAnimationFrame(() => {
       const itemH = container.clientHeight;
       container.scrollTop = itemH * len;
@@ -93,7 +89,7 @@ const GalleryPage = () => {
     return () => observer.disconnect();
   }, [tripled]);
 
-  // Infinite loop: when scrolling near edges, silently reposition to middle set
+  // Infinite loop reposition
   useEffect(() => {
     if (!len) return;
     const container = containerRef.current;
@@ -110,10 +106,8 @@ const GalleryPage = () => {
         const totalMiddleEnd = itemH * len * 2;
 
         if (scrollTop < itemH * 0.5) {
-          // Near top — jump to middle set same position
           container.scrollTop = scrollTop + totalMiddleStart;
         } else if (scrollTop >= totalMiddleEnd - itemH * 0.5) {
-          // Near bottom — jump to middle set same position
           container.scrollTop = scrollTop - totalMiddleStart;
         }
         ticking = false;
@@ -124,18 +118,20 @@ const GalleryPage = () => {
     return () => container.removeEventListener("scrollend", handleScroll);
   }, [len]);
 
-  // Autoplay active video, pause others
+  // Autoplay active video, pause others, handle mute
   useEffect(() => {
     videoRefs.current.forEach((vid, i) => {
       if (!vid) return;
       if (i === activeIndex) {
+        vid.muted = isMuted;
         vid.currentTime = 0;
         vid.play().catch(() => {});
       } else {
         vid.pause();
+        vid.muted = true;
       }
     });
-  }, [activeIndex, tripled]);
+  }, [activeIndex, tripled, isMuted]);
 
   // Record view when active video changes
   const lastRecordedRef = useRef<string>("");
@@ -160,8 +156,10 @@ const GalleryPage = () => {
 
   const goBack = () => navigate(-1);
 
-  // Get current real ad id
   const activeAdId = tripled.length ? tripled[activeIndex % tripled.length]?.adId : null;
+
+  // Check if video is near active (within 2) for src loading
+  const isNearActive = (idx: number) => Math.abs(idx - activeIndex) <= 2;
 
   if (isLoading) {
     return (
@@ -175,9 +173,7 @@ const GalleryPage = () => {
     return (
       <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center gap-4">
         <p className="text-white/70 text-base">لا توجد فيديوهات حالياً</p>
-        <button onClick={goBack} className="text-white/90 text-sm underline">
-          العودة
-        </button>
+        <button onClick={goBack} className="text-white/90 text-sm underline">العودة</button>
       </div>
     );
   }
@@ -199,10 +195,20 @@ const GalleryPage = () => {
       {/* Side interactions */}
       {activeAdId && (
         <div
-          className="absolute right-3 z-[110] flex flex-col items-center"
+          className="absolute right-3 z-[110] flex flex-col items-center gap-4"
           style={{ bottom: "calc(env(safe-area-inset-bottom, 24px) + 120px)" }}
         >
-          <GalleryInteractions adId={activeAdId} />
+          {/* Mute toggle */}
+          <button
+            onClick={() => setIsMuted(prev => !prev)}
+            className="flex flex-col items-center gap-1 active:scale-90 transition-transform"
+          >
+            <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+              {isMuted ? <VolumeX className="w-5 h-5 text-white/80" /> : <Volume2 className="w-5 h-5 text-white" />}
+            </div>
+          </button>
+
+          <GalleryInteractions key={activeAdId} adId={activeAdId} />
         </div>
       )}
 
@@ -221,12 +227,12 @@ const GalleryPage = () => {
           >
             <video
               ref={setVideoRef(idx)}
-              src={video.videoUrl}
+              src={isNearActive(idx) ? video.videoUrl : undefined}
               className="absolute inset-0 h-full w-full object-cover"
               loop
               muted
               playsInline
-              preload={Math.abs(idx - activeIndex) <= 1 ? "auto" : "none"}
+              preload={isNearActive(idx) ? "auto" : "none"}
             />
 
             {/* Bottom overlay */}
