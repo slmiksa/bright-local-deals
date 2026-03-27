@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { X } from "lucide-react";
+
 import { createPortal } from "react-dom";
 
 interface ImageLightboxProps {
