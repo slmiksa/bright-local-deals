@@ -92,55 +92,69 @@ const AdDetail = () => {
         </div>
       </div>
 
-      {/* Media Gallery */}
-      <div className="relative aspect-[16/10] overflow-hidden">
-        <div ref={scrollRef} onScroll={handleScroll} className="flex w-full h-full overflow-x-auto snap-x snap-mandatory hide-scrollbar" dir="ltr">
-          {ad.media.map((m, i) =>
-            m.type === 'video' ? (
-              <div key={i} className="w-full h-full shrink-0 snap-center relative">
-                <video src={m.url} className="w-full h-full object-cover" controls playsInline preload="auto" />
-              </div>
-            ) : (
-              <img key={i} src={m.url} alt={`${ad.shopName} ${i + 1}`} className="w-full h-full object-cover shrink-0 snap-center cursor-pointer" onClick={() => {setLightboxIndex(i);setLightboxOpen(true);}} />
-            )
-          )}
-        </div>
-        {ad.featured && <span className="absolute top-3 right-3 bg-gold text-primary-foreground text-[11px] font-bold px-3 py-1 rounded-xl shadow-elevated flex items-center gap-1 pointer-events-none"><Star className="w-3 h-3" /> مميز</span>}
-        {ad.media.length > 1 && <>
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 pointer-events-none">
-            {ad.media.map((_, i) => <div key={i} className={`h-1.5 rounded-full transition-all ${i === imgIndex ? "w-5 bg-primary-foreground" : "w-1.5 bg-primary-foreground/50"}`} />)}
-          </div>
-          <div className="absolute top-3 left-3 bg-foreground/50 backdrop-blur-sm text-primary-foreground text-[11px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 pointer-events-none">
-            <Images className="w-3 h-3" /> {imgIndex + 1}/{ad.media.length}
-          </div>
-        </>}
-      </div>
-
-      {/* Thumbnail strip */}
-      {ad.media.length > 1 && <div className="flex gap-2 px-5 mt-3 overflow-x-auto hide-scrollbar">
-        {ad.media.map((m, i) =>
-        <button key={i} onClick={() => {
-          if (m.type === 'image') { setLightboxIndex(i); setLightboxOpen(true); }
-          else {
-            // Scroll to the video
-            if (scrollRef.current) {
-              scrollRef.current.scrollTo({ left: i * scrollRef.current.clientWidth, behavior: 'smooth' });
-            }
-          }
-        }} className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all relative ${i === imgIndex ? "border-primary" : "border-transparent opacity-60"}`}>
-            {m.type === 'video' ? (
+      {/* Main Image Gallery - images only */}
+      {(() => {
+        const imageMedia = ad.media.filter(m => m.type === 'image');
+        const videoMedia = ad.media.filter(m => m.type === 'video');
+        return (
+          <>
+            {imageMedia.length > 0 && (
               <>
-                <video src={m.url} className="w-full h-full object-cover" muted />
-                <div className="absolute inset-0 flex items-center justify-center bg-foreground/20">
-                  <Play className="w-4 h-4 text-primary-foreground fill-primary-foreground" />
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <div ref={scrollRef} onScroll={handleScroll} className="flex w-full h-full overflow-x-auto snap-x snap-mandatory hide-scrollbar" dir="ltr">
+                    {imageMedia.map((m, i) => (
+                      <img key={i} src={m.url} alt={`${ad.shopName} ${i + 1}`} className="w-full h-full object-cover shrink-0 snap-center cursor-pointer" onClick={() => { setLightboxIndex(i); setLightboxOpen(true); }} />
+                    ))}
+                  </div>
+                  {ad.featured && <span className="absolute top-3 right-3 bg-gold text-primary-foreground text-[11px] font-bold px-3 py-1 rounded-xl shadow-elevated flex items-center gap-1 pointer-events-none"><Star className="w-3 h-3" /> مميز</span>}
+                  {imageMedia.length > 1 && <>
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 pointer-events-none">
+                      {imageMedia.map((_, i) => <div key={i} className={`h-1.5 rounded-full transition-all ${i === imgIndex ? "w-5 bg-primary-foreground" : "w-1.5 bg-primary-foreground/50"}`} />)}
+                    </div>
+                    <div className="absolute top-3 left-3 bg-foreground/50 backdrop-blur-sm text-primary-foreground text-[11px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 pointer-events-none">
+                      <Images className="w-3 h-3" /> {imgIndex + 1}/{imageMedia.length}
+                    </div>
+                  </>}
                 </div>
+
+                {/* Image thumbnails */}
+                {imageMedia.length > 1 && (
+                  <div className="flex gap-2 px-5 mt-3 overflow-x-auto hide-scrollbar">
+                    {imageMedia.map((m, i) => (
+                      <button key={i} onClick={() => { setLightboxIndex(i); setLightboxOpen(true); }} className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${i === imgIndex ? "border-primary" : "border-transparent opacity-60"}`}>
+                        <img src={m.url} alt="" className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </>
-            ) : (
-              <img src={m.url} alt="" className="w-full h-full object-cover" />
             )}
-          </button>
-        )}
-      </div>}
+
+            {/* Videos Section */}
+            {videoMedia.length > 0 && (
+              <div className="px-5 mt-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Video className="w-5 h-5 text-primary" />
+                  <h3 className="font-bold text-[15px] text-foreground">الفيديوهات ({videoMedia.length})</h3>
+                </div>
+                <div className="space-y-3">
+                  {videoMedia.map((m, i) => (
+                    <div key={i} className="rounded-2xl overflow-hidden bg-foreground/5 border border-border">
+                      <video
+                        src={m.url}
+                        className="w-full aspect-video object-cover"
+                        controls
+                        playsInline
+                        preload="metadata"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       {/* Info */}
       <div className="px-5 pt-5">
