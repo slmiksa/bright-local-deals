@@ -1,17 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Smartphone, CupSoda, SprayCan, Lamp, ChefHat, PartyPopper, ChevronLeft } from "lucide-react";
-import PullToRefresh from "@/components/PullToRefresh";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-
-const categoryIcons: Record<string, React.ElementType> = {
-  electronics: Smartphone,
-  cafes: CupSoda,
-  perfumes: SprayCan,
-  furniture: Lamp,
-  food: ChefHat,
-  events: PartyPopper,
-};
+import { ChevronLeft } from "lucide-react";
+import { getCategoryIcon } from "@/lib/categoryIcons";
 
 const CategoriesPage = () => {
   const navigate = useNavigate();
