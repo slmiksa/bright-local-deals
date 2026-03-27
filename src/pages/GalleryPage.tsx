@@ -174,10 +174,9 @@ const GalleryPage = () => {
   const handleShare = useCallback(async () => {
     if (!activeAdId) return;
     const url = `${SHARE_DOMAIN}/gallery/${activeAdId}`;
-    const shareData = { title: "لمحة", text: "شاهد هذا العرض على لمحة", url };
     try {
       if (navigator.share) {
-        await navigator.share(shareData);
+        await navigator.share({ url });
       } else {
         await navigator.clipboard.writeText(url);
         toast({ title: "تم نسخ الرابط" });
