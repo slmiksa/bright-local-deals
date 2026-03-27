@@ -1,9 +1,10 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import { X, ArrowLeft, Heart, Eye, Volume2, VolumeX } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { X, ArrowLeft, Heart, Eye, Volume2, VolumeX, Share2 } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useVideoAds } from "@/hooks/useVideoAds";
 import { useCity } from "@/contexts/CityContext";
 import { useAdStats, recordView } from "@/hooks/useAdStats";
+import { toast } from "@/hooks/use-toast";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -38,8 +39,11 @@ const GalleryInteractions = ({ adId }: { adId: number }) => {
   );
 };
 
+const SHARE_DOMAIN = "https://lamha.trndsky.com";
+
 const GalleryPage = () => {
   const navigate = useNavigate();
+  const { adId: paramAdId } = useParams<{ adId?: string }>();
   const { city } = useCity();
   const { data: videos = [], isLoading } = useVideoAds(city);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,7 +51,16 @@ const GalleryPage = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
 
-  const shuffled = useMemo(() => (videos.length ? shuffle(videos) : []), [videos]);
+  const shuffled = useMemo(() => {
+    if (!videos.length) return [];
+    if (paramAdId) {
+      const targetId = Number(paramAdId);
+      const target = videos.filter(v => v.adId === targetId);
+      const rest = videos.filter(v => v.adId !== targetId);
+      return [...target, ...shuffle(rest)];
+    }
+    return shuffle(videos);
+  }, [videos, paramAdId]);
 
   const tripled = useMemo(() => {
     if (!shuffled.length) return [];
@@ -158,6 +171,25 @@ const GalleryPage = () => {
 
   const activeAdId = tripled.length ? tripled[activeIndex % tripled.length]?.adId : null;
 
+  const handleShare = useCallback(async () => {
+    if (!activeAdId) return;
+    const url = `${SHARE_DOMAIN}/gallery/${activeAdId}`;
+    const shareData = { title: "لمحة", text: "شاهد هذا العرض على لمحة", url };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast({ title: "تم نسخ الرابط" });
+      }
+    } catch {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast({ title: "تم نسخ الرابط" });
+      } catch {}
+    }
+  }, [activeAdId]);
+
   // Check if video is near active (within 2) for src loading
   const isNearActive = (idx: number) => Math.abs(idx - activeIndex) <= 2;
 
@@ -198,6 +230,15 @@ const GalleryPage = () => {
           className="absolute right-3 z-[110] flex flex-col items-center gap-4"
           style={{ bottom: "calc(env(safe-area-inset-bottom, 24px) + 120px)" }}
         >
+          <button
+            onClick={handleShare}
+            className="flex flex-col items-center gap-1 active:scale-90 transition-transform"
+          >
+            <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+              <Share2 className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-white/80 text-xs font-bold drop-shadow">مشاركة</span>
+          </button>
           <button
             onClick={() => setIsMuted(prev => !prev)}
             className="flex flex-col items-center gap-1 active:scale-90 transition-transform"

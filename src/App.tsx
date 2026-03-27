@@ -108,6 +108,7 @@ const App = () => {
                 <Route path="/categories" element={<CategoriesPage />} />
                 <Route path="/category/:id" element={<CategoryPage />} />
                 <Route path="/gallery" element={<GalleryPage />} />
+                <Route path="/gallery/:adId" element={<GalleryPage />} />
                 <Route path="/add" element={<AddAdPage />} />
                 <Route path="/support" element={<SupportPage />} />
                 <Route path="/privacy" element={<TermsPage />} />
