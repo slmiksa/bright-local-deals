@@ -137,12 +137,12 @@ const AdDetail = () => {
                   <Video className="w-5 h-5 text-primary" />
                   <h3 className="font-bold text-[15px] text-foreground">الفيديوهات ({videoMedia.length})</h3>
                 </div>
-                <div className="space-y-3">
+                <div className="flex gap-2 overflow-x-auto hide-scrollbar">
                   {videoMedia.map((m, i) => (
-                    <div key={i} className="rounded-2xl overflow-hidden bg-foreground/5 border border-border">
+                    <div key={i} className="shrink-0 w-44 rounded-2xl overflow-hidden bg-foreground/5 border border-border">
                       <video
                         src={m.url}
-                        className="w-full aspect-video object-cover"
+                        className="w-full aspect-square object-cover"
                         controls
                         playsInline
                         preload="metadata"
