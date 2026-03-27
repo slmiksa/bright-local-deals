@@ -266,24 +266,33 @@ export type Database = {
         Row: {
           featured_surcharge: number
           featured_surcharge_enabled: boolean
+          force_update: boolean | null
           id: string
           launch_date: string | null
+          min_required_version: string | null
+          update_message: string | null
           updated_at: string
           whatsapp_number: string
         }
         Insert: {
           featured_surcharge?: number
           featured_surcharge_enabled?: boolean
+          force_update?: boolean | null
           id?: string
           launch_date?: string | null
+          min_required_version?: string | null
+          update_message?: string | null
           updated_at?: string
           whatsapp_number?: string
         }
         Update: {
           featured_surcharge?: number
           featured_surcharge_enabled?: boolean
+          force_update?: boolean | null
           id?: string
           launch_date?: string | null
+          min_required_version?: string | null
+          update_message?: string | null
           updated_at?: string
           whatsapp_number?: string
         }
