@@ -39,8 +39,11 @@ const GalleryInteractions = ({ adId }: { adId: number }) => {
   );
 };
 
+const SHARE_DOMAIN = "https://lamha.trndsky.com";
+
 const GalleryPage = () => {
   const navigate = useNavigate();
+  const { adId: paramAdId } = useParams<{ adId?: string }>();
   const { city } = useCity();
   const { data: videos = [], isLoading } = useVideoAds(city);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -48,7 +51,16 @@ const GalleryPage = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
 
-  const shuffled = useMemo(() => (videos.length ? shuffle(videos) : []), [videos]);
+  const shuffled = useMemo(() => {
+    if (!videos.length) return [];
+    if (paramAdId) {
+      const targetId = Number(paramAdId);
+      const target = videos.filter(v => v.adId === targetId);
+      const rest = videos.filter(v => v.adId !== targetId);
+      return [...target, ...shuffle(rest)];
+    }
+    return shuffle(videos);
+  }, [videos, paramAdId]);
 
   const tripled = useMemo(() => {
     if (!shuffled.length) return [];
