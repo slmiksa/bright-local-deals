@@ -221,6 +221,18 @@ const AddAdPage = () => {
         });
       }
 
+      // 4. Upload videos
+      for (let i = 0; i < videos.length; i++) {
+        const url = await uploadImage(videos[i].file, request.id, extraImages.length + i + 1);
+        await supabase.from("ad_request_images").insert({
+          request_id: request.id,
+          image_url: url,
+          is_main: false,
+          sort_order: extraImages.length + i + 1,
+          media_type: 'video',
+        });
+      }
+
       setOrderNumber(request.order_number);
 
       // 3. Build WhatsApp URL for later use
