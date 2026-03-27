@@ -13,7 +13,7 @@ interface AdSectionProps {
 
 const AdSection = ({ id, title, ads }: AdSectionProps) => {
   const navigate = useNavigate();
-  const Icon = categoryIcons[id];
+  const Icon = getCategoryIcon(id);
 
   return (
     <section id={id} className="pt-7">
