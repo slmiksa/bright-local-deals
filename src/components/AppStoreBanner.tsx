@@ -9,8 +9,7 @@ const AppStoreBanner = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const isNative = !!(window as any).Capacitor?.isNativePlatform?.();
-    if (isNative) return;
+    if (Capacitor.isNativePlatform()) return;
 
     const lastDismissed = localStorage.getItem(DISMISSED_KEY);
     if (lastDismissed && Date.now() - Number(lastDismissed) < 5 * 60 * 1000) return;
