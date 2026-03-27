@@ -1,33 +1,14 @@
-import { Search, MapPin, ChevronDown, X } from "lucide-react";
+import { Search, MapPin, ChevronDown } from "lucide-react";
 import { useCity } from "@/contexts/CityContext";
-import { useCities, useAdsByCity } from "@/hooks/useAds";
-import { useState, useMemo } from "react";
+import { useCities } from "@/hooks/useAds";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const TopBar = () => {
   const { city, setCity } = useCity();
   const { data: cities = [], isLoading: citiesLoading } = useCities();
   const [showCities, setShowCities] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
-  const [query, setQuery] = useState("");
-  const { data: sections = [] } = useAdsByCity(city, { enabled: showSearch });
   const navigate = useNavigate();
-
-  // Flatten all ads from sections for search
-  const allAdsInCity = useMemo(() => (showSearch ? sections.flatMap((s) => s.ads) : []), [sections, showSearch]);
-
-  const results = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.trim().toLowerCase();
-    return allAdsInCity
-      .filter(
-        (ad) =>
-          ad.shopName.toLowerCase().includes(q) ||
-          ad.offer.toLowerCase().includes(q) ||
-          ad.description.toLowerCase().includes(q)
-      )
-      .slice(0, 10);
-  }, [query, allAdsInCity]);
 
   return (
     <>
@@ -55,7 +36,7 @@ const TopBar = () => {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => { setShowSearch(true); setQuery(""); }}
+              onClick={() => navigate("/search")}
               className="touch-target flex items-center justify-center w-10 h-10 rounded-xl bg-primary transition-colors active:opacity-80"
             >
               <Search className="w-[18px] h-[18px] text-primary-foreground" />
@@ -64,58 +45,6 @@ const TopBar = () => {
         </div>
       </header>
 
-      {showSearch && (
-        <div className="fixed inset-0 z-[100]" onClick={() => setShowSearch(false)}>
-          <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" />
-          <div
-            className="absolute top-0 left-0 right-0 bg-card max-w-[430px] mx-auto animate-in slide-in-from-top duration-300"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="px-5 pb-3 flex items-center gap-3" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
-              <div className="flex-1 relative">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  autoFocus
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="ابحث عن متجر أو عرض..."
-                  className="w-full h-11 pr-10 pl-4 rounded-xl bg-secondary text-foreground text-[14px] placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
-                />
-              </div>
-              <button
-                onClick={() => setShowSearch(false)}
-                className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted"
-              >
-                <X className="w-5 h-5 text-foreground" />
-              </button>
-            </div>
-
-            {query.trim() && (
-              <div className="px-5 pb-4 max-h-[60vh] overflow-y-auto">
-                {results.length > 0 ? (
-                  <div className="space-y-1.5">
-                    {results.map((ad) => (
-                      <button
-                        key={ad.id}
-                        onClick={() => { setShowSearch(false); navigate(`/ad/${ad.id}`); }}
-                        className="touch-target w-full flex items-center gap-3 p-3 rounded-xl active:bg-secondary transition-colors text-right"
-                      >
-                        <img src={ad.images[0]} alt={ad.shopName} className="w-12 h-12 rounded-xl object-cover shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[14px] font-bold text-foreground truncate">{ad.shopName}</p>
-                          <p className="text-[12px] text-muted-foreground truncate">{ad.offer}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-muted-foreground text-[14px] py-8">لا توجد نتائج</p>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {showCities && (
         <div className="fixed inset-0 z-[100]" onClick={() => setShowCities(false)}>
