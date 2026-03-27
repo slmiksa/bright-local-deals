@@ -12,7 +12,7 @@ import Index from "./pages/Index";
 import AdDetail from "./pages/AdDetail";
 import CategoriesPage from "./pages/CategoriesPage";
 import CategoryPage from "./pages/CategoryPage";
-import FeaturedPage from "./pages/FeaturedPage";
+import GalleryPage from "./pages/GalleryPage";
 import AddAdPage from "./pages/AddAdPage";
 import SupportPage from "./pages/SupportPage";
 import TermsPage from "./pages/TermsPage";
@@ -101,7 +101,7 @@ const App = () => {
                 <Route path="/ad/:id" element={<AdDetail />} />
                 <Route path="/categories" element={<CategoriesPage />} />
                 <Route path="/category/:id" element={<CategoryPage />} />
-                <Route path="/featured" element={<FeaturedPage />} />
+                <Route path="/gallery" element={<GalleryPage />} />
                 <Route path="/add" element={<AddAdPage />} />
                 <Route path="/support" element={<SupportPage />} />
                 <Route path="/privacy" element={<TermsPage />} />
