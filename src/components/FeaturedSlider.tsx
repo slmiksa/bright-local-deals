@@ -11,7 +11,7 @@ const FeaturedSlider = () => {
   const { city } = useCity();
   const { data: featured = [] } = useFeaturedAds(city);
 
-  const slides = featured.slice(0, 5).map((ad) => ({
+  const slides = featured.slice(0, 10).map((ad) => ({
     id: ad.id,
     image: ad.images[0] || null,
     firstMedia: ad.media?.[0] || null,
