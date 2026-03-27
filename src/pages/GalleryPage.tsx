@@ -77,59 +77,79 @@ const GalleryPage = () => {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black">
-      {/* Close button */}
+    <div
+      className="fixed inset-0 z-[100] bg-black"
+      style={{
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: "100dvh",
+        width: "100vw",
+      }}
+    >
+      {/* Close button - positioned well below notch/dynamic island for Capacitor */}
       <button
         onClick={goBack}
-        className="absolute top-4 right-4 z-[110] w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center"
-        style={{ top: "calc(env(safe-area-inset-top, 16px) + 8px)" }}
+        className="absolute right-4 z-[110] w-11 h-11 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform"
+        style={{ top: "max(env(safe-area-inset-top, 20px), 20px)" }}
       >
         <X className="w-5 h-5 text-white" />
       </button>
 
       {/* Counter */}
       <div
-        className="absolute top-4 left-4 z-[110] text-white/70 text-xs font-medium bg-black/40 rounded-full px-3 py-1.5 backdrop-blur-sm"
-        style={{ top: "calc(env(safe-area-inset-top, 16px) + 8px)" }}
+        className="absolute left-4 z-[110] text-white/80 text-xs font-medium bg-black/50 rounded-full px-3 py-1.5 backdrop-blur-md"
+        style={{ top: "max(env(safe-area-inset-top, 20px), 20px)" }}
       >
         {activeIndex + 1} / {videos.length}
       </div>
 
-      {/* Video feed */}
+      {/* Video feed - true fullscreen with dvh */}
       <div
         ref={containerRef}
-        className="h-full w-full overflow-y-scroll snap-y snap-mandatory"
-        style={{ scrollbarWidth: "none" }}
+        className="w-full overflow-y-scroll snap-y snap-mandatory"
+        style={{
+          height: "100dvh",
+          scrollbarWidth: "none",
+          WebkitOverflowScrolling: "touch",
+        }}
       >
         {videos.map((video, idx) => (
           <div
             key={`${video.adId}-${idx}`}
             data-index={idx}
-            className="h-full w-full snap-start snap-always relative flex items-center justify-center"
+            className="w-full snap-start snap-always relative"
+            style={{ height: "100dvh" }}
           >
             <video
               ref={setVideoRef(idx)}
               src={video.videoUrl}
-              className="h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
               loop
               muted
               playsInline
               preload={Math.abs(idx - activeIndex) <= 1 ? "auto" : "none"}
             />
 
-            {/* Bottom overlay */}
-            <div className="absolute bottom-0 left-0 right-0 pb-8 pt-20 px-5 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
-              style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 32px) + 24px)" }}
+            {/* Bottom overlay - RTL aligned text */}
+            <div
+              className="absolute bottom-0 left-0 right-0 pt-24 px-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+              style={{ paddingBottom: "max(env(safe-area-inset-bottom, 24px), 24px)" }}
             >
-              <h3 className="text-white text-lg font-bold mb-1">{video.shopName}</h3>
-              <p className="text-white/70 text-sm mb-4 line-clamp-1">{video.offer}</p>
-              <button
-                onClick={() => navigate(`/ad/${video.adId}`)}
-                className="flex items-center gap-2 bg-white text-black font-bold text-sm px-5 py-2.5 rounded-xl active:scale-95 transition-transform"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                عرض الإعلان
-              </button>
+              <div className="text-right">
+                <h3 className="text-white text-lg font-bold mb-1">{video.shopName}</h3>
+                <p className="text-white/70 text-sm mb-4 line-clamp-1">{video.offer}</p>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => navigate(`/ad/${video.adId}`)}
+                  className="flex items-center gap-2 bg-white text-black font-bold text-sm px-6 py-3 rounded-xl active:scale-95 transition-transform shadow-lg"
+                >
+                  عرض الإعلان
+                  <ArrowLeft className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         ))}
