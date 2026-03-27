@@ -1,33 +1,14 @@
-import { Search, MapPin, ChevronDown, X } from "lucide-react";
+import { Search, MapPin, ChevronDown } from "lucide-react";
 import { useCity } from "@/contexts/CityContext";
-import { useCities, useAdsByCity } from "@/hooks/useAds";
-import { useState, useMemo } from "react";
+import { useCities } from "@/hooks/useAds";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const TopBar = () => {
   const { city, setCity } = useCity();
   const { data: cities = [], isLoading: citiesLoading } = useCities();
   const [showCities, setShowCities] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
-  const [query, setQuery] = useState("");
-  const { data: sections = [] } = useAdsByCity(city, { enabled: showSearch });
   const navigate = useNavigate();
-
-  // Flatten all ads from sections for search
-  const allAdsInCity = useMemo(() => (showSearch ? sections.flatMap((s) => s.ads) : []), [sections, showSearch]);
-
-  const results = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.trim().toLowerCase();
-    return allAdsInCity
-      .filter(
-        (ad) =>
-          ad.shopName.toLowerCase().includes(q) ||
-          ad.offer.toLowerCase().includes(q) ||
-          ad.description.toLowerCase().includes(q)
-      )
-      .slice(0, 10);
-  }, [query, allAdsInCity]);
 
   return (
     <>
@@ -55,7 +36,7 @@ const TopBar = () => {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => { setShowSearch(true); setQuery(""); }}
+              onClick={() => navigate("/search")}
               className="touch-target flex items-center justify-center w-10 h-10 rounded-xl bg-primary transition-colors active:opacity-80"
             >
               <Search className="w-[18px] h-[18px] text-primary-foreground" />
