@@ -1,12 +1,12 @@
 import { isNative } from "@/lib/capacitor";
-import { APP_STORE_URL } from "@/lib/version";
 import { Download } from "lucide-react";
 
 interface ForceUpdateModalProps {
   message: string;
+  storeUrl: string;
 }
 
-const ForceUpdateModal = ({ message }: ForceUpdateModalProps) => {
+const ForceUpdateModal = ({ message, storeUrl }: ForceUpdateModalProps) => {
   if (!isNative) return null;
 
   return (
@@ -19,7 +19,7 @@ const ForceUpdateModal = ({ message }: ForceUpdateModalProps) => {
         {message}
       </p>
       <a
-        href={APP_STORE_URL}
+        href={storeUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold py-3 px-8 rounded-xl text-base hover:bg-primary/90 transition-colors"

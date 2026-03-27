@@ -12,24 +12,26 @@ const AdminAppVersion = () => {
   const [minVersion, setMinVersion] = useState("1.1.0");
   const [updateMessage, setUpdateMessage] = useState("يوجد تحديث جديد، يرجى التحديث للاستمرار");
   const [forceUpdate, setForceUpdate] = useState(false);
+  const [storeUrl, setStoreUrl] = useState("https://apps.apple.com/sa/app/lamha-ads/id6760237672?l=ar");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchSettings = async () => {
       const { data } = await supabase
         .from("app_settings")
-        .select("min_required_version, update_message, force_update")
+        .select("min_required_version, update_message, force_update, store_url")
         .eq("id", "default")
         .single();
       if (data) {
         setMinVersion(data.min_required_version || "1.1.0");
         setUpdateMessage(data.update_message || "");
         setForceUpdate(data.force_update || false);
+        setStoreUrl((data as any).store_url || "https://apps.apple.com/sa/app/lamha-ads/id6760237672?l=ar");
       }
       setLoading(false);
     };
-    fetch();
+    fetchSettings();
   }, []);
 
   const handleSave = async () => {
@@ -40,7 +42,8 @@ const AdminAppVersion = () => {
         min_required_version: minVersion,
         update_message: updateMessage,
         force_update: forceUpdate,
-      })
+        store_url: storeUrl,
+      } as any)
       .eq("id", "default");
 
     if (error) {
@@ -95,6 +98,20 @@ const AdminAppVersion = () => {
             onChange={(e) => setUpdateMessage(e.target.value)}
             rows={3}
           />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">رابط المتجر (App Store)</label>
+          <Input
+            value={storeUrl}
+            onChange={(e) => setStoreUrl(e.target.value)}
+            placeholder="https://apps.apple.com/..."
+            dir="ltr"
+            className="font-mono text-xs"
+          />
+          <p className="text-xs text-muted-foreground">
+            الرابط الذي سينتقل إليه المستخدم عند الضغط على "تحديث الآن"
+          </p>
         </div>
 
         <Button onClick={handleSave} disabled={saving} className="w-full gap-2">
