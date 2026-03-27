@@ -84,8 +84,8 @@ const GalleryPage = () => {
         left: 0,
         right: 0,
         bottom: 0,
-        height: "100dvh",
-        width: "100vw",
+        height: "100%",
+        width: "100%",
       }}
     >
       {/* Close button - positioned well below notch/dynamic island for Capacitor */}
@@ -110,7 +110,7 @@ const GalleryPage = () => {
         ref={containerRef}
         className="w-full overflow-y-scroll snap-y snap-mandatory"
         style={{
-          height: "100dvh",
+          height: "100%",
           scrollbarWidth: "none",
           WebkitOverflowScrolling: "touch",
         }}
@@ -120,7 +120,7 @@ const GalleryPage = () => {
             key={`${video.adId}-${idx}`}
             data-index={idx}
             className="w-full snap-start snap-always relative"
-            style={{ height: "100dvh" }}
+            style={{ height: "100%" }}
           >
             <video
               ref={setVideoRef(idx)}
