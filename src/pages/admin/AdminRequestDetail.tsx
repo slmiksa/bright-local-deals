@@ -2,8 +2,25 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Star, Sparkles, MapPin, Store, Tag, DollarSign, Clock, Image as ImageIcon, Play, Phone, Download } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
+
+const forceDownload = async (url: string, filename: string) => {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(blobUrl);
+  } catch {
+    window.open(url, "_blank");
+  }
+};
 
 const AdminRequestDetail = () => {
   const { id } = useParams<{ id: string }>();
