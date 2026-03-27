@@ -113,12 +113,8 @@ const AdminRequestDetail = () => {
           <button
             onClick={() => {
               images.forEach((img, i) => {
-                const link = document.createElement("a");
-                link.href = img.image_url;
-                link.download = `${request.order_number}_${i + 1}`;
-                link.target = "_blank";
-                link.rel = "noopener noreferrer";
-                link.click();
+                const ext = (img as any).media_type === 'video' ? 'mp4' : 'jpg';
+                forceDownload(img.image_url, `${request.order_number}_${i + 1}.${ext}`);
               });
             }}
             className="flex items-center gap-1.5 text-[12px] font-semibold text-primary hover:underline"
@@ -143,15 +139,12 @@ const AdminRequestDetail = () => {
                 <img src={mainImage.image_url} alt="صورة الغلاف" className="w-full h-full object-cover" />
               )}
             </div>
-            <a
-              href={mainImage.image_url}
-              download={`${request.order_number}_cover`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => forceDownload(mainImage.image_url, `${request.order_number}_cover.${(mainImage as any).media_type === 'video' ? 'mp4' : 'jpg'}`)}
               className="absolute top-2 left-2 w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
             >
               <Download className="w-4 h-4 text-white" />
-            </a>
+            </button>
           </div>
         </div>
       )}
@@ -181,15 +174,12 @@ const AdminRequestDetail = () => {
                     <img src={img.image_url} alt={`صورة ${i + 1}`} className="w-full h-full object-cover" />
                   )}
                 </div>
-                <a
-                  href={img.image_url}
-                  download={`${request.order_number}_${i + 1}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => forceDownload(img.image_url, `${request.order_number}_${i + 1}.${(img as any).media_type === 'video' ? 'mp4' : 'jpg'}`)}
                   className="absolute top-1 left-1 w-7 h-7 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-colors z-10"
                 >
                   <Download className="w-3.5 h-3.5 text-white" />
-                </a>
+                </button>
               </div>
             ))}
           </div>
