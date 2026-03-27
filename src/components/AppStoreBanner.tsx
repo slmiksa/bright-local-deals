@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 
 const APP_STORE_URL = "https://apps.apple.com/sa/app/lamha-ads/id6760237672?l=ar";
 const DISMISSED_KEY = "lamha_appstore_dismissed";
