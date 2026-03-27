@@ -8,10 +8,15 @@ interface ImageLightboxProps {
   onClose: () => void;
 }
 
+const DISMISS_THRESHOLD = 120;
+
 const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps) => {
   const [current, setCurrent] = useState(initialIndex);
   const [scale, setScale] = useState(1);
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
+  const [dismissY, setDismissY] = useState(0);
+  const [dismissTransition, setDismissTransition] = useState(false);
+  const isDismissing = useRef(false);
   const touchRef = useRef<{ startX: number; startY: number; dist: number; scaling: boolean; moved: boolean }>({
     startX: 0, startY: 0, dist: 0, scaling: false, moved: false,
   });
@@ -47,6 +52,7 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
     Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    setDismissTransition(false);
     if (e.touches.length === 2) {
       e.preventDefault();
       touchRef.current.scaling = true;
@@ -54,10 +60,10 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
     } else if (e.touches.length === 1) {
       touchRef.current.scaling = false;
       touchRef.current.moved = false;
+      isDismissing.current = false;
       touchRef.current.startX = e.touches[0].clientX;
       touchRef.current.startY = e.touches[0].clientY;
 
-      // Double tap to zoom
       const now = Date.now();
       if (now - lastTap.current < 300) {
         e.preventDefault();
@@ -67,7 +73,7 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
         } else {
           setScale(2.5);
         }
-        touchRef.current.moved = true; // prevent tap navigation on double tap
+        touchRef.current.moved = true;
       }
       lastTap.current = now;
     }
@@ -82,15 +88,28 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
       touchRef.current.dist = newDist;
       touchRef.current.moved = true;
     } else if (e.touches.length === 1) {
-      const dx = Math.abs(e.touches[0].clientX - touchRef.current.startX);
-      const dy = Math.abs(e.touches[0].clientY - touchRef.current.startY);
-      if (dx > 8 || dy > 8) touchRef.current.moved = true;
+      const dx = e.touches[0].clientX - touchRef.current.startX;
+      const dy = e.touches[0].clientY - touchRef.current.startY;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+
+      // Detect dismiss gesture: vertical > horizontal, not zoomed, dragging down
+      if (!isDismissing.current && scale === 1 && !touchRef.current.moved && absDy > 12 && absDy > absDx * 1.5) {
+        isDismissing.current = true;
+        touchRef.current.moved = true;
+      }
+
+      if (isDismissing.current) {
+        e.preventDefault();
+        setDismissY(dy);
+        return;
+      }
+
+      if (absDx > 8 || absDy > 8) touchRef.current.moved = true;
 
       if (scale > 1) {
         e.preventDefault();
-        const ddx = e.touches[0].clientX - touchRef.current.startX;
-        const ddy = e.touches[0].clientY - touchRef.current.startY;
-        setTranslate((t) => ({ x: t.x + ddx, y: t.y + ddy }));
+        setTranslate((t) => ({ x: t.x + dx, y: t.y + dy }));
         touchRef.current.startX = e.touches[0].clientX;
         touchRef.current.startY = e.touches[0].clientY;
       }
@@ -98,6 +117,17 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    if (isDismissing.current) {
+      isDismissing.current = false;
+      if (Math.abs(dismissY) > DISMISS_THRESHOLD) {
+        handleClose();
+      } else {
+        setDismissTransition(true);
+        setDismissY(0);
+      }
+      return;
+    }
+
     if (touchRef.current.scaling && e.touches.length < 2) {
       touchRef.current.scaling = false;
       if (scale <= 1) {
@@ -107,18 +137,28 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
       return;
     }
 
-    // Tap navigation like Snapchat (only when not zoomed and not moved)
+    // Swipe left/right navigation when not zoomed
+    if (scale === 1 && touchRef.current.moved && e.changedTouches.length === 1 && images.length > 1) {
+      const swipeDx = e.changedTouches[0].clientX - touchRef.current.startX;
+      if (Math.abs(swipeDx) > 50) {
+        if (swipeDx < 0) next();
+        else prev();
+        return;
+      }
+    }
+
+    // Tap navigation
     if (scale === 1 && !touchRef.current.moved && e.changedTouches.length === 1 && images.length > 1) {
       const tapX = e.changedTouches[0].clientX;
       const screenW = window.innerWidth;
-      // Tap on right 40% → next, left 40% → prev, middle 20% → do nothing
-      if (tapX > screenW * 0.6) {
-        next();
-      } else if (tapX < screenW * 0.4) {
-        prev();
-      }
+      if (tapX > screenW * 0.6) next();
+      else if (tapX < screenW * 0.4) prev();
     }
   };
+
+  const dismissProgress = Math.min(Math.abs(dismissY) / DISMISS_THRESHOLD, 1);
+  const bgOpacity = 0.95 - dismissProgress * 0.5;
+  const imgScale = 1 - dismissProgress * 0.15;
 
   return createPortal(
     <div
@@ -133,11 +173,12 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
         right: 0,
         bottom: 0,
         zIndex: 2147483647,
-        backgroundColor: "rgba(0,0,0,0.95)",
+        backgroundColor: `rgba(0,0,0,${bgOpacity})`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         touchAction: "none",
+        transition: dismissTransition ? "background-color 0.25s ease" : "none",
       }}
     >
       {/* Close button */}
@@ -175,8 +216,15 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
           objectFit: "contain",
           userSelect: "none",
           pointerEvents: "none",
-          transform: `scale(${scale}) translate(${translate.x / scale}px, ${translate.y / scale}px)`,
-          transition: scale === 1 ? "transform 0.2s ease" : "none",
+          transform: isDismissing.current || dismissY !== 0
+            ? `translateY(${dismissY}px) scale(${imgScale})`
+            : `scale(${scale}) translate(${translate.x / scale}px, ${translate.y / scale}px)`,
+          transition: dismissTransition
+            ? "transform 0.25s ease"
+            : scale === 1 && !isDismissing.current
+              ? "transform 0.2s ease"
+              : "none",
+          borderRadius: dismissProgress > 0 ? `${dismissProgress * 16}px` : "0",
         }}
       />
 
