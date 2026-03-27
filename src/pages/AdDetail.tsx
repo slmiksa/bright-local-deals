@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images, Eye, Heart, Play, Copy, X, Link, CheckCircle2, Video, Image as ImageIcon } from "lucide-react";
+import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images, Eye, Heart, Play, Copy, X, Link, CheckCircle2, Video, Image as ImageIcon, Globe } from "lucide-react";
 import { useAdById } from "@/hooks/useAds";
 import { useState, useRef, useEffect } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
@@ -193,6 +193,11 @@ const AdDetail = () => {
             <Share2 className="w-5 h-5" /> مشاركة الإعلان
           </button>
         </div>
+        {ad.website && (
+          <a href={ad.website.startsWith('http') ? ad.website : `https://${ad.website}`} target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center justify-center gap-2 bg-accent text-accent-foreground rounded-2xl py-3.5 font-bold text-[14px] active:scale-[0.97] transition-transform shadow-card w-full">
+            <Globe className="w-5 h-5" /> زيارة الموقع الإلكتروني
+          </a>
+        )}
         
         {(ad.lat !== 0 && ad.lng !== 0 && ad.lat && ad.lng) && (
         <div className="mt-5 rounded-2xl overflow-hidden shadow-card bg-card">

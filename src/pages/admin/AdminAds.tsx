@@ -17,6 +17,7 @@ interface DbAd {
   city: string;
   phone: string | null;
   address: string | null;
+  website: string | null;
   lat: number | null;
   lng: number | null;
   featured: boolean | null;
@@ -39,6 +40,7 @@ const emptyForm = {
   city: "",
   phone: "",
   address: "",
+  website: "",
   lat: "",
   lng: "",
   hasLocation: false,
@@ -95,6 +97,7 @@ const AdminAds = () => {
       city: ad.city,
       phone: ad.phone || "",
       address: ad.address || "",
+      website: ad.website || "",
       lat: String(ad.lat || ""),
       lng: String(ad.lng || ""),
       hasLocation: hasLoc,
@@ -178,6 +181,7 @@ const AdminAds = () => {
       city: form.city,
       phone: form.phone.trim() || null,
       address: form.address.trim() || null,
+      website: form.website.trim() || null,
       lat: form.lat ? parseFloat(form.lat) : null,
       lng: form.lng ? parseFloat(form.lng) : null,
       featured: form.featured,
@@ -364,7 +368,10 @@ const AdminAds = () => {
                   <input value={form.address} onChange={(e) => setForm(f => ({...f, address: e.target.value}))} className="w-full h-10 px-3 rounded-xl bg-background text-foreground text-sm border border-border" />
                 </div>
               </div>
-              {/* Location Toggle */}
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1">الموقع الإلكتروني (اختياري)</label>
+                <input value={form.website} onChange={(e) => setForm(f => ({...f, website: e.target.value}))} placeholder="مثال: https://example.com" className="w-full h-10 px-3 rounded-xl bg-background text-foreground text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30" dir="ltr" />
+              </div>
               <div>
                 <label className="flex items-center gap-2 cursor-pointer mb-2">
                   <input

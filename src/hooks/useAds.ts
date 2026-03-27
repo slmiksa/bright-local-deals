@@ -21,6 +21,7 @@ export interface Ad {
   lat: number;
   lng: number;
   address: string;
+  website: string;
 }
 
 export interface Section {
@@ -52,6 +53,7 @@ interface DbAd {
   lat: number | null;
   lng: number | null;
   featured: boolean | null;
+  website: string | null;
   ad_images: { image_url: string; sort_order: number | null; media_type?: string }[];
 }
 
@@ -76,6 +78,7 @@ function mapDbAdToAd(dbAd: DbAd): Ad {
     lat: dbAd.lat || 0,
     lng: dbAd.lng || 0,
     address: dbAd.address || "",
+    website: dbAd.website || "",
   };
 }
 

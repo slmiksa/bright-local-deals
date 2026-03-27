@@ -1,0 +1,1 @@
+ALTER TABLE public.ads ADD COLUMN website text DEFAULT NULL;

@@ -213,6 +213,7 @@ export type Database = {
           shop_name: string
           start_date: string | null
           updated_at: string
+          website: string | null
         }
         Insert: {
           active?: boolean | null
@@ -232,6 +233,7 @@ export type Database = {
           shop_name: string
           start_date?: string | null
           updated_at?: string
+          website?: string | null
         }
         Update: {
           active?: boolean | null
@@ -251,6 +253,7 @@ export type Database = {
           shop_name?: string
           start_date?: string | null
           updated_at?: string
+          website?: string | null
         }
         Relationships: [
           {
