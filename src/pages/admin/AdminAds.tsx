@@ -17,6 +17,7 @@ interface DbAd {
   city: string;
   phone: string | null;
   address: string | null;
+  website: string | null;
   lat: number | null;
   lng: number | null;
   featured: boolean | null;
@@ -39,6 +40,7 @@ const emptyForm = {
   city: "",
   phone: "",
   address: "",
+  website: "",
   lat: "",
   lng: "",
   hasLocation: false,
