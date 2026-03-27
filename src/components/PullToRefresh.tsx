@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, ReactNode } from "react";
+import { RefreshCw } from "lucide-react";
 
 interface PullToRefreshProps {
   children: ReactNode;
@@ -13,7 +14,6 @@ const PullToRefresh = ({ children, className = "" }: PullToRefreshProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
-    // Only allow pull-to-refresh when scrolled to top AND touch starts in top 100px of screen
     const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
     const rootEl = document.getElementById('root');
     const rootScrollTop = rootEl ? rootEl.scrollTop : 0;
@@ -42,6 +42,8 @@ const PullToRefresh = ({ children, className = "" }: PullToRefreshProps) => {
     setPullDistance(0);
   }, [pullDistance]);
 
+  const progress = Math.min(pullDistance / 60, 1);
+
   return (
     <div
       ref={containerRef}
@@ -50,20 +52,33 @@ const PullToRefresh = ({ children, className = "" }: PullToRefreshProps) => {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* Pull indicator - fixed position so it doesn't push content */}
       {(pullDistance > 0 || refreshing) && (
         <div
           className="fixed left-0 right-0 z-[60] flex items-center justify-center max-w-[430px] mx-auto pointer-events-none"
-          style={{ 
+          style={{
             top: 'calc(env(safe-area-inset-top, 0px) + 60px)',
             height: refreshing ? 48 : pullDistance,
-            transition: refreshing ? 'height 0.3s ease' : undefined
+            transition: refreshing ? 'height 0.3s ease' : undefined,
           }}
         >
           <div
-            className={`w-5 h-5 border-2 border-primary border-t-transparent rounded-full ${refreshing ? "animate-spin" : ""}`}
-            style={{ transform: refreshing ? undefined : `rotate(${pullDistance * 4}deg)` }}
-          />
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
+              refreshing
+                ? "bg-primary/15 shadow-md shadow-primary/10"
+                : "bg-primary/10"
+            }`}
+            style={{
+              transform: `scale(${0.6 + progress * 0.4})`,
+              opacity: 0.4 + progress * 0.6,
+            }}
+          >
+            <RefreshCw
+              className={`w-5 h-5 text-primary transition-transform ${refreshing ? "animate-spin" : ""}`}
+              style={{
+                transform: refreshing ? undefined : `rotate(${pullDistance * 5}deg)`,
+              }}
+            />
+          </div>
         </div>
       )}
       {children}
