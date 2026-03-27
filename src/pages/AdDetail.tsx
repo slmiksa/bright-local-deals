@@ -206,6 +206,7 @@ const AdDetail = () => {
           <a href={`https://www.google.com/maps/dir/?api=1&destination=${ad.lat},${ad.lng}`} target="_blank" rel="noopener noreferrer" className="block text-center text-primary font-semibold text-[13px] py-3 active:bg-secondary transition-colors">فتح في خرائط قوقل ↗</a>
         </div>
         )}
+        <div className="h-8" />
       </div>
       {lightboxOpen && <ImageLightbox images={ad.images} initialIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />}
       
