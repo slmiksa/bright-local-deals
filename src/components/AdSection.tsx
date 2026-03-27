@@ -1,17 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import AdCard from "./AdCard";
 import PlaceholderAdCard from "./PlaceholderAdCard";
-import { ChevronLeft, Smartphone, CupSoda, SprayCan, Lamp, ChefHat, PartyPopper } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Ad } from "@/hooks/useAds";
-
-const categoryIcons: Record<string, React.ElementType> = {
-  electronics: Smartphone,
-  cafes: CupSoda,
-  perfumes: SprayCan,
-  furniture: Lamp,
-  food: ChefHat,
-  events: PartyPopper,
-};
+import { getCategoryIcon } from "@/lib/categoryIcons";
 
 interface AdSectionProps {
   id: string;
