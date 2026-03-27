@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Phone, Images, Eye, Heart, Play } from "lucide-react";
+import { Phone, Images, Eye, Heart } from "lucide-react";
 import ImageLightbox from "./ImageLightbox";
+import VideoThumbnail from "./VideoThumbnail";
 import { useAdStats } from "@/hooks/useAdStats";
 import { AdMedia } from "@/hooks/useAds";
 
@@ -36,12 +37,13 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured }: AdCardPro
   const renderMediaItem = (m: AdMedia, i: number) => {
     if (m.type === 'video') {
       return (
-        <div key={i} className="w-full h-full shrink-0 snap-center relative cursor-pointer" onClick={() => navigate(`/ad/${id}`)}>
-          <video src={m.url} className="w-full h-full object-cover" muted playsInline preload="metadata" />
-          <div className="absolute inset-0 flex items-center justify-center bg-foreground/20 pointer-events-none">
-            <Play className="w-10 h-10 text-primary-foreground fill-primary-foreground drop-shadow-lg" />
-          </div>
-        </div>
+        <VideoThumbnail
+          key={i}
+          src={m.url}
+          alt={`${shopName} فيديو`}
+          className="w-full h-full shrink-0 snap-center"
+          onClick={() => navigate(`/ad/${id}`)}
+        />
       );
     }
     return (
