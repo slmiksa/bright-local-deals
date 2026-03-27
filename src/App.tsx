@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -39,6 +39,11 @@ import AdminBannerSlides from "./pages/admin/AdminBannerSlides";
 import AdminSupport from "./pages/admin/AdminSupport";
 import PopupAd from "./components/PopupAd";
 import AppStoreBanner from "./components/AppStoreBanner";
+import ForceUpdateModal from "./components/ForceUpdateModal";
+import AdminAppVersion from "./pages/admin/AdminAppVersion";
+import { APP_VERSION, compareVersions } from "./lib/version";
+import { isNative } from "./lib/capacitor";
+import { supabase } from "./integrations/supabase/client";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,6 +63,25 @@ const App = () => {
   });
   const handleSplashFinish = useCallback(() => setShowSplash(false), []);
 
+  const [forceUpdateData, setForceUpdateData] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
+
+  useEffect(() => {
+    if (!isNative) return;
+    const checkVersion = async () => {
+      const { data } = await supabase
+        .from("app_settings")
+        .select("min_required_version, update_message, force_update")
+        .eq("id", "default")
+        .single();
+      if (data?.force_update && data.min_required_version) {
+        if (compareVersions(APP_VERSION, data.min_required_version) < 0) {
+          setForceUpdateData({ show: true, message: data.update_message || "يرجى تحديث التطبيق" });
+        }
+      }
+    };
+    checkVersion();
+  }, []);
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
@@ -66,6 +90,7 @@ const App = () => {
           <CityProvider>
             <Toaster />
             <Sonner />
+            {forceUpdateData.show && <ForceUpdateModal message={forceUpdateData.message} />}
             {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
             <BrowserRouter>
               <ScrollToTop />
@@ -98,6 +123,7 @@ const App = () => {
                   <Route path="popup-ads" element={<AdminPopupAds />} />
                   <Route path="banner-slides" element={<AdminBannerSlides />} />
                   <Route path="support" element={<AdminSupport />} />
+                  <Route path="app-version" element={<AdminAppVersion />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />
