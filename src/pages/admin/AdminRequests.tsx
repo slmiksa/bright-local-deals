@@ -3,6 +3,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Eye, Trash2, Clock, CheckCircle, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const statusMap: Record<string, { label: string; color: string; icon: typeof Clock }> = {
   pending: { label: "قيد المراجعة", color: "text-yellow-600 bg-yellow-50 border-yellow-200", icon: Clock },
@@ -13,6 +24,8 @@ const statusMap: Record<string, { label: string; color: string; icon: typeof Clo
 const AdminRequests = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const [confirmAction, setConfirmAction] = useState<{ type: "reject" | "delete"; id: string; orderNum: number } | null>(null);
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["admin-ad-requests"],
@@ -141,7 +154,7 @@ const AdminRequests = () => {
                         <CheckCircle className="w-3.5 h-3.5" /> قبول
                       </button>
                       <button
-                        onClick={() => updateStatus.mutate({ id: req.id, status: "rejected" })}
+                        onClick={() => setConfirmAction({ type: "reject", id: req.id, orderNum: req.order_number })}
                         className="flex items-center justify-center gap-1 text-[12px] font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl py-2 px-3 transition-colors"
                       >
                         <XCircle className="w-3.5 h-3.5" /> رفض
@@ -150,7 +163,7 @@ const AdminRequests = () => {
                   )}
 
                   <button
-                    onClick={() => { if (confirm("هل أنت متأكد من حذف هذا الطلب؟")) deleteMutation.mutate(req.id); }}
+                    onClick={() => setConfirmAction({ type: "delete", id: req.id, orderNum: req.order_number })}
                     className="flex items-center justify-center text-destructive hover:bg-destructive/10 rounded-xl py-2 px-2.5 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -161,6 +174,38 @@ const AdminRequests = () => {
           })}
         </div>
       )}
+
+      <AlertDialog open={!!confirmAction} onOpenChange={(open) => !open && setConfirmAction(null)}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmAction?.type === "delete" ? "تأكيد الحذف" : "تأكيد الرفض"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmAction?.type === "delete"
+                ? `هل أنت متأكد من حذف الطلب #${confirmAction?.orderNum}؟ لا يمكن التراجع عن هذا الإجراء.`
+                : `هل أنت متأكد من رفض الطلب #${confirmAction?.orderNum}؟`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex gap-2 flex-row-reverse sm:flex-row-reverse">
+            <AlertDialogCancel>لا، إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              className={confirmAction?.type === "delete" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : "bg-red-600 text-white hover:bg-red-700"}
+              onClick={() => {
+                if (!confirmAction) return;
+                if (confirmAction.type === "delete") {
+                  deleteMutation.mutate(confirmAction.id);
+                } else {
+                  updateStatus.mutate({ id: confirmAction.id, status: "rejected" });
+                }
+                setConfirmAction(null);
+              }}
+            >
+              نعم، {confirmAction?.type === "delete" ? "احذف" : "ارفض"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
