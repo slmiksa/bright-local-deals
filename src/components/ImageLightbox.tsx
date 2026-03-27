@@ -44,7 +44,7 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
   const prev = () => { if (scale === 1) setCurrent((c) => (c > 0 ? c - 1 : images.length - 1)); };
   const next = () => { if (scale === 1) setCurrent((c) => (c < images.length - 1 ? c + 1 : 0)); };
 
-  const getDistance = (t1: Touch, t2: Touch) =>
+  const getDistance = (t1: React.Touch, t2: React.Touch) =>
     Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
 
   const handleTouchStart = (e: React.TouchEvent) => {
