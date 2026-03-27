@@ -108,19 +108,8 @@ const GalleryPage = () => {
     });
   }, [activeIndex, tripled, isMuted]);
 
-  // Record view when active video changes
-  const lastRecordedRef = useRef<string>("");
-  useEffect(() => {
-    if (!tripled.length) return;
-    const realIdx = activeIndex % len;
-    const video = shuffled[realIdx];
-    if (!video) return;
-    const key = `${video.adId}-${realIdx}`;
-    if (lastRecordedRef.current !== key) {
-      lastRecordedRef.current = key;
-      recordView(video.adId);
-    }
-  }, [activeIndex, shuffled, len, tripled]);
+
+
 
   const setVideoRef = useCallback(
     (idx: number) => (el: HTMLVideoElement | null) => {
