@@ -182,6 +182,7 @@ const AdminAds = () => {
       phone: form.phone.trim() || null,
       address: form.address.trim() || null,
       website: form.website.trim() || null,
+      lat: form.lat ? parseFloat(form.lat) : null,
       lng: form.lng ? parseFloat(form.lng) : null,
       featured: form.featured,
       active: form.active,
