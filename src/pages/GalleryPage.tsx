@@ -1,10 +1,8 @@
 import { useRef, useEffect, useState, useCallback } from "react";
-import { ArrowLeft } from "lucide-react";
+import { X, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useVideoAds } from "@/hooks/useVideoAds";
 import { useCity } from "@/contexts/CityContext";
-
-const BOTTOM_TAB_HEIGHT = 72; // matches BottomTabBar height
 
 const GalleryPage = () => {
   const navigate = useNavigate();
@@ -57,9 +55,11 @@ const GalleryPage = () => {
     []
   );
 
+  const goBack = () => navigate(-1);
+
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center" style={{ bottom: BOTTOM_TAB_HEIGHT }}>
+      <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
       </div>
     );
@@ -67,17 +67,36 @@ const GalleryPage = () => {
 
   if (!videos.length) {
     return (
-      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center gap-4" style={{ bottom: BOTTOM_TAB_HEIGHT }}>
+      <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center gap-4">
         <p className="text-white/70 text-base">لا توجد فيديوهات حالياً</p>
+        <button onClick={goBack} className="text-white/90 text-sm underline">
+          العودة
+        </button>
       </div>
     );
   }
 
   return (
     <div
-      className="fixed inset-0 bg-black"
-      style={{ bottom: BOTTOM_TAB_HEIGHT }}
+      className="fixed inset-0 z-[100] bg-black"
+      style={{
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: "100dvh",
+        width: "100vw",
+      }}
     >
+      {/* Close button - positioned well below notch/dynamic island for Capacitor */}
+      <button
+        onClick={goBack}
+        className="absolute right-4 z-[110] w-11 h-11 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform"
+        style={{ top: "max(env(safe-area-inset-top, 20px), 20px)" }}
+      >
+        <X className="w-5 h-5 text-white" />
+      </button>
+
       {/* Counter */}
       <div
         className="absolute left-4 z-[110] text-white/80 text-xs font-medium bg-black/50 rounded-full px-3 py-1.5 backdrop-blur-md"
@@ -86,11 +105,12 @@ const GalleryPage = () => {
         {activeIndex + 1} / {videos.length}
       </div>
 
-      {/* Video feed */}
+      {/* Video feed - true fullscreen with dvh */}
       <div
         ref={containerRef}
-        className="w-full h-full overflow-y-scroll snap-y snap-mandatory"
+        className="w-full overflow-y-scroll snap-y snap-mandatory"
         style={{
+          height: "100dvh",
           scrollbarWidth: "none",
           WebkitOverflowScrolling: "touch",
         }}
@@ -99,7 +119,8 @@ const GalleryPage = () => {
           <div
             key={`${video.adId}-${idx}`}
             data-index={idx}
-            className="w-full h-full snap-start snap-always relative"
+            className="w-full snap-start snap-always relative"
+            style={{ height: "100dvh" }}
           >
             <video
               ref={setVideoRef(idx)}
@@ -111,8 +132,11 @@ const GalleryPage = () => {
               preload={Math.abs(idx - activeIndex) <= 1 ? "auto" : "none"}
             />
 
-            {/* Bottom overlay */}
-            <div className="absolute bottom-0 left-0 right-0 pt-24 px-5 pb-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+            {/* Bottom overlay - RTL aligned text */}
+            <div
+              className="absolute bottom-0 left-0 right-0 pt-24 px-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+              style={{ paddingBottom: "max(env(safe-area-inset-bottom, 24px), 24px)" }}
+            >
               <div className="text-right">
                 <h3 className="text-white text-lg font-bold mb-1">{video.shopName}</h3>
                 <p className="text-white/70 text-sm mb-4 line-clamp-1">{video.offer}</p>
