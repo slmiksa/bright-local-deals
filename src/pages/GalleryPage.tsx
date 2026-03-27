@@ -231,6 +231,15 @@ const GalleryPage = () => {
           style={{ bottom: "calc(env(safe-area-inset-bottom, 24px) + 120px)" }}
         >
           <button
+            onClick={handleShare}
+            className="flex flex-col items-center gap-1 active:scale-90 transition-transform"
+          >
+            <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+              <Share2 className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-white/80 text-xs font-bold drop-shadow">مشاركة</span>
+          </button>
+          <button
             onClick={() => setIsMuted(prev => !prev)}
             className="flex flex-col items-center gap-1 active:scale-90 transition-transform"
           >
