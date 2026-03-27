@@ -1,8 +1,44 @@
-import { useRef, useEffect, useState, useCallback } from "react";
-import { X, ArrowLeft } from "lucide-react";
+import { useRef, useEffect, useState, useCallback, useMemo } from "react";
+import { X, ArrowLeft, Heart, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useVideoAds } from "@/hooks/useVideoAds";
 import { useCity } from "@/contexts/CityContext";
+import { useAdStats, recordView } from "@/hooks/useAdStats";
+
+// Fisher-Yates shuffle
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Side interaction bar for the active video
+const GalleryInteractions = ({ adId }: { adId: number }) => {
+  const { views, likes, liked, toggleLike } = useAdStats(adId);
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <button
+        onClick={(e) => { e.stopPropagation(); toggleLike(); }}
+        className="flex flex-col items-center gap-1 active:scale-90 transition-transform"
+      >
+        <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+          <Heart className={`w-6 h-6 transition-colors ${liked ? "fill-red-500 text-red-500" : "text-white"}`} />
+        </div>
+        <span className="text-white text-xs font-bold drop-shadow">{likes}</span>
+      </button>
+      <div className="flex flex-col items-center gap-1">
+        <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+          <Eye className="w-5 h-5 text-white/80" />
+        </div>
+        <span className="text-white/80 text-xs font-bold drop-shadow">{views}</span>
+      </div>
+    </div>
+  );
+};
 
 const GalleryPage = () => {
   const navigate = useNavigate();
@@ -12,9 +48,31 @@ const GalleryPage = () => {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // Shuffle once when videos load
+  const shuffled = useMemo(() => (videos.length ? shuffle(videos) : []), [videos]);
+
+  // Triple the list for infinite loop illusion
+  const tripled = useMemo(() => {
+    if (!shuffled.length) return [];
+    return [...shuffled, ...shuffled, ...shuffled];
+  }, [shuffled]);
+
+  const len = shuffled.length;
+
+  // Start in the middle set
+  useEffect(() => {
+    if (!len || !containerRef.current) return;
+    const container = containerRef.current;
+    // Jump to the start of the middle copy (index = len)
+    requestAnimationFrame(() => {
+      const itemH = container.clientHeight;
+      container.scrollTop = itemH * len;
+    });
+  }, [len]);
+
   // Observe which video is visible
   useEffect(() => {
-    if (!videos.length) return;
+    if (!tripled.length) return;
     const container = containerRef.current;
     if (!container) return;
 
@@ -33,7 +91,38 @@ const GalleryPage = () => {
     const items = container.querySelectorAll("[data-index]");
     items.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [videos]);
+  }, [tripled]);
+
+  // Infinite loop: when scrolling near edges, silently reposition to middle set
+  useEffect(() => {
+    if (!len) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    let ticking = false;
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const itemH = container.clientHeight;
+        const scrollTop = container.scrollTop;
+        const totalMiddleStart = itemH * len;
+        const totalMiddleEnd = itemH * len * 2;
+
+        if (scrollTop < itemH * 0.5) {
+          // Near top — jump to middle set same position
+          container.scrollTop = scrollTop + totalMiddleStart;
+        } else if (scrollTop >= totalMiddleEnd - itemH * 0.5) {
+          // Near bottom — jump to middle set same position
+          container.scrollTop = scrollTop - totalMiddleStart;
+        }
+        ticking = false;
+      });
+    };
+
+    container.addEventListener("scrollend", handleScroll);
+    return () => container.removeEventListener("scrollend", handleScroll);
+  }, [len]);
 
   // Autoplay active video, pause others
   useEffect(() => {
@@ -46,7 +135,21 @@ const GalleryPage = () => {
         vid.pause();
       }
     });
-  }, [activeIndex, videos]);
+  }, [activeIndex, tripled]);
+
+  // Record view when active video changes
+  const lastRecordedRef = useRef<string>("");
+  useEffect(() => {
+    if (!tripled.length) return;
+    const realIdx = activeIndex % len;
+    const video = shuffled[realIdx];
+    if (!video) return;
+    const key = `${video.adId}-${realIdx}`;
+    if (lastRecordedRef.current !== key) {
+      lastRecordedRef.current = key;
+      recordView(video.adId);
+    }
+  }, [activeIndex, shuffled, len, tripled]);
 
   const setVideoRef = useCallback(
     (idx: number) => (el: HTMLVideoElement | null) => {
@@ -56,6 +159,9 @@ const GalleryPage = () => {
   );
 
   const goBack = () => navigate(-1);
+
+  // Get current real ad id
+  const activeAdId = tripled.length ? tripled[activeIndex % tripled.length]?.adId : null;
 
   if (isLoading) {
     return (
@@ -79,43 +185,34 @@ const GalleryPage = () => {
   return (
     <div
       className="fixed inset-0 z-[100] bg-black"
-      style={{
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        height: "100%",
-        width: "100%",
-      }}
+      style={{ top: 0, left: 0, right: 0, bottom: 0, height: "100%", width: "100%" }}
     >
-      {/* Close button - positioned well below notch/dynamic island for Capacitor */}
+      {/* Close button */}
       <button
         onClick={goBack}
         className="absolute right-4 z-[110] w-11 h-11 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform"
-        style={{ top: "max(env(safe-area-inset-top, 20px), 20px)" }}
+        style={{ top: "calc(env(safe-area-inset-top, 20px) + 12px)" }}
       >
         <X className="w-5 h-5 text-white" />
       </button>
 
-      {/* Counter */}
-      <div
-        className="absolute left-4 z-[110] text-white/80 text-xs font-medium bg-black/50 rounded-full px-3 py-1.5 backdrop-blur-md"
-        style={{ top: "max(env(safe-area-inset-top, 20px), 20px)" }}
-      >
-        {activeIndex + 1} / {videos.length}
-      </div>
+      {/* Side interactions */}
+      {activeAdId && (
+        <div
+          className="absolute right-3 z-[110] flex flex-col items-center"
+          style={{ bottom: "calc(env(safe-area-inset-bottom, 24px) + 120px)" }}
+        >
+          <GalleryInteractions adId={activeAdId} />
+        </div>
+      )}
 
-      {/* Video feed - true fullscreen with dvh */}
+      {/* Video feed */}
       <div
         ref={containerRef}
         className="w-full overflow-y-scroll snap-y snap-mandatory"
-        style={{
-          height: "100%",
-          scrollbarWidth: "none",
-          WebkitOverflowScrolling: "touch",
-        }}
+        style={{ height: "100%", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
       >
-        {videos.map((video, idx) => (
+        {tripled.map((video, idx) => (
           <div
             key={`${video.adId}-${idx}`}
             data-index={idx}
@@ -132,16 +229,16 @@ const GalleryPage = () => {
               preload={Math.abs(idx - activeIndex) <= 1 ? "auto" : "none"}
             />
 
-            {/* Bottom overlay - RTL aligned text */}
+            {/* Bottom overlay */}
             <div
               className="absolute bottom-0 left-0 right-0 pt-24 px-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
-              style={{ paddingBottom: "max(env(safe-area-inset-bottom, 24px), 24px)" }}
+              style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 24px) + 8px)" }}
             >
-              <div className="text-right">
+              <div className="text-right pr-14">
                 <h3 className="text-white text-lg font-bold mb-1">{video.shopName}</h3>
                 <p className="text-white/70 text-sm mb-4 line-clamp-1">{video.offer}</p>
               </div>
-              <div className="flex justify-end">
+              <div className="flex justify-end pr-14">
                 <button
                   onClick={() => navigate(`/ad/${video.adId}`)}
                   className="flex items-center gap-2 bg-white text-black font-bold text-sm px-6 py-3 rounded-xl active:scale-95 transition-transform shadow-lg"
