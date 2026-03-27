@@ -1,5 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
+import PullToRefresh from "@/components/PullToRefresh";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { getCategoryIcon } from "@/lib/categoryIcons";
 
 const CategoriesPage = () => {
@@ -22,17 +25,17 @@ const CategoriesPage = () => {
 
       <div className="px-5 pt-4 space-y-2.5">
         {categories.map((cat) => {
-          const Icon = categoryIcons[cat.id] || Smartphone;
+          const Icon = getCategoryIcon(cat.id, cat.icon);
           return (
             <button
               key={cat.id}
               onClick={() => navigate(`/category/${cat.id}`)}
-              className="touch-target w-full flex items-center gap-4 p-4 bg-card rounded-2xl shadow-card active:scale-[0.98] transition-transform"
+              className="touch-target w-full flex items-center gap-3 p-3 bg-card rounded-2xl shadow-card active:scale-[0.98] transition-transform"
             >
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 bg-primary">
-                <Icon className="w-6 h-6 text-primary-foreground" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-primary">
+                <Icon className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="flex-1 text-[15px] font-bold text-foreground text-right">{cat.name}</span>
+              <span className="flex-1 text-[14px] font-bold text-foreground text-right">{cat.name}</span>
               <ChevronLeft className="w-5 h-5 text-muted-foreground" />
             </button>
           );
