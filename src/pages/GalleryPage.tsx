@@ -88,14 +88,6 @@ const GalleryPage = () => {
         width: "100vw",
       }}
     >
-      {/* Close button - positioned well below notch/dynamic island for Capacitor */}
-      <button
-        onClick={goBack}
-        className="absolute right-4 z-[110] w-11 h-11 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center active:scale-90 transition-transform"
-        style={{ top: "max(env(safe-area-inset-top, 20px), 20px)" }}
-      >
-        <X className="w-5 h-5 text-white" />
-      </button>
 
       {/* Counter */}
       <div
