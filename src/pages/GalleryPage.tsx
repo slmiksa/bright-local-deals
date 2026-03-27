@@ -1,9 +1,10 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import { X, ArrowLeft, Heart, Eye, Volume2, VolumeX } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { X, ArrowLeft, Heart, Eye, Volume2, VolumeX, Share2 } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useVideoAds } from "@/hooks/useVideoAds";
 import { useCity } from "@/contexts/CityContext";
 import { useAdStats, recordView } from "@/hooks/useAdStats";
+import { toast } from "@/hooks/use-toast";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
