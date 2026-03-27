@@ -1,44 +1,31 @@
 
 
-## خطة: نظام التحديث الإجباري للتطبيق
+## خطة: إظهار لقطة من الفيديو كصورة مصغرة
+
+### المشكلة
+عندما يكون الفيديو هو الواجهة في بطاقة الإعلان، يظهر فارغاً بدون صورة لأن `preload="metadata"` لا يضمن عرض إطار مرئي في جميع المتصفحات.
+
+### الحل
+إضافة خاصية `poster` للفيديو عبر إنشاء صورة مصغرة تلقائياً من أول إطار باستخدام Canvas.
 
 ### التعديلات
 
-#### 1. إضافة أعمدة للتحديث الإجباري في جدول `app_settings`
-```sql
-ALTER TABLE app_settings 
-ADD COLUMN min_required_version text DEFAULT '1.1.0',
-ADD COLUMN update_message text DEFAULT 'يوجد تحديث جديد، يرجى التحديث للاستمرار',
-ADD COLUMN force_update boolean DEFAULT false;
-```
+#### 1. إنشاء hook جديد `src/hooks/useVideoPoster.ts`
+- يستقبل رابط الفيديو ويُرجع Data URL لأول إطار
+- يُحمّل الفيديو في عنصر مخفي، يلتقط الإطار عند `loadeddata`، ويرسمه على Canvas
+- سريع جداً لأنه يحمل فقط أول جزء من الفيديو
 
-#### 2. إنشاء `src/lib/version.ts`
-ثابت يحدد الإصدار الحالي: `APP_VERSION = "1.1.0"`
+#### 2. إنشاء مكون `src/components/VideoThumbnail.tsx`
+- يستخدم الـ hook لعرض صورة الفيديو فوراً
+- يعرض أيقونة Play فوق الصورة
+- يُستخدم بدلاً من عنصر `<video>` في البطاقات
 
-#### 3. إنشاء `src/components/ForceUpdateModal.tsx`
-- شاشة كاملة غير قابلة للإغلاق تظهر فقط داخل تطبيق Capacitor
-- تعرض رسالة التحديث وزر "تحديث الآن" يفتح رابط App Store
-- رابط: `https://apps.apple.com/sa/app/lamha-ads/id6760237672?l=ar`
-
-#### 4. تعديل `src/App.tsx`
-- جلب `min_required_version` و `force_update` من `app_settings`
-- مقارنة مع `APP_VERSION` — إذا أقل وforce_update مفعّل، تظهر الشاشة الإجبارية
-
-#### 5. إنشاء صفحة إدارة `src/pages/admin/AdminAppVersion.tsx`
-- حقول: رقم الإصدار المطلوب، رسالة التحديث، تفعيل/إيقاف
-- حفظ في `app_settings`
-
-#### 6. تعديل `src/pages/admin/AdminLayout.tsx`
-- إضافة رابط "تحديث التطبيق" في القائمة الجانبية
-
-#### 7. تعديل `src/App.tsx` (Routes)
-- إضافة route: `/admin/app-version`
+#### 3. تعديل `src/components/AdCard.tsx`
+- استبدال عنصر `<video>` في `renderMediaItem` بمكون `VideoThumbnail`
+- النتيجة: ظهور لقطة من الفيديو بشكل فوري بدل الشاشة الفارغة
 
 ### الملفات المتأثرة
-- Migration جديد (أعمدة في `app_settings`)
-- `src/lib/version.ts` (جديد)
-- `src/components/ForceUpdateModal.tsx` (جديد)
-- `src/pages/admin/AdminAppVersion.tsx` (جديد)
-- `src/App.tsx` (تعديل)
-- `src/pages/admin/AdminLayout.tsx` (تعديل)
+- `src/hooks/useVideoPoster.ts` (جديد)
+- `src/components/VideoThumbnail.tsx` (جديد)
+- `src/components/AdCard.tsx` (تعديل)
 
