@@ -36,7 +36,7 @@ const AdSection = ({ id, title, ads }: AdSectionProps) => {
         className="flex gap-3 overflow-x-auto px-5 hide-scrollbar"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
-        {ads.map((ad) => (
+        {ads.slice(0, 10).map((ad) => (
           <div key={ad.id} className="shrink-0 w-[44%]">
             <AdCard {...ad} />
           </div>
