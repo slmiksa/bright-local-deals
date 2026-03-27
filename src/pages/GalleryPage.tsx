@@ -171,6 +171,25 @@ const GalleryPage = () => {
 
   const activeAdId = tripled.length ? tripled[activeIndex % tripled.length]?.adId : null;
 
+  const handleShare = useCallback(async () => {
+    if (!activeAdId) return;
+    const url = `${SHARE_DOMAIN}/gallery/${activeAdId}`;
+    const shareData = { title: "لمحة", text: "شاهد هذا العرض على لمحة", url };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast({ title: "تم نسخ الرابط" });
+      }
+    } catch {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast({ title: "تم نسخ الرابط" });
+      } catch {}
+    }
+  }, [activeAdId]);
+
   // Check if video is near active (within 2) for src loading
   const isNearActive = (idx: number) => Math.abs(idx - activeIndex) <= 2;
 
