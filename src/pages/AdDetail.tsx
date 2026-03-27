@@ -141,11 +141,12 @@ const AdDetail = () => {
                   {videoMedia.map((m, i) => (
                     <div key={i} className="shrink-0 w-44 rounded-2xl overflow-hidden bg-foreground/5 border border-border">
                       <video
-                        src={m.url}
+                        src={m.url + "#t=0.5"}
                         className="w-full aspect-square object-cover"
                         controls
                         playsInline
                         preload="metadata"
+                        poster=""
                       />
                     </div>
                   ))}
