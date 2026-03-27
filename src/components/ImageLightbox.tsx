@@ -159,7 +159,7 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
 
       <p style={{
         position: "absolute",
-        top: 20,
+        top: 64,
         right: 20,
         color: "rgba(255,255,255,0.7)",
         fontSize: 13,
