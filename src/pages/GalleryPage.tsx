@@ -296,6 +296,38 @@ const GalleryPage = () => {
           </div>
         ))}
       </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div
+          className="fixed inset-0 z-[120] flex items-end justify-center"
+          onClick={() => setShowShareModal(false)}
+        >
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div
+            className="relative w-full max-w-md mx-4 mb-8 bg-[#1c1c1e] rounded-2xl p-5 animate-in slide-in-from-bottom duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-white text-base font-bold text-center mb-4">مشاركة الفيديو</h3>
+            <div className="flex items-center gap-2 bg-black/40 rounded-xl p-3 mb-4" dir="ltr">
+              <p className="text-white/80 text-sm flex-1 truncate select-text">{shareUrl}</p>
+              <button
+                onClick={handleCopyLink}
+                className="shrink-0 flex items-center gap-1.5 bg-white text-black text-sm font-bold px-4 py-2 rounded-lg active:scale-95 transition-transform"
+              >
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copied ? "تم" : "نسخ"}
+              </button>
+            </div>
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="w-full text-white/60 text-sm py-2"
+            >
+              إلغاء
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
