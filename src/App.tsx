@@ -42,7 +42,7 @@ import PopupAd from "./components/PopupAd";
 import AppStoreBanner from "./components/AppStoreBanner";
 import ForceUpdateModal from "./components/ForceUpdateModal";
 import AdminAppVersion from "./pages/admin/AdminAppVersion";
-import { APP_VERSION, compareVersions } from "./lib/version";
+import { APP_VERSION, APP_STORE_URL, compareVersions } from "./lib/version";
 import { isNative } from "./lib/capacitor";
 import { supabase } from "./integrations/supabase/client";
 
