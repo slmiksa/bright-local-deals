@@ -1,11 +1,11 @@
-import { Home, Grid3X3, Plus, Star, Headphones } from "lucide-react";
+import { Home, Grid3X3, Plus, Clapperboard, Headphones } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const tabs = [
   { icon: Home, label: "الرئيسية", id: "home", path: "/" },
   { icon: Grid3X3, label: "التصنيفات", id: "categories", path: "/categories" },
   { icon: Plus, label: "انشر اعلانك", id: "add", accent: true, path: "/add" },
-  { icon: Star, label: "المميزة", id: "featured", path: "/featured" },
+  { icon: Clapperboard, label: "المعرض", id: "gallery", path: "/gallery" },
   { icon: Headphones, label: "الدعم", id: "support", path: "/support" },
 ];
 
@@ -14,7 +14,7 @@ const BottomTabBar = () => {
   const navigate = useNavigate();
 
   // Hide on admin pages
-  if (location.pathname.startsWith("/admin")) return null;
+  if (location.pathname.startsWith("/admin") || location.pathname === "/gallery") return null;
 
   const getActiveTab = () => {
     const path = location.pathname;
