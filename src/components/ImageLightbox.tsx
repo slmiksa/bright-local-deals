@@ -181,29 +181,6 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
         transition: dismissTransition ? "background-color 0.25s ease" : "none",
       }}
     >
-      {/* Close button */}
-      <button
-        onClick={(e) => { e.stopPropagation(); handleClose(); }}
-        style={{
-          position: "absolute",
-          top: 60,
-          left: 16,
-          width: 44,
-          height: 44,
-          borderRadius: 14,
-          backgroundColor: "rgba(255,255,255,0.2)",
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)",
-          border: "1px solid rgba(255,255,255,0.15)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          zIndex: 10,
-        }}
-      >
-        <X style={{ width: 22, height: 22, color: "white" }} />
-      </button>
 
       {/* Image */}
       <img
