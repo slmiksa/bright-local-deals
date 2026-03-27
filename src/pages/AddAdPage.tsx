@@ -121,10 +121,7 @@ const AddAdPage = () => {
   const handleVideos = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-    const remaining = 3 - videos.length;
-    if (remaining <= 0) return;
-    
-    const newFiles = Array.from(files).slice(0, remaining);
+    const newFiles = Array.from(files);
     
     newFiles.forEach((file) => {
       // Validate duration
@@ -136,10 +133,7 @@ const AddAdPage = () => {
           toast({ title: "تنبيه", description: `الفيديو "${file.name}" يتجاوز 3 دقائق`, variant: "destructive" });
           return;
         }
-        setVideos((prev) => {
-          if (prev.length >= 3) return prev;
-          return [...prev, { file, preview: URL.createObjectURL(file) }];
-        });
+        setVideos((prev) => [...prev, { file, preview: URL.createObjectURL(file) }]);
       };
       videoEl.src = URL.createObjectURL(file);
     });
@@ -487,14 +481,12 @@ const AddAdPage = () => {
                   </button>
                 </div>
               ))}
-              {videos.length < 3 && (
-                <button type="button" onClick={() => videoInputRef.current?.click()} className="aspect-square rounded-xl border-2 border-dashed border-border bg-secondary/30 flex flex-col items-center justify-center gap-1 active:bg-secondary/50 transition-colors">
-                  <Video className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-[10px] text-muted-foreground">إضافة فيديو</span>
-                </button>
-              )}
+              <button type="button" onClick={() => videoInputRef.current?.click()} className="aspect-square rounded-xl border-2 border-dashed border-border bg-secondary/30 flex flex-col items-center justify-center gap-1 active:bg-secondary/50 transition-colors">
+                <Video className="w-5 h-5 text-muted-foreground" />
+                <span className="text-[10px] text-muted-foreground">إضافة فيديو</span>
+              </button>
             </div>
-            {videos.length > 0 && <p className="text-[11px] text-muted-foreground mt-1.5">{videos.length} / 3 فيديوهات</p>}
+            {videos.length > 0 && <p className="text-[11px] text-muted-foreground mt-1.5">{videos.length} فيديو</p>}
           </div>
 
           {/* Email notification */}
