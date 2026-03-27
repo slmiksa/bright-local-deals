@@ -19,7 +19,7 @@ const PullToRefresh = ({ children, className = "" }: PullToRefreshProps) => {
     const rootScrollTop = rootEl ? rootEl.scrollTop : 0;
     const touchY = e.touches[0].clientY;
 
-    if (scrollTop <= 0 && rootScrollTop <= 0 && touchY < 500) {
+    if (scrollTop <= 0 && rootScrollTop <= 0 && touchY < 250) {
       startY.current = touchY;
       setPulling(true);
     }

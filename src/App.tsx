@@ -16,6 +16,7 @@ import GalleryPage from "./pages/GalleryPage";
 import AddAdPage from "./pages/AddAdPage";
 import SupportPage from "./pages/SupportPage";
 import TermsPage from "./pages/TermsPage";
+import FeaturedPage from "./pages/FeaturedPage";
 import NotFound from "./pages/NotFound";
 import BottomTabBar from "./components/BottomTabBar";
 import ScrollToTop from "./components/ScrollToTop";
@@ -105,6 +106,7 @@ const App = () => {
                 <Route path="/add" element={<AddAdPage />} />
                 <Route path="/support" element={<SupportPage />} />
                 <Route path="/privacy" element={<TermsPage />} />
+                <Route path="/featured" element={<FeaturedPage />} />
 
                 {/* Admin routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
