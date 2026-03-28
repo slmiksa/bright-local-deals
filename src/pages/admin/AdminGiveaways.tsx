@@ -16,7 +16,7 @@ const AdminGiveaways = () => {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "", prize: "", end_date: "", snapchat_url: "",
-    sponsor_name: "", sponsor_logo_url: "",
+    sponsor_name: "", sponsor_logo_url: "", sponsor_url: "",
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showEntries, setShowEntries] = useState<string | null>(null);
@@ -68,6 +68,7 @@ const AdminGiveaways = () => {
         snapchat_url: form.snapchat_url,
         sponsor_name: form.sponsor_name || null,
         sponsor_logo_url: logoUrl || null,
+        sponsor_url: form.sponsor_url || null,
       };
 
       if (editId) {
@@ -133,7 +134,7 @@ const AdminGiveaways = () => {
   const resetForm = () => {
     setShowForm(false);
     setEditId(null);
-    setForm({ title: "", prize: "", end_date: "", snapchat_url: "", sponsor_name: "", sponsor_logo_url: "" });
+    setForm({ title: "", prize: "", end_date: "", snapchat_url: "", sponsor_name: "", sponsor_logo_url: "", sponsor_url: "" });
     setLogoFile(null);
   };
 
@@ -145,6 +146,7 @@ const AdminGiveaways = () => {
       snapchat_url: g.snapchat_url || "",
       sponsor_name: g.sponsor_name || "",
       sponsor_logo_url: g.sponsor_logo_url || "",
+      sponsor_url: g.sponsor_url || "",
     });
     setShowForm(true);
   };
@@ -189,6 +191,10 @@ const AdminGiveaways = () => {
                 <div className="space-y-1.5">
                   <Label>اسم الراعي</Label>
                   <Input value={form.sponsor_name} onChange={e => setForm(f => ({ ...f, sponsor_name: e.target.value }))} placeholder="مثال: كوفي لمحة" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>رابط الراعي</Label>
+                  <Input value={form.sponsor_url} onChange={e => setForm(f => ({ ...f, sponsor_url: e.target.value }))} placeholder="https://..." dir="ltr" />
                 </div>
                 <div className="space-y-1.5">
                   <Label>لوقو الراعي</Label>
