@@ -219,6 +219,13 @@ const GiveawaySection = () => {
             </div>
           ) : (
             <div className="space-y-2">
+              {inlineMsg && (
+                <div className={`rounded-lg px-3 py-2 text-xs font-bold text-center ${
+                  inlineMsg.type === "error" ? "bg-red-500/20 text-red-200" : "bg-white/15 text-green-200"
+                }`}>
+                  {inlineMsg.text}
+                </div>
+              )}
               <Input
                 placeholder="الاسم"
                 value={name}
