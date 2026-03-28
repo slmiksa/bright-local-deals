@@ -92,14 +92,19 @@ const GiveawaySection = () => {
 
   const SponsorBadge = () => {
     if (!giveaway.sponsor_name) return null;
-    return (
-      <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-white/20">
+    const content = (
+      <div className={`flex items-center justify-center gap-2 mt-3 pt-3 border-t border-white/20 ${(giveaway as any).sponsor_url ? "cursor-pointer hover:opacity-90 transition-opacity" : ""}`}>
         {giveaway.sponsor_logo_url && (
           <img src={giveaway.sponsor_logo_url} alt={giveaway.sponsor_name} className="w-8 h-8 rounded-full object-cover bg-white" />
         )}
         <span className="text-xs opacity-80">برعاية {giveaway.sponsor_name}</span>
+        {(giveaway as any).sponsor_url && <ExternalLink className="w-3 h-3 opacity-60" />}
       </div>
     );
+    if ((giveaway as any).sponsor_url) {
+      return <a href={(giveaway as any).sponsor_url} target="_blank" rel="noopener noreferrer">{content}</a>;
+    }
+    return content;
   };
 
   const SnapchatButton = () => {
