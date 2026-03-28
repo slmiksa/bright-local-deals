@@ -22,7 +22,7 @@ const AdminGiveaways = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showEntries, setShowEntries] = useState<string | null>(null);
   const [winnerInput, setWinnerInput] = useState("");
-  const [sponsorLinkType, setSponsorLinkType] = useState<"external" | "internal">("external");
+  const [sponsorLinkType, setSponsorLinkType] = useState<"external" | "internal" | "snapchat">("external");
   const [adSearch, setAdSearch] = useState("");
 
   const { data: giveaways = [] } = useQuery({
@@ -88,6 +88,7 @@ const AdminGiveaways = () => {
         sponsor_name: form.sponsor_name || null,
         sponsor_logo_url: logoUrl || null,
         sponsor_url: form.sponsor_url || null,
+        sponsor_link_type: sponsorLinkType,
       };
 
       if (editId) {
@@ -162,8 +163,8 @@ const AdminGiveaways = () => {
   const startEdit = (g: any) => {
     setEditId(g.id);
     const url = g.sponsor_url || "";
-    const isInternal = /^\/ad\/\d+$/.test(url);
-    setSponsorLinkType(isInternal ? "internal" : "external");
+    const linkType = g.sponsor_link_type || (/^\/ad\/\d+$/.test(url) ? "internal" : "external");
+    setSponsorLinkType(linkType);
     setForm({
       title: g.title, prize: g.prize,
       end_date: new Date(g.end_date).toISOString().slice(0, 16),
@@ -218,23 +219,22 @@ const AdminGiveaways = () => {
                 </div>
                 <div className="space-y-1.5">
                   <Label>نوع رابط الراعي</Label>
-                  <Select value={sponsorLinkType} onValueChange={(v: "external" | "internal") => {
+                  <Select value={sponsorLinkType} onValueChange={(v: "external" | "internal" | "snapchat") => {
                     setSponsorLinkType(v);
                     setForm(f => ({ ...f, sponsor_url: "" }));
                     setAdSearch("");
                   }}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="external">رابط خارجي</SelectItem>
+                      <SelectItem value="external">رابط خارجي (موقع)</SelectItem>
+                      <SelectItem value="snapchat">سناب شات</SelectItem>
                       <SelectItem value="internal">إعلان داخلي</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label>{sponsorLinkType === "external" ? "رابط الراعي" : "اختر الإعلان"}</Label>
-                  {sponsorLinkType === "external" ? (
-                    <Input value={form.sponsor_url} onChange={e => setForm(f => ({ ...f, sponsor_url: e.target.value }))} placeholder="https://..." dir="ltr" />
-                  ) : (
+                  <Label>{sponsorLinkType === "internal" ? "اختر الإعلان" : sponsorLinkType === "snapchat" ? "رابط سناب شات الراعي" : "رابط الراعي"}</Label>
+                  {sponsorLinkType === "internal" ? (
                     <div className="space-y-2">
                       <div className="relative">
                         <Search className="absolute right-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
@@ -264,6 +264,8 @@ const AdminGiveaways = () => {
                         <p className="text-xs text-muted-foreground">المختار: إعلان رقم {form.sponsor_url.replace("/ad/", "")}</p>
                       )}
                     </div>
+                  ) : (
+                    <Input value={form.sponsor_url} onChange={e => setForm(f => ({ ...f, sponsor_url: e.target.value }))} placeholder={sponsorLinkType === "snapchat" ? "https://snapchat.com/add/..." : "https://..."} dir="ltr" />
                   )}
                 </div>
                 <div className="space-y-1.5">

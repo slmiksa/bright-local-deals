@@ -1,0 +1,1 @@
+ALTER TABLE public.giveaways ADD COLUMN sponsor_link_type text DEFAULT 'external';
