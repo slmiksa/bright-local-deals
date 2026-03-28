@@ -1,28 +1,70 @@
 
 
-# إضافة زر مشاركة الفيديو في المعرض مع Deep Link
+# نظام السحوبات الترويجية
 
 ## الفكرة
-- زر مشاركة في الشريط الجانبي للمعرض
-- الرابط المُشارك: `https://lamha.trndsky.com/gallery/{adId}`
-- عند فتح الرابط → يفتح المعرض ويبدأ بالفيديو المحدد أولاً
+نظام سحب يظهر/يختفي بتحكم الأدمن، مع عداد تنازلي، تسجيل مشاركين، إعلان فائز، وإمكانية إضافة راعي اختياري مع لوقو.
 
-## التعديلات
+## قاعدة البيانات
 
-### 1. `src/App.tsx`
-- إضافة route جديد `/gallery/:adId` بجانب `/gallery` الحالي، كلاهما يفتح `GalleryPage`
+### جدول `giveaways`
+| عمود | نوع | وصف |
+|-------|------|------|
+| id | uuid PK | معرف |
+| title | text | عنوان السحب |
+| prize | text | الجائزة |
+| end_date | timestamptz | موعد السحب |
+| snapchat_url | text | رابط السناب |
+| active | boolean default false | إظهار/إخفاء |
+| winner_name | text nullable | اسم الفائز |
+| sponsor_name | text nullable | اسم الراعي (اختياري) |
+| sponsor_logo_url | text nullable | لوقو الراعي (اختياري) |
+| created_at | timestamptz | تاريخ الإنشاء |
 
-### 2. `src/pages/GalleryPage.tsx`
-- استيراد `useParams` لقراءة `adId` من الـ URL
-- استيراد أيقونة `Share2` من lucide
-- تعديل `shuffled` useMemo: إذا وُجد `adId` في الـ URL → وضع فيديوهات ذلك الإعلان في البداية ثم باقي الفيديوهات عشوائياً بعدها
-- إضافة **زر مشاركة** في الشريط الجانبي (فوق زر الصوت) يستخدم:
-  - `navigator.share()` على الأجهزة التي تدعمه (iOS/Android)
-  - نسخ الرابط للحافظة كـ fallback
-  - الرابط دائماً بصيغة `https://lamha.trndsky.com/gallery/{activeAdId}`
-  - عرض toast "تم نسخ الرابط" عند النسخ
+- RLS: قراءة عامة، تعديل للأدمن فقط
 
-### الملفات المتأثرة
-- `src/App.tsx` — إضافة route
-- `src/pages/GalleryPage.tsx` — زر مشاركة + ترتيب الفيديو حسب الـ param
+### جدول `giveaway_entries`
+| عمود | نوع | وصف |
+|-------|------|------|
+| id | uuid PK | معرف |
+| giveaway_id | uuid FK → giveaways | مرجع للسحب |
+| name | text | اسم المشارك |
+| phone | text | رقم الجوال |
+| created_at | timestamptz | وقت التسجيل |
+
+- قيد فريد على `(giveaway_id, phone)`
+- RLS: قراءة وإدراج عامة، حذف للأدمن
+
+## المكونات الجديدة
+
+### `GiveawaySection.tsx` — الصفحة الرئيسية
+ثلاث حالات:
+
+1. **السحب جاري**: عنوان + جائزة + عداد تنازلي + نموذج (اسم/جوال) + زر اشتراك + زر سناب + إذا وُجد راعي يظهر "برعاية [اسم]" مع اللوقو
+2. **تم إعلان الفائز**: تصميم احتفالي 🏆 مع اسم الفائز + زر سناب + الراعي إن وُجد
+3. **لا يوجد سحب نشط**: لا يظهر شيء
+
+### `AdminGiveaways.tsx` — لوحة التحكم
+- إنشاء/تعديل سحب (عنوان، جائزة، تاريخ، رابط سناب)
+- حقول اختيارية: اسم الراعي + رفع لوقو الراعي (إلى storage bucket)
+- تفعيل/تعطيل السحب (switch)
+- عرض قائمة المشتركين + عددهم
+- حقل اسم الفائز + زر "إعلان الفائز"
+- زر سحب عشوائي
+
+## Storage
+- إنشاء bucket جديد `giveaway-images` (public) لتخزين لوقو الرعاة
+
+## التعديلات على الملفات الحالية
+- **`Index.tsx`**: إضافة `<GiveawaySection />` بعد `<BannerSlider />`
+- **`App.tsx`**: إضافة route `/admin/giveaways`
+- **`AdminLayout.tsx`**: إضافة رابط "السحوبات" مع أيقونة `Gift`
+
+## الملفات المتأثرة
+- Migration SQL (جدولين + RLS)
+- `src/components/GiveawaySection.tsx` — جديد
+- `src/pages/admin/AdminGiveaways.tsx` — جديد
+- `src/pages/Index.tsx`
+- `src/App.tsx`
+- `src/pages/admin/AdminLayout.tsx`
 
