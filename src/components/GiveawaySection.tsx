@@ -164,7 +164,10 @@ const GiveawaySection = () => {
             <p className="text-2xl font-black">{giveaway.winner_name}</p>
             <p className="text-sm mt-1 opacity-80">الجائزة: {giveaway.prize}</p>
           </div>
-          <SnapchatButton />
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <SnapchatButton />
+            <ShareButton />
+          </div>
           <SponsorBadge />
         </div>
       </div>
@@ -240,7 +243,10 @@ const GiveawaySection = () => {
             </div>
           )}
 
-          <SnapchatButton />
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <SnapchatButton />
+            <ShareButton />
+          </div>
           <SponsorBadge />
         </div>
       </div>
