@@ -487,6 +487,12 @@ const AddAdPage = () => {
               </button>
             </div>
             {videos.length > 0 && <p className="text-[11px] text-muted-foreground mt-1.5">{videos.length} فيديو</p>}
+            <div className="mt-2 bg-emerald-50 border border-emerald-200 rounded-xl px-3.5 py-2.5 flex items-start gap-2">
+              <span className="text-base mt-0.5">🎬</span>
+              <p className="text-[11px] text-emerald-700 leading-relaxed font-medium">
+                أضف فيديو لإعلانك وسيظهر في قسم <span className="font-black">المعرض</span> ليصل لآلاف المتصفحين! الفيديو يزيد التفاعل ويجذب عملاء أكثر لمتجرك ✨
+              </p>
+            </div>
           </div>
 
           {/* Email notification */}
