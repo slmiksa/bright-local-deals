@@ -6,6 +6,7 @@ import AdSection from "@/components/AdSection";
 import PullToRefresh from "@/components/PullToRefresh";
 import CountdownTimer from "@/components/CountdownTimer";
 import BannerSlider from "@/components/BannerSlider";
+import GiveawaySection from "@/components/GiveawaySection";
 import ComingSoonSection from "@/components/ComingSoonSection";
 import { useAdsByCity } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
@@ -20,6 +21,7 @@ const Index = () => {
       <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
       <CountdownTimer />
       <BannerSlider />
+      <GiveawaySection />
       <ComingSoonSection />
       <FeaturedSlider />
       <EventsSlider />

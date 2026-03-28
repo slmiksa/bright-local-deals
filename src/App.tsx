@@ -43,6 +43,7 @@ import PopupAd from "./components/PopupAd";
 import AppStoreBanner from "./components/AppStoreBanner";
 import ForceUpdateModal from "./components/ForceUpdateModal";
 import AdminAppVersion from "./pages/admin/AdminAppVersion";
+import AdminGiveaways from "./pages/admin/AdminGiveaways";
 import { APP_VERSION, APP_STORE_URL, compareVersions } from "./lib/version";
 import { isNative } from "./lib/capacitor";
 import { supabase } from "./integrations/supabase/client";
@@ -133,6 +134,7 @@ const App = () => {
                   <Route path="banner-slides" element={<AdminBannerSlides />} />
                   <Route path="support" element={<AdminSupport />} />
                   <Route path="app-version" element={<AdminAppVersion />} />
+                  <Route path="giveaways" element={<AdminGiveaways />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />
