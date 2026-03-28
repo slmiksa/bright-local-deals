@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Gift, Trophy, ExternalLink, Check } from "lucide-react";
+import { Gift, Trophy, ExternalLink, Check, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +30,7 @@ const GiveawaySection = () => {
   const [registered, setRegistered] = useState(false);
   const [inlineMsg, setInlineMsg] = useState<{ text: string; type: "success" | "error" } | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [expanded, setExpanded] = useState(false);
 
   const endTime = useMemo(() => giveaway?.end_date ? new Date(giveaway.end_date).getTime() : null, [giveaway?.end_date]);
   const isExpired = endTime ? endTime <= Date.now() : true;
@@ -191,76 +192,101 @@ const GiveawaySection = () => {
     ];
 
     return (
-      <div className="mx-4 mt-4 p-5 rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 text-white shadow-elevated">
-        <div className="text-center space-y-3">
-          <div className="flex items-center justify-center gap-2">
-            <Gift className="w-6 h-6" />
-            <h3 className="font-black text-base">{giveaway.title}</h3>
+      <div className="mx-4 mt-4 rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 text-white shadow-elevated overflow-hidden">
+        {/* Collapsed header - always visible */}
+        <div
+          className="p-4 flex items-center justify-between cursor-pointer active:opacity-90"
+          onClick={() => setExpanded(e => !e)}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <Gift className="w-5 h-5 shrink-0" />
+            <h3 className="font-black text-sm truncate">{giveaway.title}</h3>
           </div>
-          <div className="bg-white/15 backdrop-blur-sm rounded-xl px-4 py-2">
-            <p className="text-xl font-black">{giveaway.prize}</p>
+          <div className="flex items-center gap-2.5 shrink-0" dir="ltr">
+            <div className="flex items-center gap-1 text-xs font-bold tabular-nums">
+              <span className="bg-white/20 rounded-lg px-1.5 py-0.5">{String(timeLeft.days).padStart(2, "0")}</span>
+              <span className="opacity-50">:</span>
+              <span className="bg-white/20 rounded-lg px-1.5 py-0.5">{String(timeLeft.hours).padStart(2, "0")}</span>
+              <span className="opacity-50">:</span>
+              <span className="bg-white/20 rounded-lg px-1.5 py-0.5">{String(timeLeft.minutes).padStart(2, "0")}</span>
+              <span className="opacity-50">:</span>
+              <span className="bg-white/20 rounded-lg px-1.5 py-0.5">{String(timeLeft.seconds).padStart(2, "0")}</span>
+            </div>
+            <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${expanded ? "rotate-180" : ""}`} />
           </div>
+        </div>
 
-          {/* Countdown */}
-          <div className="flex items-center justify-center gap-3" dir="ltr">
-            {units.map((unit, i) => (
-              <div key={unit.label} className="flex items-center gap-3">
-                <div className="flex flex-col items-center">
-                  <span className="text-xl font-black tabular-nums bg-white/20 rounded-xl w-11 h-11 flex items-center justify-center backdrop-blur-sm">
-                    {String(unit.value).padStart(2, "0")}
-                  </span>
-                  <span className="text-[9px] mt-1 opacity-75">{unit.label}</span>
+        {/* Expanded content */}
+        <div
+          className="transition-all duration-300 ease-in-out overflow-hidden"
+          style={{ maxHeight: expanded ? "600px" : "0", opacity: expanded ? 1 : 0 }}
+        >
+          <div className="px-5 pb-5 text-center space-y-3">
+            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-4 py-2">
+              <p className="text-xl font-black">{giveaway.prize}</p>
+            </div>
+
+            {/* Countdown */}
+            <div className="flex items-center justify-center gap-3" dir="ltr">
+              {units.map((unit, i) => (
+                <div key={unit.label} className="flex items-center gap-3">
+                  <div className="flex flex-col items-center">
+                    <span className="text-xl font-black tabular-nums bg-white/20 rounded-xl w-11 h-11 flex items-center justify-center backdrop-blur-sm">
+                      {String(unit.value).padStart(2, "0")}
+                    </span>
+                    <span className="text-[9px] mt-1 opacity-75">{unit.label}</span>
+                  </div>
+                  {i < units.length - 1 && <span className="text-lg font-bold opacity-50 -mt-4">:</span>}
                 </div>
-                {i < units.length - 1 && <span className="text-lg font-bold opacity-50 -mt-4">:</span>}
+              ))}
+            </div>
+
+            {/* Registration form */}
+            {registered ? (
+              <div className="bg-white/15 rounded-xl p-3 flex items-center justify-center gap-2">
+                <Check className="w-5 h-5 text-green-300" />
+                <span className="text-sm font-bold">تم تسجيلك بنجاح، بالتوفيق! 🎉</span>
               </div>
-            ))}
-          </div>
+            ) : (
+              <div className="space-y-2">
+                {inlineMsg && (
+                  <div className={`rounded-lg px-3 py-2 text-xs font-bold text-center ${
+                    inlineMsg.type === "error" ? "bg-red-500/20 text-red-200" : "bg-white/15 text-green-200"
+                  }`}>
+                    {inlineMsg.text}
+                  </div>
+                )}
+                <Input
+                  placeholder="الاسم"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="bg-white/15 border-white/20 text-white placeholder:text-white/60 text-center text-sm h-10"
+                  maxLength={50}
+                />
+                <Input
+                  placeholder="رقم الجوال"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="bg-white/15 border-white/20 text-white placeholder:text-white/60 text-center text-sm h-10"
+                  dir="ltr"
+                  maxLength={15}
+                />
+                <Button
+                  onClick={() => registerMutation.mutate()}
+                  disabled={registerMutation.isPending}
+                  className="w-full bg-white text-emerald-700 hover:bg-white/90 font-black text-sm"
+                >
+                  {registerMutation.isPending ? "جارٍ التسجيل..." : "اشترك الآن 🎁"}
+                </Button>
+              </div>
+            )}
 
-          {/* Registration form */}
-          {registered ? (
-            <div className="bg-white/15 rounded-xl p-3 flex items-center justify-center gap-2">
-              <Check className="w-5 h-5 text-green-300" />
-              <span className="text-sm font-bold">تم تسجيلك بنجاح، بالتوفيق! 🎉</span>
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <SnapchatButton />
             </div>
-          ) : (
-            <div className="space-y-2">
-              {inlineMsg && (
-                <div className={`rounded-lg px-3 py-2 text-xs font-bold text-center ${
-                  inlineMsg.type === "error" ? "bg-red-500/20 text-red-200" : "bg-white/15 text-green-200"
-                }`}>
-                  {inlineMsg.text}
-                </div>
-              )}
-              <Input
-                placeholder="الاسم"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="bg-white/15 border-white/20 text-white placeholder:text-white/60 text-center text-sm h-10"
-                maxLength={50}
-              />
-              <Input
-                placeholder="رقم الجوال"
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="bg-white/15 border-white/20 text-white placeholder:text-white/60 text-center text-sm h-10"
-                dir="ltr"
-                maxLength={15}
-              />
-              <Button
-                onClick={() => registerMutation.mutate()}
-                disabled={registerMutation.isPending}
-                className="w-full bg-white text-emerald-700 hover:bg-white/90 font-black text-sm"
-              >
-                {registerMutation.isPending ? "جارٍ التسجيل..." : "اشترك الآن 🎁"}
-              </Button>
-            </div>
-          )}
-
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            <SnapchatButton />
+            <SponsorBadge />
           </div>
-          <SponsorBadge />
         </div>
       </div>
     );
