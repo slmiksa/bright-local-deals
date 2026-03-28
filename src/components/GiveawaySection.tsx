@@ -195,23 +195,29 @@ const GiveawaySection = () => {
       <div className="mx-4 mt-4 rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 text-white shadow-elevated overflow-hidden">
         {/* Collapsed header - always visible */}
         <div
-          className="p-4 flex items-center justify-between cursor-pointer active:opacity-90"
+          className="px-4 py-3.5 flex items-center justify-between cursor-pointer active:opacity-90"
           onClick={() => setExpanded(e => !e)}
         >
           <div className="flex items-center gap-2 min-w-0">
-            <Gift className="w-5 h-5 shrink-0" />
-            <h3 className="font-black text-sm truncate">{giveaway.title}</h3>
+            <span className="text-lg">🎁</span>
+            <span className="text-lg">💰</span>
+            <div className="min-w-0">
+              <h3 className="font-black text-sm truncate">{giveaway.title}</h3>
+              {!expanded && <p className="text-[10px] opacity-75 mt-0.5">اضغط هنا وادخل السحب</p>}
+            </div>
           </div>
           <div className="flex items-center gap-2.5 shrink-0" dir="ltr">
-            <div className="flex items-center gap-1 text-xs font-bold tabular-nums">
-              <span className="bg-white/20 rounded-lg px-1.5 py-0.5">{String(timeLeft.days).padStart(2, "0")}</span>
-              <span className="opacity-50">:</span>
-              <span className="bg-white/20 rounded-lg px-1.5 py-0.5">{String(timeLeft.hours).padStart(2, "0")}</span>
-              <span className="opacity-50">:</span>
-              <span className="bg-white/20 rounded-lg px-1.5 py-0.5">{String(timeLeft.minutes).padStart(2, "0")}</span>
-              <span className="opacity-50">:</span>
-              <span className="bg-white/20 rounded-lg px-1.5 py-0.5">{String(timeLeft.seconds).padStart(2, "0")}</span>
-            </div>
+            {!expanded && (
+              <div className="flex items-center gap-1 text-xs font-bold tabular-nums">
+                <span className="bg-white/20 rounded-lg px-1.5 py-0.5">{String(timeLeft.days).padStart(2, "0")}</span>
+                <span className="opacity-50">:</span>
+                <span className="bg-white/20 rounded-lg px-1.5 py-0.5">{String(timeLeft.hours).padStart(2, "0")}</span>
+                <span className="opacity-50">:</span>
+                <span className="bg-white/20 rounded-lg px-1.5 py-0.5">{String(timeLeft.minutes).padStart(2, "0")}</span>
+                <span className="opacity-50">:</span>
+                <span className="bg-white/20 rounded-lg px-1.5 py-0.5">{String(timeLeft.seconds).padStart(2, "0")}</span>
+              </div>
+            )}
             <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${expanded ? "rotate-180" : ""}`} />
           </div>
         </div>
