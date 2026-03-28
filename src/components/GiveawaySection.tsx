@@ -110,7 +110,7 @@ const GiveawaySection = () => {
         onClick={() => window.open(giveaway.snapchat_url, "_blank")}
       >
         <ExternalLink className="w-3.5 h-3.5" />
-        تابعنا على سناب شات 👻
+        تابعنا لإعلان الفائز 👻
       </Button>
     );
   };
