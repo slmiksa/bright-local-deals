@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Gift, Trophy, ExternalLink, Check } from "lucide-react";
+import { Gift, Trophy, ExternalLink, Check, Share2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -111,6 +111,35 @@ const GiveawaySection = () => {
       >
         <ExternalLink className="w-3.5 h-3.5" />
         تابعنا لإعلان الفائز 👻
+      </Button>
+    );
+  };
+
+  const ShareButton = () => {
+    const handleShare = async () => {
+      const shareData = {
+        title: giveaway.title,
+        text: `🎁 ${giveaway.title} - الجائزة: ${giveaway.prize}\nسجّل الآن واربح!`,
+        url: window.location.href,
+      };
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+          toast({ title: "تم نسخ رابط السحب 📋" });
+        }
+      } catch {}
+    };
+    return (
+      <Button
+        variant="secondary"
+        size="sm"
+        className="bg-white/20 text-white hover:bg-white/30 font-bold text-xs gap-1.5"
+        onClick={handleShare}
+      >
+        <Share2 className="w-3.5 h-3.5" />
+        مشاركة السحب
       </Button>
     );
   };
