@@ -155,17 +155,22 @@ const AdminGiveaways = () => {
     setEditId(null);
     setForm({ title: "", prize: "", end_date: "", snapchat_url: "", sponsor_name: "", sponsor_logo_url: "", sponsor_url: "" });
     setLogoFile(null);
+    setSponsorLinkType("external");
+    setAdSearch("");
   };
 
   const startEdit = (g: any) => {
     setEditId(g.id);
+    const url = g.sponsor_url || "";
+    const isInternal = /^\/ad\/\d+$/.test(url);
+    setSponsorLinkType(isInternal ? "internal" : "external");
     setForm({
       title: g.title, prize: g.prize,
       end_date: new Date(g.end_date).toISOString().slice(0, 16),
       snapchat_url: g.snapchat_url || "",
       sponsor_name: g.sponsor_name || "",
       sponsor_logo_url: g.sponsor_logo_url || "",
-      sponsor_url: g.sponsor_url || "",
+      sponsor_url: url,
     });
     setShowForm(true);
   };
