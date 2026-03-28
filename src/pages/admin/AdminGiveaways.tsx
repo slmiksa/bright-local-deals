@@ -50,6 +50,22 @@ const AdminGiveaways = () => {
     enabled: !!showEntries,
   });
 
+  const { data: ads = [] } = useQuery({
+    queryKey: ["admin_ads_for_sponsor"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("ads")
+        .select("id, shop_name, offer")
+        .eq("active", true)
+        .order("created_at", { ascending: false });
+      return data || [];
+    },
+  });
+
+  const filteredAds = ads.filter((a: any) =>
+    a.shop_name.includes(adSearch) || a.offer.includes(adSearch)
+  );
+
   const uploadLogo = async (file: File): Promise<string> => {
     const ext = file.name.split(".").pop();
     const path = `sponsors/${Date.now()}.${ext}`;
