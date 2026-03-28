@@ -169,7 +169,13 @@ const GalleryPage = () => {
     []
   );
 
-  const goBack = () => navigate(-1);
+  const goBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/", { replace: true });
+    }
+  };
 
   const activeAdId = tripled.length ? tripled[activeIndex % tripled.length]?.adId : null;
 
