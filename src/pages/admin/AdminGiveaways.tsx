@@ -217,8 +217,54 @@ const AdminGiveaways = () => {
                   <Input value={form.sponsor_name} onChange={e => setForm(f => ({ ...f, sponsor_name: e.target.value }))} placeholder="مثال: كوفي لمحة" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>رابط الراعي</Label>
-                  <Input value={form.sponsor_url} onChange={e => setForm(f => ({ ...f, sponsor_url: e.target.value }))} placeholder="https://..." dir="ltr" />
+                  <Label>نوع رابط الراعي</Label>
+                  <Select value={sponsorLinkType} onValueChange={(v: "external" | "internal") => {
+                    setSponsorLinkType(v);
+                    setForm(f => ({ ...f, sponsor_url: "" }));
+                    setAdSearch("");
+                  }}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="external">رابط خارجي</SelectItem>
+                      <SelectItem value="internal">إعلان داخلي</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>{sponsorLinkType === "external" ? "رابط الراعي" : "اختر الإعلان"}</Label>
+                  {sponsorLinkType === "external" ? (
+                    <Input value={form.sponsor_url} onChange={e => setForm(f => ({ ...f, sponsor_url: e.target.value }))} placeholder="https://..." dir="ltr" />
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <Search className="absolute right-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          value={adSearch}
+                          onChange={e => setAdSearch(e.target.value)}
+                          placeholder="ابحث عن إعلان..."
+                          className="pr-9"
+                        />
+                      </div>
+                      <div className="max-h-40 overflow-auto border rounded-lg divide-y">
+                        {filteredAds.length === 0 && (
+                          <p className="text-xs text-muted-foreground text-center py-3">لا توجد نتائج</p>
+                        )}
+                        {filteredAds.map((ad: any) => (
+                          <div
+                            key={ad.id}
+                            onClick={() => setForm(f => ({ ...f, sponsor_url: `/ad/${ad.id}` }))}
+                            className={`px-3 py-2 text-xs cursor-pointer hover:bg-muted transition-colors ${form.sponsor_url === `/ad/${ad.id}` ? "bg-primary/10 font-bold" : ""}`}
+                          >
+                            <span className="font-medium">{ad.shop_name}</span>
+                            <span className="text-muted-foreground mr-2">— {ad.offer}</span>
+                          </div>
+                        ))}
+                      </div>
+                      {form.sponsor_url && sponsorLinkType === "internal" && (
+                        <p className="text-xs text-muted-foreground">المختار: إعلان رقم {form.sponsor_url.replace("/ad/", "")}</p>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-1.5">
                   <Label>لوقو الراعي</Label>
