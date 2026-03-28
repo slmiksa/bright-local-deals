@@ -382,6 +382,77 @@ export type Database = {
         }
         Relationships: []
       }
+      giveaway_entries: {
+        Row: {
+          created_at: string
+          giveaway_id: string
+          id: string
+          name: string
+          phone: string
+        }
+        Insert: {
+          created_at?: string
+          giveaway_id: string
+          id?: string
+          name: string
+          phone: string
+        }
+        Update: {
+          created_at?: string
+          giveaway_id?: string
+          id?: string
+          name?: string
+          phone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "giveaway_entries_giveaway_id_fkey"
+            columns: ["giveaway_id"]
+            isOneToOne: false
+            referencedRelation: "giveaways"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      giveaways: {
+        Row: {
+          active: boolean
+          created_at: string
+          end_date: string
+          id: string
+          prize: string
+          snapchat_url: string
+          sponsor_logo_url: string | null
+          sponsor_name: string | null
+          title: string
+          winner_name: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          end_date: string
+          id?: string
+          prize: string
+          snapchat_url?: string
+          sponsor_logo_url?: string | null
+          sponsor_name?: string | null
+          title: string
+          winner_name?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          end_date?: string
+          id?: string
+          prize?: string
+          snapchat_url?: string
+          sponsor_logo_url?: string | null
+          sponsor_name?: string | null
+          title?: string
+          winner_name?: string | null
+        }
+        Relationships: []
+      }
       popup_ads: {
         Row: {
           active: boolean
