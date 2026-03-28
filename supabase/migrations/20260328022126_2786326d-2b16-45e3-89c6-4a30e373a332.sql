@@ -1,0 +1,1 @@
+ALTER TABLE public.giveaways ADD COLUMN sponsor_url text;

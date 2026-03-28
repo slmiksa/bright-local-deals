@@ -424,6 +424,7 @@ export type Database = {
           snapchat_url: string
           sponsor_logo_url: string | null
           sponsor_name: string | null
+          sponsor_url: string | null
           title: string
           winner_name: string | null
         }
@@ -436,6 +437,7 @@ export type Database = {
           snapchat_url?: string
           sponsor_logo_url?: string | null
           sponsor_name?: string | null
+          sponsor_url?: string | null
           title: string
           winner_name?: string | null
         }
@@ -448,6 +450,7 @@ export type Database = {
           snapchat_url?: string
           sponsor_logo_url?: string | null
           sponsor_name?: string | null
+          sponsor_url?: string | null
           title?: string
           winner_name?: string | null
         }
