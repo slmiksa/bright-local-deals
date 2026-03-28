@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Gift, Trophy, Users, Trash2, Shuffle, Plus, Upload } from "lucide-react";
+import { Gift, Trophy, Users, Trash2, Shuffle, Plus, Upload, Search } from "lucide-react";
 
 const AdminGiveaways = () => {
   const { toast } = useToast();
@@ -21,6 +22,8 @@ const AdminGiveaways = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showEntries, setShowEntries] = useState<string | null>(null);
   const [winnerInput, setWinnerInput] = useState("");
+  const [sponsorLinkType, setSponsorLinkType] = useState<"external" | "internal">("external");
+  const [adSearch, setAdSearch] = useState("");
 
   const { data: giveaways = [] } = useQuery({
     queryKey: ["admin_giveaways"],
@@ -46,6 +49,22 @@ const AdminGiveaways = () => {
     },
     enabled: !!showEntries,
   });
+
+  const { data: ads = [] } = useQuery({
+    queryKey: ["admin_ads_for_sponsor"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("ads")
+        .select("id, shop_name, offer")
+        .eq("active", true)
+        .order("created_at", { ascending: false });
+      return data || [];
+    },
+  });
+
+  const filteredAds = ads.filter((a: any) =>
+    a.shop_name.includes(adSearch) || a.offer.includes(adSearch)
+  );
 
   const uploadLogo = async (file: File): Promise<string> => {
     const ext = file.name.split(".").pop();
@@ -136,17 +155,22 @@ const AdminGiveaways = () => {
     setEditId(null);
     setForm({ title: "", prize: "", end_date: "", snapchat_url: "", sponsor_name: "", sponsor_logo_url: "", sponsor_url: "" });
     setLogoFile(null);
+    setSponsorLinkType("external");
+    setAdSearch("");
   };
 
   const startEdit = (g: any) => {
     setEditId(g.id);
+    const url = g.sponsor_url || "";
+    const isInternal = /^\/ad\/\d+$/.test(url);
+    setSponsorLinkType(isInternal ? "internal" : "external");
     setForm({
       title: g.title, prize: g.prize,
       end_date: new Date(g.end_date).toISOString().slice(0, 16),
       snapchat_url: g.snapchat_url || "",
       sponsor_name: g.sponsor_name || "",
       sponsor_logo_url: g.sponsor_logo_url || "",
-      sponsor_url: g.sponsor_url || "",
+      sponsor_url: url,
     });
     setShowForm(true);
   };
@@ -193,8 +217,54 @@ const AdminGiveaways = () => {
                   <Input value={form.sponsor_name} onChange={e => setForm(f => ({ ...f, sponsor_name: e.target.value }))} placeholder="مثال: كوفي لمحة" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>رابط الراعي</Label>
-                  <Input value={form.sponsor_url} onChange={e => setForm(f => ({ ...f, sponsor_url: e.target.value }))} placeholder="https://..." dir="ltr" />
+                  <Label>نوع رابط الراعي</Label>
+                  <Select value={sponsorLinkType} onValueChange={(v: "external" | "internal") => {
+                    setSponsorLinkType(v);
+                    setForm(f => ({ ...f, sponsor_url: "" }));
+                    setAdSearch("");
+                  }}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="external">رابط خارجي</SelectItem>
+                      <SelectItem value="internal">إعلان داخلي</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>{sponsorLinkType === "external" ? "رابط الراعي" : "اختر الإعلان"}</Label>
+                  {sponsorLinkType === "external" ? (
+                    <Input value={form.sponsor_url} onChange={e => setForm(f => ({ ...f, sponsor_url: e.target.value }))} placeholder="https://..." dir="ltr" />
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <Search className="absolute right-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          value={adSearch}
+                          onChange={e => setAdSearch(e.target.value)}
+                          placeholder="ابحث عن إعلان..."
+                          className="pr-9"
+                        />
+                      </div>
+                      <div className="max-h-40 overflow-auto border rounded-lg divide-y">
+                        {filteredAds.length === 0 && (
+                          <p className="text-xs text-muted-foreground text-center py-3">لا توجد نتائج</p>
+                        )}
+                        {filteredAds.map((ad: any) => (
+                          <div
+                            key={ad.id}
+                            onClick={() => setForm(f => ({ ...f, sponsor_url: `/ad/${ad.id}` }))}
+                            className={`px-3 py-2 text-xs cursor-pointer hover:bg-muted transition-colors ${form.sponsor_url === `/ad/${ad.id}` ? "bg-primary/10 font-bold" : ""}`}
+                          >
+                            <span className="font-medium">{ad.shop_name}</span>
+                            <span className="text-muted-foreground mr-2">— {ad.offer}</span>
+                          </div>
+                        ))}
+                      </div>
+                      {form.sponsor_url && sponsorLinkType === "internal" && (
+                        <p className="text-xs text-muted-foreground">المختار: إعلان رقم {form.sponsor_url.replace("/ad/", "")}</p>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-1.5">
                   <Label>لوقو الراعي</Label>
