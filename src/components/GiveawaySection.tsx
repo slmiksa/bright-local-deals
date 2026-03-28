@@ -93,6 +93,14 @@ const GiveawaySection = () => {
   const SponsorBadge = () => {
     if (!giveaway.sponsor_name) return null;
     const sponsorUrl = (giveaway as any).sponsor_url as string | null;
+    const linkType = (giveaway as any).sponsor_link_type as string | null;
+    const isSnapchat = linkType === "snapchat";
+
+    const SnapIcon = () => (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+        <path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12.992-.27a.93.93 0 01.402-.082.68.68 0 01.541.264c.164.215.188.486.012.7-.218.262-.556.46-.874.635-.39.21-.828.39-1.252.484a.49.49 0 00-.375.39c-.13.66-.27 1.32-.39 1.98-.12.63-.33 1.26-.6 1.86-.51 1.14-1.35 2.07-2.37 2.73-.57.36-1.2.63-1.83.84-.63.18-1.29.3-1.95.33h-.18c-.66-.03-1.32-.15-1.95-.33-.63-.21-1.26-.48-1.83-.84-1.02-.66-1.86-1.59-2.37-2.73-.27-.6-.48-1.23-.6-1.86-.12-.66-.26-1.32-.39-1.98a.49.49 0 00-.375-.39c-.424-.093-.862-.273-1.252-.484-.318-.176-.656-.373-.874-.635-.176-.215-.152-.486.012-.7a.68.68 0 01.54-.264.93.93 0 01.403.082c.333.15.692.254.992.27.198 0 .326-.045.401-.09a15.27 15.27 0 01-.033-.57c-.104-1.628-.23-3.654.3-4.847C5.653 1.069 9.01.793 10 .793h2.206z"/>
+      </svg>
+    );
 
     if (sponsorUrl) {
       const handleClick = () => {
@@ -106,13 +114,14 @@ const GiveawaySection = () => {
       return (
         <button
           onClick={handleClick}
-          className="mt-3 w-full flex items-center justify-center gap-2.5 bg-white/95 hover:bg-white text-gray-800 rounded-xl px-4 py-2.5 transition-all active:scale-[0.98]"
+          className="mt-3 inline-flex items-center justify-center gap-2 bg-white/90 hover:bg-white rounded-full px-5 py-2 transition-all active:scale-[0.97]"
+          style={{ color: isSnapchat ? "#FFFC00" : undefined, background: isSnapchat ? "#FFFC00" : undefined }}
         >
           {giveaway.sponsor_logo_url && (
-            <img src={giveaway.sponsor_logo_url} alt={giveaway.sponsor_name} className="w-7 h-7 rounded-full object-cover" />
+            <img src={giveaway.sponsor_logo_url} alt={giveaway.sponsor_name} className="w-5 h-5 rounded-full object-cover" />
           )}
-          <span className="text-sm font-bold">زيارة متجر {giveaway.sponsor_name}</span>
-          <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+          <span className={`text-xs font-bold ${isSnapchat ? "text-black" : "text-gray-700"}`}>مشاهدة الراعي</span>
+          {isSnapchat ? <SnapIcon /> : <ExternalLink className="w-3 h-3 opacity-60" />}
         </button>
       );
     }
@@ -120,7 +129,7 @@ const GiveawaySection = () => {
     return (
       <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-white/20">
         {giveaway.sponsor_logo_url && (
-          <img src={giveaway.sponsor_logo_url} alt={giveaway.sponsor_name} className="w-8 h-8 rounded-full object-cover bg-white" />
+          <img src={giveaway.sponsor_logo_url} alt={giveaway.sponsor_name} className="w-6 h-6 rounded-full object-cover bg-white" />
         )}
         <span className="text-xs opacity-80">برعاية {giveaway.sponsor_name}</span>
       </div>
