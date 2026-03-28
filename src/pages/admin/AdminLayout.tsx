@@ -32,6 +32,7 @@ import {
   Headphones,
   GalleryHorizontalEnd,
   Smartphone,
+  Gift,
 } from "lucide-react";
 
 const menuItems = [
@@ -46,6 +47,7 @@ const menuItems = [
   { title: "السلايد الإعلاني", url: "/admin/banner-slides", icon: GalleryHorizontalEnd },
   { title: "الإعلانات المنبثقة", url: "/admin/popup-ads", icon: MonitorSmartphone },
   { title: "أزرار التواصل", url: "/admin/support", icon: Headphones },
+  { title: "السحوبات", url: "/admin/giveaways", icon: Gift },
   { title: "تحديث التطبيق", url: "/admin/app-version", icon: Smartphone },
   { title: "الإحصائيات", url: "/admin/stats", icon: BarChart3 },
   { title: "الإعدادات", url: "/admin/settings", icon: Settings },
