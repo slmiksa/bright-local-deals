@@ -92,25 +92,39 @@ const GiveawaySection = () => {
 
   const SponsorBadge = () => {
     if (!giveaway.sponsor_name) return null;
-    const content = (
-      <div className={`flex items-center justify-center gap-2 mt-3 pt-3 border-t border-white/20 ${(giveaway as any).sponsor_url ? "cursor-pointer hover:opacity-90 transition-opacity" : ""}`}>
+    const sponsorUrl = (giveaway as any).sponsor_url as string | null;
+
+    if (sponsorUrl) {
+      const handleClick = () => {
+        const internalMatch = sponsorUrl.match(/^\/ad\/(\d+)$/);
+        if (internalMatch) {
+          navigate(sponsorUrl);
+        } else {
+          window.open(sponsorUrl, "_blank");
+        }
+      };
+      return (
+        <button
+          onClick={handleClick}
+          className="mt-3 w-full flex items-center justify-center gap-2.5 bg-white/95 hover:bg-white text-gray-800 rounded-xl px-4 py-2.5 transition-all active:scale-[0.98]"
+        >
+          {giveaway.sponsor_logo_url && (
+            <img src={giveaway.sponsor_logo_url} alt={giveaway.sponsor_name} className="w-7 h-7 rounded-full object-cover" />
+          )}
+          <span className="text-sm font-bold">زيارة متجر {giveaway.sponsor_name}</span>
+          <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+        </button>
+      );
+    }
+
+    return (
+      <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-white/20">
         {giveaway.sponsor_logo_url && (
           <img src={giveaway.sponsor_logo_url} alt={giveaway.sponsor_name} className="w-8 h-8 rounded-full object-cover bg-white" />
         )}
         <span className="text-xs opacity-80">برعاية {giveaway.sponsor_name}</span>
-        {(giveaway as any).sponsor_url && <ExternalLink className="w-3 h-3 opacity-60" />}
       </div>
     );
-    const sponsorUrl = (giveaway as any).sponsor_url as string | null;
-    if (sponsorUrl) {
-      // Check if it's an internal ad link
-      const internalMatch = sponsorUrl.match(/^\/ad\/(\d+)$/);
-      if (internalMatch) {
-        return <div onClick={() => navigate(sponsorUrl)} className="cursor-pointer">{content}</div>;
-      }
-      return <a href={sponsorUrl} target="_blank" rel="noopener noreferrer">{content}</a>;
-    }
-    return content;
   };
 
   const SnapchatButton = () => {
