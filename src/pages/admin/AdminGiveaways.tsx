@@ -22,6 +22,8 @@ const AdminGiveaways = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showEntries, setShowEntries] = useState<string | null>(null);
   const [winnerInput, setWinnerInput] = useState("");
+  const [sponsorLinkType, setSponsorLinkType] = useState<"external" | "internal">("external");
+  const [adSearch, setAdSearch] = useState("");
 
   const { data: giveaways = [] } = useQuery({
     queryKey: ["admin_giveaways"],
