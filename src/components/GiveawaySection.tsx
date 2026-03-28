@@ -152,7 +152,6 @@ const GiveawaySection = () => {
           </div>
           <div className="flex items-center justify-center gap-2 flex-wrap">
             <SnapchatButton />
-            <ShareButton />
           </div>
           <SponsorBadge />
         </div>
@@ -238,7 +237,6 @@ const GiveawaySection = () => {
 
           <div className="flex items-center justify-center gap-2 flex-wrap">
             <SnapchatButton />
-            <ShareButton />
           </div>
           <SponsorBadge />
         </div>
