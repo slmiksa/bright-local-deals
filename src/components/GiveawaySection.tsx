@@ -28,6 +28,7 @@ const GiveawaySection = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [registered, setRegistered] = useState(false);
+  const [inlineMsg, setInlineMsg] = useState<{ text: string; type: "success" | "error" } | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   const endTime = useMemo(() => giveaway?.end_date ? new Date(giveaway.end_date).getTime() : null, [giveaway?.end_date]);
@@ -79,10 +80,11 @@ const GiveawaySection = () => {
       setRegistered(true);
       setName("");
       setPhone("");
-      toast({ title: "تم التسجيل بنجاح! 🎉", description: "بالتوفيق في السحب" });
+      setInlineMsg({ text: "تم التسجيل بنجاح! بالتوفيق 🎉", type: "success" });
     },
     onError: (err: any) => {
-      toast({ title: "خطأ", description: err.message, variant: "destructive" });
+      setInlineMsg({ text: err.message, type: "error" });
+      setTimeout(() => setInlineMsg(null), 4000);
     },
   });
 
@@ -217,6 +219,13 @@ const GiveawaySection = () => {
             </div>
           ) : (
             <div className="space-y-2">
+              {inlineMsg && (
+                <div className={`rounded-lg px-3 py-2 text-xs font-bold text-center ${
+                  inlineMsg.type === "error" ? "bg-red-500/20 text-red-200" : "bg-white/15 text-green-200"
+                }`}>
+                  {inlineMsg.text}
+                </div>
+              )}
               <Input
                 placeholder="الاسم"
                 value={name}
