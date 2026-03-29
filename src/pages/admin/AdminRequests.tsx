@@ -65,6 +65,9 @@ const AdminRequests = () => {
               storeName: req.store_name,
               city: req.city,
               adType: req.ad_type,
+              adTier: req.ad_tier,
+              totalPrice: req.total_price,
+              phone: req.phone || "",
               customerEmail: req.email,
             },
           }).catch(console.error);

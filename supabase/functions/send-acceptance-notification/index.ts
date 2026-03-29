@@ -29,7 +29,7 @@ serve(async (req) => {
   }
 
   try {
-    const { orderNumber, storeName, city, adType, customerEmail } = await req.json();
+    const { orderNumber, storeName, city, adType, adTier, totalPrice, phone, customerEmail } = await req.json();
 
     if (!customerEmail) {
       return new Response(JSON.stringify({ skipped: true, reason: "no email" }), {
@@ -37,6 +37,12 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const row = (label: string, value: string, isLast = false) => `
+      <tr>
+        <td style="padding:10px 12px;color:${TEXT_MUTED};font-size:13px;border-bottom:${isLast ? "none" : `1px solid rgba(61,139,110,0.08)`};">${label}</td>
+        <td style="padding:10px 12px;font-weight:600;font-size:13px;text-align:left;color:${TEXT_DARK};border-bottom:${isLast ? "none" : `1px solid rgba(61,139,110,0.08)`};">${value}</td>
+      </tr>`;
 
     const html = `
 <!DOCTYPE html>
@@ -61,20 +67,15 @@ serve(async (req) => {
         <p style="margin:0;color:#fff;font-size:32px;font-weight:900;">#${orderNumber}</p>
       </div>
       
-      <div style="background:${BG};border-radius:16px;padding:18px;text-align:right;border:1px solid rgba(61,139,110,0.1);">
-        <table style="width:100%;border-collapse:collapse;font-size:14px;color:${TEXT_DARK};">
-          <tr>
-            <td style="padding:8px 0;color:${TEXT_MUTED};border-bottom:1px solid rgba(61,139,110,0.08);">اسم المتجر</td>
-            <td style="padding:8px 0;font-weight:600;text-align:left;border-bottom:1px solid rgba(61,139,110,0.08);">${storeName}</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 0;color:${TEXT_MUTED};border-bottom:1px solid rgba(61,139,110,0.08);">نوع الإعلان</td>
-            <td style="padding:8px 0;font-weight:600;text-align:left;border-bottom:1px solid rgba(61,139,110,0.08);">${adType}</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 0;color:${TEXT_MUTED};">المدينة</td>
-            <td style="padding:8px 0;font-weight:600;text-align:left;">${city}</td>
-          </tr>
+      <div style="background:${BG};border-radius:16px;padding:4px 0;text-align:right;border:1px solid rgba(61,139,110,0.1);overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;">
+          ${row("🏪 اسم المتجر", storeName)}
+          ${row("📋 نوع الإعلان", adType)}
+          ${row("⭐ فئة الإعلان", adTier || "عادي")}
+          ${row("📍 المدينة", city)}
+          ${row("📞 رقم التواصل", phone || "غير محدد")}
+          ${row("📧 البريد الإلكتروني", customerEmail)}
+          ${row("💰 السعر", `${totalPrice || 0} ريال`, true)}
         </table>
       </div>
 
