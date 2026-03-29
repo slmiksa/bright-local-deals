@@ -15,6 +15,7 @@ import CategoryPage from "./pages/CategoryPage";
 import GalleryPage from "./pages/GalleryPage";
 import AddAdPage from "./pages/AddAdPage";
 import SupportPage from "./pages/SupportPage";
+import PartnersPage from "./pages/PartnersPage";
 import TermsPage from "./pages/TermsPage";
 import FeaturedPage from "./pages/FeaturedPage";
 import SearchPage from "./pages/SearchPage";
@@ -113,6 +114,7 @@ const App = () => {
                 <Route path="/gallery/:adId" element={<GalleryPage />} />
                 <Route path="/add" element={<AddAdPage />} />
                 <Route path="/support" element={<SupportPage />} />
+                <Route path="/partners" element={<PartnersPage />} />
                 <Route path="/privacy" element={<TermsPage />} />
                 <Route path="/featured" element={<FeaturedPage />} />
                 <Route path="/search" element={<SearchPage />} />
