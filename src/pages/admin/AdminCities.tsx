@@ -2,6 +2,16 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Pencil, Trash2, X, Check, Star, MapPin } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Region {
   id: string;
@@ -32,6 +42,9 @@ const AdminCities = () => {
   const [showCityForm, setShowCityForm] = useState(false);
   const [editCityId, setEditCityId] = useState<string | null>(null);
   const [cityForm, setCityForm] = useState({ name: "", sort_order: "0", region_id: "" });
+
+  // Delete confirmation
+  const [deleteDialog, setDeleteDialog] = useState<{ type: "region" | "city"; id: string; name: string } | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -74,19 +87,35 @@ const AdminCities = () => {
     setShowRegionForm(false);
     fetchData();
   };
-  const deleteRegion = async (id: string) => {
-    if (!confirm("هل أنت متأكد من حذف هذه المنطقة؟ ستفقد المدن المرتبطة بها ارتباطها.")) return;
-    const { error } = await supabase.from("regions").delete().eq("id", id);
-    if (error) { toast({ title: "خطأ", description: error.message, variant: "destructive" }); return; }
-    toast({ title: "تم", description: "تم حذف المنطقة" });
+
+  const confirmDelete = async () => {
+    if (!deleteDialog) return;
+    const { type, id } = deleteDialog;
+    if (type === "region") {
+      const { error } = await supabase.from("regions").delete().eq("id", id);
+      if (error) { toast({ title: "خطأ", description: error.message, variant: "destructive" }); }
+      else { toast({ title: "تم", description: "تم حذف المنطقة" }); }
+    } else {
+      const { error } = await supabase.from("cities").delete().eq("id", id);
+      if (error) { toast({ title: "خطأ", description: error.message, variant: "destructive" }); }
+      else { toast({ title: "تم", description: "تم حذف المدينة" }); }
+    }
+    setDeleteDialog(null);
     fetchData();
   };
-  const setDefaultRegion = async (id: string) => {
-    // Remove all defaults, then set this one
-    await supabase.from("regions").update({ is_default: false }).neq("id", "");
-    await supabase.from("cities").update({ is_default: false }).neq("id", "");
-    await supabase.from("regions").update({ is_default: true }).eq("id", id);
-    toast({ title: "تم", description: "تم تعيين المنطقة كافتراضية" });
+
+  const toggleDefaultRegion = async (region: Region) => {
+    if (region.is_default) {
+      // Unset default
+      await supabase.from("regions").update({ is_default: false }).eq("id", region.id);
+      toast({ title: "تم", description: "تم إلغاء الافتراضي" });
+    } else {
+      // Clear all defaults, then set this one
+      await supabase.from("regions").update({ is_default: false }).neq("id", "");
+      await supabase.from("cities").update({ is_default: false }).neq("id", "");
+      await supabase.from("regions").update({ is_default: true }).eq("id", region.id);
+      toast({ title: "تم", description: "تم تعيين المنطقة كافتراضية" });
+    }
     fetchData();
   };
 
@@ -126,18 +155,19 @@ const AdminCities = () => {
     setShowCityForm(false);
     fetchData();
   };
-  const deleteCity = async (id: string) => {
-    if (!confirm("هل أنت متأكد من حذف هذه المدينة؟")) return;
-    const { error } = await supabase.from("cities").delete().eq("id", id);
-    if (error) { toast({ title: "خطأ", description: error.message, variant: "destructive" }); return; }
-    toast({ title: "تم", description: "تم حذف المدينة" });
-    fetchData();
-  };
-  const setDefaultCity = async (id: string) => {
-    await supabase.from("regions").update({ is_default: false }).neq("id", "");
-    await supabase.from("cities").update({ is_default: false }).neq("id", "");
-    await supabase.from("cities").update({ is_default: true }).eq("id", id);
-    toast({ title: "تم", description: "تم تعيين المدينة كافتراضية" });
+
+  const toggleDefaultCity = async (city: City) => {
+    if (city.is_default) {
+      // Unset default
+      await supabase.from("cities").update({ is_default: false }).eq("id", city.id);
+      toast({ title: "تم", description: "تم إلغاء الافتراضي" });
+    } else {
+      // Clear all defaults, then set this one
+      await supabase.from("regions").update({ is_default: false }).neq("id", "");
+      await supabase.from("cities").update({ is_default: false }).neq("id", "");
+      await supabase.from("cities").update({ is_default: true }).eq("id", city.id);
+      toast({ title: "تم", description: "تم تعيين المدينة كافتراضية" });
+    }
     fetchData();
   };
 
@@ -180,8 +210,8 @@ const AdminCities = () => {
                     )}
                   </div>
                   <div className="flex items-center gap-1">
-                    <button onClick={() => setDefaultRegion(region.id)} title="تعيين كافتراضي" className="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center">
-                      <Star className="w-3.5 h-3.5" />
+                    <button onClick={() => toggleDefaultRegion(region)} title={region.is_default ? "إلغاء الافتراضي" : "تعيين كافتراضي"} className={`w-7 h-7 rounded-lg flex items-center justify-center ${region.is_default ? "bg-amber-500/20 text-amber-600" : "bg-amber-500/10 text-amber-600"}`}>
+                      <Star className={`w-3.5 h-3.5 ${region.is_default ? "fill-amber-500" : ""}`} />
                     </button>
                     <button onClick={() => openNewCity(region.id)} className="w-7 h-7 rounded-lg bg-accent/20 text-accent-foreground flex items-center justify-center">
                       <Plus className="w-3.5 h-3.5" />
@@ -189,7 +219,7 @@ const AdminCities = () => {
                     <button onClick={() => openEditRegion(region)} className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
-                    <button onClick={() => deleteRegion(region.id)} className="w-7 h-7 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
+                    <button onClick={() => setDeleteDialog({ type: "region", id: region.id, name: region.name })} className="w-7 h-7 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -210,13 +240,13 @@ const AdminCities = () => {
                           )}
                         </div>
                         <div className="flex items-center gap-1">
-                          <button onClick={() => setDefaultCity(c.id)} title="تعيين كافتراضي" className="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center">
-                            <Star className="w-3 h-3" />
+                          <button onClick={() => toggleDefaultCity(c)} title={c.is_default ? "إلغاء الافتراضي" : "تعيين كافتراضي"} className={`w-7 h-7 rounded-lg flex items-center justify-center ${c.is_default ? "bg-amber-500/20 text-amber-600" : "bg-amber-500/10 text-amber-600"}`}>
+                            <Star className={`w-3 h-3 ${c.is_default ? "fill-amber-500" : ""}`} />
                           </button>
                           <button onClick={() => openEditCity(c)} className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                             <Pencil className="w-3 h-3" />
                           </button>
-                          <button onClick={() => deleteCity(c.id)} className="w-7 h-7 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
+                          <button onClick={() => setDeleteDialog({ type: "city", id: c.id, name: c.name })} className="w-7 h-7 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
                             <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
@@ -242,7 +272,7 @@ const AdminCities = () => {
                       <button onClick={() => openEditCity(c)} className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                         <Pencil className="w-3 h-3" />
                       </button>
-                      <button onClick={() => deleteCity(c.id)} className="w-7 h-7 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
+                      <button onClick={() => setDeleteDialog({ type: "city", id: c.id, name: c.name })} className="w-7 h-7 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
                         <Trash2 className="w-3 h-3" />
                       </button>
                     </div>
@@ -253,6 +283,33 @@ const AdminCities = () => {
           )}
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteDialog} onOpenChange={(open) => !open && setDeleteDialog(null)}>
+        <AlertDialogContent className="max-w-[340px] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-right text-base font-bold">
+              تأكيد الحذف
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-right text-sm">
+              {deleteDialog?.type === "region"
+                ? `هل أنت متأكد من حذف منطقة "${deleteDialog?.name}"؟ ستفقد المدن المرتبطة بها ارتباطها.`
+                : `هل أنت متأكد من حذف مدينة "${deleteDialog?.name}"؟`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-col gap-2 sm:flex-col">
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl font-bold"
+            >
+              حذف
+            </AlertDialogAction>
+            <AlertDialogCancel className="rounded-xl font-bold">
+              إلغاء
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Region Form Modal */}
       {showRegionForm && (
