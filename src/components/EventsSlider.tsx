@@ -22,10 +22,6 @@ const EventsSlider = () => {
     setActiveIndex(events.length - 1 - index);
   };
 
-  const openLightbox = (adImages: string[], index: number) => {
-    setLightboxImages(adImages);
-    setLightboxIndex(index);
-  };
 
   if (events.length === 0) return null;
 
