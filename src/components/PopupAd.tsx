@@ -54,7 +54,9 @@ const PopupAd = () => {
           const rCityNames = region.cities.map(c => c.name);
           return userCities.some(uc => rCityNames.includes(uc));
         }
-        return userCities.includes(s.city);
+        // Support comma-separated multi-city
+        const adCities = s.city.split(",").map(c => c.trim());
+        return userCities.some(uc => adCities.includes(uc));
       });
 
       if (matching.length > 0) {

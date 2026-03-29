@@ -46,7 +46,9 @@ const BannerSlider = () => {
           const rCityNames = region.cities.map(c => c.name);
           return userCities.some(uc => rCityNames.includes(uc));
         }
-        return userCities.includes(s.city);
+        // Support comma-separated multi-city
+        const slideCities = s.city.split(",").map(c => c.trim());
+        return userCities.some(uc => slideCities.includes(uc));
       });
     },
     staleTime: 1000 * 60 * 5,
