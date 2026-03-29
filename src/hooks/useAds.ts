@@ -1,6 +1,7 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { resolveImageUrl } from "@/data/imageMap";
+import { useRegionsWithCities, RegionWithCities } from "@/hooks/useRegions";
 
 export interface AdMedia {
   url: string;
@@ -82,7 +83,20 @@ function mapDbAdToAd(dbAd: DbAd): Ad {
   };
 }
 
-async function fetchAds(opts?: { city?: string; cities?: string[]; category?: string; featured?: boolean }): Promise<Ad[]> {
+function matchesCity(adCity: string, userCities: string[], regions: RegionWithCities[]): boolean {
+  if (!adCity || adCity === "all") return true;
+  if (adCity.startsWith("region:")) {
+    const rName = adCity.replace("region:", "");
+    const region = regions.find(r => r.name === rName);
+    if (!region) return false;
+    const rCityNames = region.cities.map(c => c.name);
+    return userCities.some(uc => rCityNames.includes(uc));
+  }
+  const adCities = adCity.split(",").map(c => c.trim());
+  return userCities.some(uc => adCities.includes(uc));
+}
+
+async function fetchAds(opts?: { city?: string; cities?: string[]; category?: string; featured?: boolean; regions?: RegionWithCities[] }): Promise<Ad[]> {
   const now = new Date().toISOString();
   let query = supabase
     .from("ads")
@@ -91,20 +105,24 @@ async function fetchAds(opts?: { city?: string; cities?: string[]; category?: st
     .lte("start_date", now)
     .order("created_at", { ascending: false });
 
-  // Filter out expired ads: end_date is null (no expiry) or in the future
   query = query.or(`end_date.is.null,end_date.gte.${now}`);
 
-  if (opts?.cities && opts.cities.length > 0) {
-    query = query.in("city", opts.cities);
-  } else if (opts?.city) {
-    query = query.eq("city", opts.city);
-  }
   if (opts?.category) query = query.eq("category", opts.category);
   if (opts?.featured) query = query.eq("featured", true);
 
   const { data, error } = await query;
   if (error) throw error;
-  return (data as unknown as DbAd[]).map(mapDbAdToAd);
+
+  let ads = (data as unknown as DbAd[]).map(mapDbAdToAd);
+
+  // Client-side city filtering to support comma-separated, "all", and "region:" values
+  const userCities = opts?.cities?.length ? opts.cities : opts?.city ? [opts.city] : [];
+  if (userCities.length > 0) {
+    const regions = opts?.regions || [];
+    ads = ads.filter(ad => matchesCity(ad.city, userCities, regions));
+  }
+
+  return ads;
 }
 
 async function fetchAdById(id: number): Promise<Ad | null> {
@@ -130,6 +148,7 @@ async function fetchCities(): Promise<string[]> {
 
 // React Query hooks
 export function useAdsByCity(city: string, options?: { enabled?: boolean; cities?: string[] }) {
+  const { data: regions = [] } = useRegionsWithCities();
   const queryKey = options?.cities?.length
     ? ["ads", "byRegionCities", ...options.cities]
     : ["ads", "byCity", city];
@@ -138,7 +157,7 @@ export function useAdsByCity(city: string, options?: { enabled?: boolean; cities
     queryKey,
     queryFn: async () => {
       const [ads, categoriesResult] = await Promise.all([
-        fetchAds(options?.cities?.length ? { cities: options.cities } : { city }),
+        fetchAds(options?.cities?.length ? { cities: options.cities, regions } : { city, regions }),
         supabase.from("categories").select("id, name").order("sort_order"),
       ]);
 
@@ -172,9 +191,10 @@ export function useAdsByCity(city: string, options?: { enabled?: boolean; cities
 }
 
 export function useFeaturedAds(city: string, cities?: string[]) {
+  const { data: regions = [] } = useRegionsWithCities();
   return useQuery({
     queryKey: cities?.length ? ["ads", "featured", "region", ...cities] : ["ads", "featured", city],
-    queryFn: () => fetchAds(cities?.length ? { cities, featured: true } : { city, featured: true }),
+    queryFn: () => fetchAds(cities?.length ? { cities, featured: true, regions } : { city, featured: true, regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
@@ -183,9 +203,10 @@ export function useFeaturedAds(city: string, cities?: string[]) {
 }
 
 export function useAdsByCategory(category: string, city: string, cities?: string[]) {
+  const { data: regions = [] } = useRegionsWithCities();
   return useQuery({
     queryKey: cities?.length ? ["ads", "category", category, "region", ...cities] : ["ads", "category", category, city],
-    queryFn: () => fetchAds(cities?.length ? { cities, category } : { city, category }),
+    queryFn: () => fetchAds(cities?.length ? { cities, category, regions } : { city, category, regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
@@ -202,9 +223,10 @@ export function useAdById(id: number) {
 }
 
 export function useEventAds(city: string, cities?: string[]) {
+  const { data: regions = [] } = useRegionsWithCities();
   return useQuery({
     queryKey: cities?.length ? ["ads", "events", "region", ...cities] : ["ads", "events", city],
-    queryFn: () => fetchAds(cities?.length ? { cities, category: "events" } : { city, category: "events" }),
+    queryFn: () => fetchAds(cities?.length ? { cities, category: "events", regions } : { city, category: "events", regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
