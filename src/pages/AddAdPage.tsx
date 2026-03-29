@@ -422,7 +422,7 @@ const AddAdPage = () => {
           {/* Location picker */}
           <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">
-              الموقع على الخريطة <span className="text-[11px] text-muted-foreground font-normal">(اختياري)</span>
+              حدد موقع اعلانك <span className="text-[11px] text-muted-foreground font-normal">( اختياري )</span>
             </label>
             <LocationPicker
               lat={mapLat}
