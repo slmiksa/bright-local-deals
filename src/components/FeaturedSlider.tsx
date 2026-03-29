@@ -17,7 +17,8 @@ const FeaturedSlider = () => {
     image: ad.images[0] || null,
     firstMedia: ad.media?.[0] || null,
     title: ad.offer,
-    subtitle: ad.shopName
+    subtitle: ad.shopName,
+    city: ad.city,
   }));
 
   const handleScroll = () => {
@@ -97,6 +98,11 @@ const FeaturedSlider = () => {
               <span className="inline-block text-[11px] font-bold bg-white/20 backdrop-blur-md text-white px-3 py-1 rounded-lg mb-2.5">
                 {slide.subtitle}
               </span>
+              {isRegionMode && slide.city && (
+                <span className="inline-block text-[10px] font-medium bg-white/15 backdrop-blur-md text-white/90 px-2 py-0.5 rounded-md mb-2 mr-1">
+                  📍 {slide.city}
+                </span>
+              )}
               <h3 className="text-white text-[18px] font-extrabold mb-4 leading-snug line-clamp-2 drop-shadow-md">
                 {slide.title}
               </h3>

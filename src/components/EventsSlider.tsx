@@ -65,6 +65,11 @@ const EventsSlider = () => {
               <span className="inline-block text-[9px] font-bold bg-white/90 text-foreground px-2 py-0.5 rounded-md mb-1.5 backdrop-blur-sm">
                 {ad.shopName}
               </span>
+              {isRegionMode && ad.city && (
+                <span className="inline-block text-[8px] font-bold bg-white/70 text-muted-foreground px-1.5 py-0.5 rounded-md mb-1 mr-1 backdrop-blur-sm">
+                  📍 {ad.city}
+                </span>
+              )}
               <h3 className="text-white text-[13px] font-bold leading-snug line-clamp-2 drop-shadow-md">{ad.offer}</h3>
             </div>
           </div>
