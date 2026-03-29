@@ -314,6 +314,7 @@ const AdminGiveaways = () => {
                   <p className="text-sm text-muted-foreground">الجائزة: {g.prize}</p>
                   <p className="text-xs text-muted-foreground">
                     الموعد: {new Date(g.end_date).toLocaleString("ar-SA")}
+                    {" · "}الموقع: {g.city === "all" ? "جميع المدن" : g.city?.startsWith("region:") ? `كل مدن ${g.city.replace("region:", "")}` : g.city?.includes(",") ? `${g.city.split(",").length} مدن محددة` : g.city || "جميع المدن"}
                   </p>
                   {g.sponsor_name && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
