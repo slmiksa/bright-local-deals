@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCity } from "@/contexts/CityContext";
+import { useRegionsWithCities } from "@/hooks/useRegions";
 import { useNavigate } from "react-router-dom";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
@@ -17,13 +18,14 @@ interface BannerSlide {
 }
 
 const BannerSlider = () => {
-  const { city } = useCity();
+  const { city, selectionMode, regionName, regionCities } = useCity();
+  const { data: regions = [] } = useRegionsWithCities();
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const autoplayPlugin = useRef(Autoplay({ delay: 4000, stopOnInteraction: false }));
 
   const { data: slides = [] } = useQuery({
-    queryKey: ["banner_slides", city],
+    queryKey: ["banner_slides", city, selectionMode, regionName],
     queryFn: async () => {
       const { data } = await supabase
         .from("banner_slides")
@@ -32,9 +34,20 @@ const BannerSlider = () => {
         .order("sort_order")
         .order("created_at", { ascending: false });
 
-      return ((data as BannerSlide[]) || []).filter(
-        (s) => s.city === "all" || s.city === city
-      );
+      const allSlides = (data as BannerSlide[]) || [];
+      const userCities = selectionMode === "region" ? regionCities : [city];
+
+      return allSlides.filter((s) => {
+        if (s.city === "all") return true;
+        if (s.city.startsWith("region:")) {
+          const rName = s.city.replace("region:", "");
+          const region = regions.find(r => r.name === rName);
+          if (!region) return false;
+          const rCityNames = region.cities.map(c => c.name);
+          return userCities.some(uc => rCityNames.includes(uc));
+        }
+        return userCities.includes(s.city);
+      });
     },
     staleTime: 1000 * 60 * 5,
   });
