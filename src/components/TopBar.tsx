@@ -14,7 +14,7 @@ const TopBar = () => {
     <>
       <header className="fixed top-0 left-0 right-0 z-50 max-w-[430px] mx-auto bg-primary" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <div className="px-3 py-2.5">
-          <div className="flex items-center bg-card rounded-2xl shadow-sm px-3 py-2 gap-2">
+          <div className="relative flex items-center bg-card rounded-2xl shadow-sm px-3 py-2">
             {/* City selector - right side */}
             <button
               onClick={() => setShowCities(true)}
@@ -24,11 +24,13 @@ const TopBar = () => {
               <ChevronDown className="w-3 h-3 text-muted-foreground" />
             </button>
 
-            {/* Logo - center */}
-            <div className="flex-1 flex flex-col items-center justify-center">
+            {/* Logo - absolutely centered */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <span className="text-[16px] font-black text-foreground leading-none">لمحة</span>
               <span className="text-[10px] text-muted-foreground font-medium leading-none mt-0.5">Lamha Ads</span>
             </div>
+
+            <div className="flex-1" />
 
             {/* Search - left side */}
             <button
