@@ -211,6 +211,9 @@ const AdminGiveaways = () => {
                 <Label>رابط سناب شات</Label>
                 <Input value={form.snapchat_url} onChange={e => setForm(f => ({ ...f, snapchat_url: e.target.value }))} placeholder="https://snapchat.com/..." dir="ltr" />
               </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <AdminLocationPicker value={form.city} onChange={(v) => setForm(f => ({ ...f, city: v }))} />
+              </div>
             </div>
 
             <div className="border-t pt-4 space-y-4">
