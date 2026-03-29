@@ -1,9 +1,46 @@
-import { Headphones, MessageCircle, Phone, Mail, ArrowRight, FileText, HelpCircle, Download } from "lucide-react";
+import { Headphones, MessageCircle, Phone, Mail, ArrowRight, FileText, HelpCircle, Download, Handshake } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Capacitor } from "@capacitor/core";
+
+type Partner = {
+  id: string;
+  name: string;
+  logo_url: string;
+  active: boolean;
+};
+
+const SuccessPartnersSection = () => {
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.from("success_partners").select("*").eq("active", true).order("sort_order").then(({ data }) => {
+      if (data) setPartners(data as Partner[]);
+    });
+  }, []);
+
+  if (partners.length === 0) return null;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 px-1">
+        <Handshake className="w-5 h-5 text-primary" />
+        <h3 className="text-[15px] font-bold text-foreground">شركاء النجاح</h3>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {partners.map((partner) => (
+          <div key={partner.id} className="flex flex-col items-center gap-2 p-3 bg-card rounded-2xl border border-border">
+            <img src={partner.logo_url} alt={partner.name} className="w-14 h-14 rounded-xl object-contain bg-background p-1" />
+            <p className="text-[11px] font-bold text-foreground text-center leading-tight">{partner.name}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 type SupportContact = {
   id: string;
@@ -94,6 +131,9 @@ const SupportPage = () => {
             <p className="text-[12px] text-muted-foreground">اطلع على سياسة الخصوصية</p>
           </div>
         </button>
+
+        {/* Success Partners */}
+        <SuccessPartnersSection />
 
         {/* App Store Download - Web Only */}
         {!Capacitor.isNativePlatform() && (
