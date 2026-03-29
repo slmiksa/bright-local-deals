@@ -9,9 +9,10 @@ interface AdSectionProps {
   id: string;
   title: string;
   ads: Ad[];
+  showCity?: boolean;
 }
 
-const AdSection = ({ id, title, ads }: AdSectionProps) => {
+const AdSection = ({ id, title, ads, showCity }: AdSectionProps) => {
   const navigate = useNavigate();
   const Icon = getCategoryIcon(id);
 
@@ -38,7 +39,7 @@ const AdSection = ({ id, title, ads }: AdSectionProps) => {
       >
         {ads.slice(0, 10).map((ad) => (
           <div key={ad.id} className="shrink-0 w-[44%]">
-            <AdCard {...ad} />
+            <AdCard {...ad} showCity={showCity} />
           </div>
         ))}
         <div className="shrink-0 w-[44%]">

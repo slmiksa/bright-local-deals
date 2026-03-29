@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Phone, Images, Eye, Heart } from "lucide-react";
+import { Phone, Images, Eye, Heart, MapPin } from "lucide-react";
 import ImageLightbox from "./ImageLightbox";
 import VideoThumbnail from "./VideoThumbnail";
 import { useAdStats } from "@/hooks/useAdStats";
