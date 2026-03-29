@@ -4,6 +4,7 @@ import { Eye, Trash2, Clock, CheckCircle, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +21,12 @@ const statusMap: Record<string, { label: string; color: string; icon: typeof Clo
   approved: { label: "مقبول", color: "text-green-600 bg-green-50 border-green-200", icon: CheckCircle },
   rejected: { label: "مرفوض", color: "text-red-600 bg-red-50 border-red-200", icon: XCircle },
 };
+
+const tabConfig = [
+  { value: "pending", label: "قيد المراجعة", icon: Clock },
+  { value: "approved", label: "مقبولة", icon: CheckCircle },
+  { value: "rejected", label: "مرفوضة", icon: XCircle },
+];
 
 const AdminRequests = () => {
   const navigate = useNavigate();
@@ -55,7 +62,6 @@ const AdminRequests = () => {
       const { error } = await supabase.from("ad_requests").update({ status }).eq("id", id);
       if (error) throw error;
 
-      // Send acceptance email if approved and customer has email
       if (status === "approved") {
         const req = requests.find((r) => r.id === id);
         if (req?.email) {
@@ -88,6 +94,87 @@ const AdminRequests = () => {
     );
   }
 
+  const grouped = {
+    pending: requests.filter((r) => r.status === "pending"),
+    approved: requests.filter((r) => r.status === "approved"),
+    rejected: requests.filter((r) => r.status === "rejected"),
+  };
+
+  const renderRequestCard = (req: (typeof requests)[0]) => {
+    const st = statusMap[req.status] || statusMap.pending;
+    const StatusIcon = st.icon;
+    return (
+      <div key={req.id} className="bg-card border border-border rounded-2xl p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-lg font-black text-primary">#{req.order_number}</span>
+            <span className="text-[14px] font-bold text-foreground">{req.store_name}</span>
+          </div>
+          <div className={`flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full border ${st.color}`}>
+            <StatusIcon className="w-3 h-3" />
+            {st.label}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 text-[12px]">
+          <div>
+            <span className="text-muted-foreground">النوع: </span>
+            <span className="font-bold text-foreground">{req.ad_type}</span>
+          </div>
+          <div>
+            <span className="text-muted-foreground">الفئة: </span>
+            <span className="font-bold text-foreground">{req.ad_tier}</span>
+          </div>
+          <div>
+            <span className="text-muted-foreground">المدينة: </span>
+            <span className="font-bold text-foreground">{req.city}</span>
+          </div>
+          <div>
+            <span className="text-muted-foreground">السعر: </span>
+            <span className="font-bold text-primary">{req.total_price} ريال</span>
+          </div>
+        </div>
+
+        <div className="text-[11px] text-muted-foreground">
+          {new Date(req.created_at).toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+        </div>
+
+        <div className="flex items-center gap-2 pt-1 border-t border-border">
+          <button
+            onClick={() => navigate(`/admin/requests/${req.id}`)}
+            className="flex-1 flex items-center justify-center gap-1.5 text-[12px] font-bold text-primary bg-primary/5 hover:bg-primary/10 rounded-xl py-2 transition-colors"
+          >
+            <Eye className="w-3.5 h-3.5" /> استعراض
+          </button>
+
+          {req.status === "pending" && (
+            <>
+              <button
+                onClick={() => updateStatus.mutate({ id: req.id, status: "approved" })}
+                className="flex items-center justify-center gap-1 text-[12px] font-bold text-green-600 bg-green-50 hover:bg-green-100 rounded-xl py-2 px-3 transition-colors"
+              >
+                <CheckCircle className="w-3.5 h-3.5" /> قبول
+              </button>
+              <button
+                onClick={() => setConfirmAction({ type: "reject", id: req.id, orderNum: req.order_number })}
+                className="flex items-center justify-center gap-1 text-[12px] font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl py-2 px-3 transition-colors"
+              >
+                <XCircle className="w-3.5 h-3.5" /> رفض
+              </button>
+            </>
+          )}
+
+          <button
+            onClick={() => setConfirmAction({ type: "delete", id: req.id, orderNum: req.order_number })}
+            className="flex items-center justify-center text-destructive hover:bg-destructive/10 rounded-xl py-2 px-2.5 transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
@@ -95,88 +182,42 @@ const AdminRequests = () => {
         <span className="text-sm text-muted-foreground">{requests.length} طلب</span>
       </div>
 
-      {requests.length === 0 ? (
-        <div className="bg-card border border-border rounded-2xl p-8 text-center text-muted-foreground">
-          لا توجد طلبات حالياً
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {requests.map((req) => {
-            const st = statusMap[req.status] || statusMap.pending;
-            const StatusIcon = st.icon;
+      <Tabs defaultValue="pending" className="w-full">
+        <TabsList className="w-full grid grid-cols-3 bg-muted/50 rounded-xl p-1 h-auto">
+          {tabConfig.map((tab) => {
+            const count = grouped[tab.value as keyof typeof grouped]?.length || 0;
+            const TabIcon = tab.icon;
             return (
-              <div key={req.id} className="bg-card border border-border rounded-2xl p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg font-black text-primary">#{req.order_number}</span>
-                    <span className="text-[14px] font-bold text-foreground">{req.store_name}</span>
-                  </div>
-                  <div className={`flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full border ${st.color}`}>
-                    <StatusIcon className="w-3 h-3" />
-                    {st.label}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-[12px]">
-                  <div>
-                    <span className="text-muted-foreground">النوع: </span>
-                    <span className="font-bold text-foreground">{req.ad_type}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">الفئة: </span>
-                    <span className="font-bold text-foreground">{req.ad_tier}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">المدينة: </span>
-                    <span className="font-bold text-foreground">{req.city}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">السعر: </span>
-                    <span className="font-bold text-primary">{req.total_price} ريال</span>
-                  </div>
-                </div>
-
-                <div className="text-[11px] text-muted-foreground">
-                  {new Date(req.created_at).toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                </div>
-
-                <div className="flex items-center gap-2 pt-1 border-t border-border">
-                  <button
-                    onClick={() => navigate(`/admin/requests/${req.id}`)}
-                    className="flex-1 flex items-center justify-center gap-1.5 text-[12px] font-bold text-primary bg-primary/5 hover:bg-primary/10 rounded-xl py-2 transition-colors"
-                  >
-                    <Eye className="w-3.5 h-3.5" /> استعراض
-                  </button>
-
-                  {req.status === "pending" && (
-                    <>
-                      <button
-                        onClick={() => updateStatus.mutate({ id: req.id, status: "approved" })}
-                        className="flex items-center justify-center gap-1 text-[12px] font-bold text-green-600 bg-green-50 hover:bg-green-100 rounded-xl py-2 px-3 transition-colors"
-                      >
-                        <CheckCircle className="w-3.5 h-3.5" /> قبول
-                      </button>
-                      <button
-                        onClick={() => setConfirmAction({ type: "reject", id: req.id, orderNum: req.order_number })}
-                        className="flex items-center justify-center gap-1 text-[12px] font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl py-2 px-3 transition-colors"
-                      >
-                        <XCircle className="w-3.5 h-3.5" /> رفض
-                      </button>
-                    </>
-                  )}
-
-                  <button
-                    onClick={() => setConfirmAction({ type: "delete", id: req.id, orderNum: req.order_number })}
-                    className="flex items-center justify-center text-destructive hover:bg-destructive/10 rounded-xl py-2 px-2.5 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className="flex items-center gap-1.5 text-[12px] font-bold py-2.5 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm"
+              >
+                <TabIcon className="w-3.5 h-3.5" />
+                {tab.label}
+                <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                  {count}
+                </span>
+              </TabsTrigger>
             );
           })}
-        </div>
-      )}
+        </TabsList>
+
+        {tabConfig.map((tab) => {
+          const items = grouped[tab.value as keyof typeof grouped] || [];
+          return (
+            <TabsContent key={tab.value} value={tab.value} className="mt-4 space-y-3">
+              {items.length === 0 ? (
+                <div className="bg-card border border-border rounded-2xl p-8 text-center text-muted-foreground text-sm">
+                  لا توجد طلبات {tab.label}
+                </div>
+              ) : (
+                items.map(renderRequestCard)
+              )}
+            </TabsContent>
+          );
+        })}
+      </Tabs>
 
       <AlertDialog open={!!confirmAction} onOpenChange={(open) => !open && setConfirmAction(null)}>
         <AlertDialogContent dir="rtl" className="max-w-[340px] rounded-2xl p-6">
