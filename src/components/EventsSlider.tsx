@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, X, Eye, PartyPopper } from "lucide-react";
+import { ChevronLeft, PartyPopper } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEventAds, Ad } from "@/hooks/useAds";
+import { useEventAds } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
-import { createPortal } from "react-dom";
+import ImageLightbox from "./ImageLightbox";
 
 const EventsSlider = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
