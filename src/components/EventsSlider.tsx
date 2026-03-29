@@ -7,8 +7,6 @@ import { useCity } from "@/contexts/CityContext";
 const EventsSlider = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
   const navigate = useNavigate();
   const { city, selectionMode, regionCities } = useCity();
   const isRegionMode = selectionMode === "region";
