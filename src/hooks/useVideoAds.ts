@@ -43,7 +43,7 @@ async function fetchVideoAds(opts?: { city?: string; cities?: string[]; regions?
     : (data as any[]);
 
   const results: VideoAd[] = [];
-  for (const ad of data as any[]) {
+  for (const ad of filtered) {
     const videos = (ad.ad_images || [])
       .filter((m: any) => m.media_type === "video")
       .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0));
@@ -61,9 +61,10 @@ async function fetchVideoAds(opts?: { city?: string; cities?: string[]; regions?
 }
 
 export function useVideoAds(city: string, cities?: string[]) {
+  const { data: regions = [] } = useRegionsWithCities();
   return useQuery({
     queryKey: cities?.length ? ["videoAds", "region", ...cities] : ["videoAds", city],
-    queryFn: () => fetchVideoAds(cities?.length ? { cities } : { city }),
+    queryFn: () => fetchVideoAds(cities?.length ? { cities, regions } : { city, regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
