@@ -76,7 +76,7 @@ function mapDbAdToAd(dbAd: DbAd): Ad {
     featured: dbAd.featured || false,
     category: dbAd.category,
     city: dbAd.city,
-    displayCity: dbAd.display_city || dbAd.city,
+    displayCity: dbAd.display_city || "",
     phone: dbAd.phone || "",
     description: dbAd.description || "",
     lat: dbAd.lat || 0,
@@ -103,7 +103,7 @@ async function fetchAds(opts?: { city?: string; cities?: string[]; category?: st
   const now = new Date().toISOString();
   let query = supabase
     .from("ads")
-    .select("*, ad_images(image_url, sort_order, media_type)")
+    .select("*, display_city, ad_images(image_url, sort_order, media_type)")
     .eq("active", true)
     .lte("start_date", now)
     .order("created_at", { ascending: false });
