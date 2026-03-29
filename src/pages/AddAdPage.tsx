@@ -250,6 +250,7 @@ const AddAdPage = () => {
             storeName,
             city: location,
             totalPrice,
+            phone,
             customerEmail: wantsEmail ? email : null,
           },
         });
