@@ -125,6 +125,8 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          lat: number | null
+          lng: number | null
           order_number: number
           phone: string | null
           status: string
@@ -138,6 +140,8 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          lat?: number | null
+          lng?: number | null
           order_number?: number
           phone?: string | null
           status?: string
@@ -151,6 +155,8 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          lat?: number | null
+          lng?: number | null
           order_number?: number
           phone?: string | null
           status?: string
