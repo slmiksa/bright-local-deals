@@ -58,19 +58,25 @@ const EventsSlider = () => {
             key={ad.id}
             className="snap-center shrink-0 w-[45%] rounded-2xl overflow-hidden relative cursor-pointer active:scale-[0.97] transition-transform"
             style={{ aspectRatio: "9/16" }}
-            onClick={() => openLightbox(ad.images, 0)}>
+            onClick={() => navigate(`/ad/${ad.id}`)}>
             <img src={ad.images[0]} alt={ad.shopName} className="w-full h-full object-cover" loading="lazy" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            <div className="absolute bottom-0 right-0 left-0 p-3">
-              <span className="inline-block text-[9px] font-bold bg-white/90 text-foreground px-2 py-0.5 rounded-md mb-1.5 backdrop-blur-sm">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+            <div className="absolute bottom-0 right-0 left-0 p-3 space-y-1.5">
+              <span className="inline-block text-[9px] font-bold bg-white/90 text-foreground px-2 py-0.5 rounded-md backdrop-blur-sm">
                 {ad.shopName}
               </span>
               {(ad.displayCity || (isRegionMode && ad.city)) && (
-                <span className="inline-block text-[8px] font-bold bg-white/70 text-muted-foreground px-1.5 py-0.5 rounded-md mb-1 mr-1 backdrop-blur-sm">
+                <span className="inline-block text-[8px] font-bold bg-white/70 text-muted-foreground px-1.5 py-0.5 rounded-md mr-1 backdrop-blur-sm">
                   📍 {ad.displayCity || ad.city}
                 </span>
               )}
-              <h3 className="text-white text-[13px] font-bold leading-snug line-clamp-2 drop-shadow-md">{ad.offer}</h3>
+              <h3 className="text-white text-[12px] font-bold leading-snug line-clamp-2 drop-shadow-md">{ad.offer}</h3>
+              <button
+                className="w-full flex items-center justify-center gap-1 bg-white/90 backdrop-blur-sm text-foreground rounded-lg py-1.5 text-[11px] font-bold active:scale-[0.95] transition-transform"
+                onClick={(e) => { e.stopPropagation(); navigate(`/ad/${ad.id}`); }}>
+                <ChevronLeft className="w-3 h-3" />
+                تفاصيل
+              </button>
             </div>
           </div>
         )}
