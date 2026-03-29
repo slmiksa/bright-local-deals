@@ -86,14 +86,6 @@ const EventsSlider = () => {
           )}
         </div>
       }
-
-      {lightboxImages.length > 0 && (
-        <ImageLightbox
-          images={lightboxImages}
-          initialIndex={lightboxIndex}
-          onClose={() => setLightboxImages([])}
-        />
-      )}
     </section>
   );
 };
