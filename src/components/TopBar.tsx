@@ -3,6 +3,7 @@ import { useCity } from "@/contexts/CityContext";
 import { useCities } from "@/hooks/useAds";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import lamhaLogo from "@/assets/lamha-logo.png";
 
 const TopBar = () => {
   const { city, setCity } = useCity();
@@ -25,9 +26,8 @@ const TopBar = () => {
             </button>
 
             {/* Logo - absolutely centered */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-[16px] font-black text-foreground leading-none">لمحة</span>
-              <span className="text-[10px] text-muted-foreground font-medium leading-none mt-0.5">Lamha Ads</span>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <img src={lamhaLogo} alt="لمحة" className="h-9 w-9 rounded-lg object-contain" />
             </div>
 
             <div className="flex-1" />
