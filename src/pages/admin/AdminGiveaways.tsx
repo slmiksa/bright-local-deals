@@ -328,7 +328,9 @@ const AdminGiveaways = () => {
                     checked={g.active}
                     onCheckedChange={(active) => toggleActive.mutate({ id: g.id, active })}
                   />
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(g)}>✏️</Button>
+                  <Button variant="outline" size="sm" className="h-8 text-xs gap-1" onClick={() => startEdit(g)}>
+                    ✏️ تعديل محتوى
+                  </Button>
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteMutation.mutate(g.id)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
