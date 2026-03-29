@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Trash2, X, Check, Upload, Image, ExternalLink, Link2, Pencil, Ban } from "lucide-react";
-import { useRegionsWithCities } from "@/hooks/useRegions";
+import AdminLocationPicker from "@/components/admin/AdminLocationPicker";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -21,7 +21,7 @@ interface BannerSlide {
 
 const AdminBannerSlides = () => {
   const [items, setItems] = useState<BannerSlide[]>([]);
-  const { data: regions = [] } = useRegionsWithCities();
+  
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -197,21 +197,7 @@ const AdminBannerSlides = () => {
           </div>
 
           {/* City / Region */}
-          <div>
-            <label className="block text-xs font-bold text-foreground mb-1">الموقع *</label>
-            <select value={form.city} onChange={(e) => setForm(f => ({ ...f, city: e.target.value }))} className={`${inputClass} appearance-none`}>
-              <option value="">اختر الموقع</option>
-              <option value="all">جميع المدن</option>
-              {regions.map(r => (
-                <optgroup key={r.id} label={r.name}>
-                  <option value={`region:${r.name}`}>كل مدن {r.name}</option>
-                  {r.cities.map(c => (
-                    <option key={c.id} value={c.name}>{c.name}</option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          </div>
+          <AdminLocationPicker value={form.city} onChange={(v) => setForm(f => ({ ...f, city: v }))} />
 
           {/* Link Type */}
           <div>
@@ -277,7 +263,7 @@ const AdminBannerSlides = () => {
               <img src={item.image_url} alt="" className="w-24 h-16 rounded-xl object-cover shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-bold text-foreground">{item.city === "all" ? "جميع المدن" : item.city.startsWith("region:") ? `كل مدن ${item.city.replace("region:", "")}` : item.city}</span>
+                  <span className="text-sm font-bold text-foreground">{item.city === "all" ? "جميع المدن" : item.city.startsWith("region:") ? `كل مدن ${item.city.replace("region:", "")}` : item.city.includes(",") ? `${item.city.split(",").length} مدن محددة` : item.city}</span>
                   <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${item.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
                     {item.active ? "مفعّل" : "معطّل"}
                   </span>
