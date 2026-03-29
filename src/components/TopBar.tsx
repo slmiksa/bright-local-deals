@@ -34,9 +34,9 @@ const TopBar = () => {
             {/* Search - left side */}
             <button
               onClick={() => navigate("/search")}
-              className="shrink-0 active:opacity-70 transition-opacity"
+              className="shrink-0 active:opacity-70 transition-opacity bg-muted/60 p-1.5 rounded-full"
             >
-              <Search className="w-[18px] h-[18px] text-muted-foreground" strokeWidth={2} />
+              <Search className="w-[18px] h-[18px] text-foreground" strokeWidth={2.5} />
             </button>
           </div>
         </div>
