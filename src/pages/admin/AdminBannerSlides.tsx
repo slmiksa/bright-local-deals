@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Trash2, X, Check, Upload, Image, ExternalLink, Link2, Pencil, Ban } from "lucide-react";
+import { useRegionsWithCities } from "@/hooks/useRegions";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -20,7 +21,7 @@ interface BannerSlide {
 
 const AdminBannerSlides = () => {
   const [items, setItems] = useState<BannerSlide[]>([]);
-  const [cities, setCities] = useState<string[]>([]);
+  const { data: regions = [] } = useRegionsWithCities();
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -43,9 +44,6 @@ const AdminBannerSlides = () => {
 
   useEffect(() => {
     fetchItems();
-    supabase.from("cities").select("name").order("sort_order").then(({ data }) => {
-      setCities((data || []).map(c => c.name));
-    });
   }, [fetchItems]);
 
   const resetForm = () => {
@@ -198,13 +196,20 @@ const AdminBannerSlides = () => {
             )}
           </div>
 
-          {/* City */}
+          {/* City / Region */}
           <div>
-            <label className="block text-xs font-bold text-foreground mb-1">المدينة *</label>
+            <label className="block text-xs font-bold text-foreground mb-1">الموقع *</label>
             <select value={form.city} onChange={(e) => setForm(f => ({ ...f, city: e.target.value }))} className={`${inputClass} appearance-none`}>
-              <option value="">اختر المدينة</option>
+              <option value="">اختر الموقع</option>
               <option value="all">جميع المدن</option>
-              {cities.map(c => <option key={c} value={c}>{c}</option>)}
+              {regions.map(r => (
+                <optgroup key={r.id} label={r.name}>
+                  <option value={`region:${r.name}`}>كل مدن {r.name}</option>
+                  {r.cities.map(c => (
+                    <option key={c.id} value={c.name}>{c.name}</option>
+                  ))}
+                </optgroup>
+              ))}
             </select>
           </div>
 
