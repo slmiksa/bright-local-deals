@@ -17,6 +17,7 @@ export interface Ad {
   featured?: boolean;
   category: string;
   city: string;
+  displayCity: string;
   phone: string;
   description: string;
   lat: number;
@@ -49,6 +50,7 @@ interface DbAd {
   description: string | null;
   category: string;
   city: string;
+  display_city: string | null;
   phone: string | null;
   address: string | null;
   lat: number | null;
@@ -74,6 +76,7 @@ function mapDbAdToAd(dbAd: DbAd): Ad {
     featured: dbAd.featured || false,
     category: dbAd.category,
     city: dbAd.city,
+    displayCity: dbAd.display_city || dbAd.city,
     phone: dbAd.phone || "",
     description: dbAd.description || "",
     lat: dbAd.lat || 0,
