@@ -26,7 +26,7 @@ const TopBar = () => {
 
             {/* Logo text - absolutely centered */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <span className="text-[15px] font-black text-foreground leading-none">لمحة للتسويق</span>
+              <span className="text-[17px] font-black text-foreground bg-primary/10 px-4 py-1 rounded-full leading-none">لمحة</span>
             </div>
 
             <div className="flex-1" />
@@ -34,9 +34,9 @@ const TopBar = () => {
             {/* Search - left side */}
             <button
               onClick={() => navigate("/search")}
-              className="shrink-0 active:opacity-70 transition-opacity"
+              className="shrink-0 active:opacity-70 transition-opacity bg-muted/60 p-1.5 rounded-full"
             >
-              <Search className="w-[18px] h-[18px] text-muted-foreground" strokeWidth={2} />
+              <Search className="w-[18px] h-[18px] text-foreground" strokeWidth={2.5} />
             </button>
           </div>
         </div>
