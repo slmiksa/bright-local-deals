@@ -15,7 +15,7 @@ const GiveawaySection = () => {
   const { data: regions = [] } = useRegionsWithCities();
 
   const { data: giveaway } = useQuery({
-    queryKey: ["active_giveaway", city, selectionMode],
+    queryKey: ["active_giveaway", city, selectionMode, regionCities, regions.map(r => r.id).join(",")],
     queryFn: async () => {
       const { data } = await supabase
         .from("giveaways")
