@@ -25,7 +25,7 @@ const BannerSlider = () => {
   const autoplayPlugin = useRef(Autoplay({ delay: 4000, stopOnInteraction: false }));
 
   const { data: slides = [] } = useQuery({
-    queryKey: ["banner_slides", city, selectionMode, regionName],
+    queryKey: ["banner_slides", city, selectionMode, regionName, regionCities, regions.map(r => r.id).join(",")],
     queryFn: async () => {
       const { data } = await supabase
         .from("banner_slides")

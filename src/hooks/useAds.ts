@@ -149,9 +149,10 @@ async function fetchCities(): Promise<string[]> {
 // React Query hooks
 export function useAdsByCity(city: string, options?: { enabled?: boolean; cities?: string[] }) {
   const { data: regions = [] } = useRegionsWithCities();
+  const regionsKey = regions.map(r => r.id).join(",");
   const queryKey = options?.cities?.length
-    ? ["ads", "byRegionCities", ...options.cities]
-    : ["ads", "byCity", city];
+    ? ["ads", "byRegionCities", regionsKey, ...options.cities]
+    : ["ads", "byCity", city, regionsKey];
 
   return useQuery({
     queryKey,
@@ -193,7 +194,7 @@ export function useAdsByCity(city: string, options?: { enabled?: boolean; cities
 export function useFeaturedAds(city: string, cities?: string[]) {
   const { data: regions = [] } = useRegionsWithCities();
   return useQuery({
-    queryKey: cities?.length ? ["ads", "featured", "region", ...cities] : ["ads", "featured", city],
+    queryKey: cities?.length ? ["ads", "featured", "region", regions.length, ...cities] : ["ads", "featured", city, regions.length],
     queryFn: () => fetchAds(cities?.length ? { cities, featured: true, regions } : { city, featured: true, regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
@@ -205,7 +206,7 @@ export function useFeaturedAds(city: string, cities?: string[]) {
 export function useAdsByCategory(category: string, city: string, cities?: string[]) {
   const { data: regions = [] } = useRegionsWithCities();
   return useQuery({
-    queryKey: cities?.length ? ["ads", "category", category, "region", ...cities] : ["ads", "category", category, city],
+    queryKey: cities?.length ? ["ads", "category", category, "region", regions.length, ...cities] : ["ads", "category", category, city, regions.length],
     queryFn: () => fetchAds(cities?.length ? { cities, category, regions } : { city, category, regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
@@ -225,7 +226,7 @@ export function useAdById(id: number) {
 export function useEventAds(city: string, cities?: string[]) {
   const { data: regions = [] } = useRegionsWithCities();
   return useQuery({
-    queryKey: cities?.length ? ["ads", "events", "region", ...cities] : ["ads", "events", city],
+    queryKey: cities?.length ? ["ads", "events", "region", regions.length, ...cities] : ["ads", "events", city, regions.length],
     queryFn: () => fetchAds(cities?.length ? { cities, category: "events", regions } : { city, category: "events", regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
