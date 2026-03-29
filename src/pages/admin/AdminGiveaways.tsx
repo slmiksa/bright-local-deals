@@ -358,7 +358,11 @@ const AdminGiveaways = () => {
                       </Button>
                     </div>
                     <Button variant="secondary" size="sm" className="h-8 text-xs gap-1"
-                      onClick={() => { setShowEntries(g.id); setTimeout(() => randomWinner(g.id), 500); }}>
+                      onClick={() => {
+                        if (!confirm("هل أنت متأكد من إجراء السحب العشوائي؟")) return;
+                        setShowEntries(g.id);
+                        setTimeout(() => randomWinner(g.id), 500);
+                      }}>
                       <Shuffle className="w-3.5 h-3.5" /> سحب عشوائي
                     </Button>
                   </>
