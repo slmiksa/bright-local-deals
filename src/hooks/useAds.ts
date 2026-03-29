@@ -223,9 +223,10 @@ export function useAdById(id: number) {
 }
 
 export function useEventAds(city: string, cities?: string[]) {
+  const { data: regions = [] } = useRegionsWithCities();
   return useQuery({
     queryKey: cities?.length ? ["ads", "events", "region", ...cities] : ["ads", "events", city],
-    queryFn: () => fetchAds(cities?.length ? { cities, category: "events" } : { city, category: "events" }),
+    queryFn: () => fetchAds(cities?.length ? { cities, category: "events", regions } : { city, category: "events", regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
