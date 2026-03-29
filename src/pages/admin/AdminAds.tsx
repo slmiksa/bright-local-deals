@@ -359,6 +359,16 @@ const AdminAds = () => {
                   onChange={(val) => setForm(f => ({...f, city: val}))}
                 />
               </div>
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1">المدينة المعروضة على البطاقة (اختياري)</label>
+                <input
+                  value={form.display_city}
+                  onChange={(e) => setForm(f => ({...f, display_city: e.target.value}))}
+                  placeholder="مثال: القوز - حلي"
+                  className="w-full h-10 px-3 rounded-xl bg-background text-foreground text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">إذا تُرك فارغاً سيظهر الموقع الأصلي</p>
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-foreground mb-1">الهاتف</label>
