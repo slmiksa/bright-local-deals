@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Pencil, Trash2, X, Check, Search, Upload, Image as ImageIcon, CalendarIcon, Video, Play } from "lucide-react";
+import AdminLocationPicker from "@/components/admin/AdminLocationPicker";
 import { toast } from "@/hooks/use-toast";
 import { resolveImageUrl } from "@/data/imageMap";
 import { format } from "date-fns";
@@ -350,13 +351,10 @@ const AdminAds = () => {
                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">المدينة *</label>
-                  <select value={form.city} onChange={(e) => setForm(f => ({...f, city: e.target.value}))} className="w-full h-10 px-3 rounded-xl bg-background text-foreground text-sm border border-border appearance-none">
-                    <option value="">اختر</option>
-                    {cities.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
+                <AdminLocationPicker
+                  value={form.city}
+                  onChange={(val) => setForm(f => ({...f, city: val}))}
+                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
