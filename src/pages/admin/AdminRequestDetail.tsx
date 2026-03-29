@@ -186,6 +186,32 @@ const AdminRequestDetail = () => {
         </div>
       )}
 
+      {/* Location map */}
+      {(request as any).lat && (request as any).lng && (
+        <div>
+          <h2 className="text-[14px] font-bold text-foreground mb-2 flex items-center gap-1.5">
+            <MapPin className="w-4 h-4 text-primary" /> الموقع على الخريطة
+          </h2>
+          <div className="rounded-2xl overflow-hidden border border-border">
+            <iframe
+              width="100%"
+              height="200"
+              style={{ border: 0 }}
+              loading="lazy"
+              src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAR1EIyv5LLAB5x0S5WKVupz8TXSBH08oo&q=${(request as any).lat},${(request as any).lng}&zoom=15`}
+            />
+          </div>
+          <a
+            href={`https://www.google.com/maps?q=${(request as any).lat},${(request as any).lng}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 text-[12px] font-semibold text-primary hover:underline mt-2"
+          >
+            <MapPin className="w-3.5 h-3.5" /> فتح في خرائط Google
+          </a>
+        </div>
+      )}
+
       {lightboxIndex !== null && (
         <ImageLightbox
           images={allImageUrls}
