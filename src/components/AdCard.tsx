@@ -14,10 +14,11 @@ interface AdCardProps {
   offer: string;
   featured?: boolean;
   city?: string;
+  displayCity?: string;
   showCity?: boolean;
 }
 
-const AdCard = ({ id, images, media = [], shopName, offer, featured, city, showCity }: AdCardProps) => {
+const AdCard = ({ id, images, media = [], shopName, offer, featured, city, displayCity, showCity }: AdCardProps) => {
   const navigate = useNavigate();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [imgIndex, setImgIndex] = useState(0);
@@ -117,10 +118,10 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured, city, showC
         <div className="p-3 space-y-1.5">
           <div>
             <h3 className="font-bold text-sm text-foreground truncate leading-tight">{shopName}</h3>
-            {showCity && city && (
+            {showCity && (displayCity || city) && (
               <p className="text-[11px] text-muted-foreground truncate flex items-center gap-0.5 mt-0.5">
                 <MapPin className="w-3 h-3 shrink-0 text-primary/60" />
-                {city}
+                {displayCity || city}
               </p>
             )}
             <p className="text-[12px] text-muted-foreground mt-0.5 truncate leading-relaxed">{offer}</p>
