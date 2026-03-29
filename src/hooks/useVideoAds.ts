@@ -63,7 +63,7 @@ async function fetchVideoAds(opts?: { city?: string; cities?: string[]; regions?
 export function useVideoAds(city: string, cities?: string[]) {
   const { data: regions = [] } = useRegionsWithCities();
   return useQuery({
-    queryKey: cities?.length ? ["videoAds", "region", ...cities] : ["videoAds", city],
+    queryKey: cities?.length ? ["videoAds", "region", regions.length, ...cities] : ["videoAds", city, regions.length],
     queryFn: () => fetchVideoAds(cities?.length ? { cities, regions } : { city, regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
