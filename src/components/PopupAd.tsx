@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useCity } from "@/contexts/CityContext";
+import { useRegionsWithCities } from "@/hooks/useRegions";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -15,15 +16,15 @@ interface PopupAdData {
 const POPUP_SEEN_KEY = "lamha_popup_seen_cities";
 
 const PopupAd = () => {
-  const { city } = useCity();
+  const { city, selectionMode, regionCities } = useCity();
+  const { data: regions = [] } = useRegionsWithCities();
   const navigate = useNavigate();
   const [popup, setPopup] = useState<PopupAdData | null>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!city) return;
+    if (!city && selectionMode !== "region") return;
 
-    // Get set of already-seen keys
     const getSeenSet = (): Set<string> => {
       try {
         return new Set(JSON.parse(sessionStorage.getItem(POPUP_SEEN_KEY) || "[]"));
@@ -31,26 +32,37 @@ const PopupAd = () => {
     };
 
     const seen = getSeenSet();
-    // If this city was already seen, skip
-    if (seen.has(city)) return;
-    // If "all" popup was already shown, skip
+    const seenKey = selectionMode === "region" ? `region:${city}` : city;
+    if (seen.has(seenKey)) return;
     if (seen.has("__all__")) return;
 
     const fetchPopup = async () => {
       const { data } = await supabase
         .from("popup_ads")
         .select("id, image_url, link_url, link_type, city")
-        .in("city", [city, "all"])
         .eq("active", true);
 
-      if (data && data.length > 0) {
-        // Pick a random one
-        const random = data[Math.floor(Math.random() * data.length)];
+      if (!data || data.length === 0) return;
+
+      const userCities = selectionMode === "region" ? regionCities : [city];
+      const matching = data.filter((s: { city: string }) => {
+        if (s.city === "all") return true;
+        if (s.city.startsWith("region:")) {
+          const rName = s.city.replace("region:", "");
+          const region = regions.find(r => r.name === rName);
+          if (!region) return false;
+          const rCityNames = region.cities.map(c => c.name);
+          return userCities.some(uc => rCityNames.includes(uc));
+        }
+        return userCities.includes(s.city);
+      });
+
+      if (matching.length > 0) {
+        const random = matching[Math.floor(Math.random() * matching.length)];
         setPopup(random as PopupAdData);
         setVisible(true);
-        // Mark as seen
         const updated = getSeenSet();
-        updated.add(city);
+        updated.add(seenKey);
         if ((random as any).city === "all") updated.add("__all__");
         sessionStorage.setItem(POPUP_SEEN_KEY, JSON.stringify([...updated]));
       }
@@ -58,7 +70,7 @@ const PopupAd = () => {
 
     const timer = setTimeout(fetchPopup, 800);
     return () => clearTimeout(timer);
-  }, [city]);
+  }, [city, selectionMode, regionCities, regions]);
 
   const handleClose = () => setVisible(false);
 

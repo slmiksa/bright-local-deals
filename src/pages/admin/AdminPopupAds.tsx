@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Trash2, X, Check, Upload, MonitorSmartphone, ExternalLink, Link2, Pencil } from "lucide-react";
+import { useRegionsWithCities } from "@/hooks/useRegions";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -19,7 +20,7 @@ interface PopupAd {
 
 const AdminPopupAds = () => {
   const [items, setItems] = useState<PopupAd[]>([]);
-  const [cities, setCities] = useState<string[]>([]);
+  const { data: regions = [] } = useRegionsWithCities();
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -38,9 +39,6 @@ const AdminPopupAds = () => {
 
   useEffect(() => {
     fetchItems();
-    supabase.from("cities").select("name").order("sort_order").then(({ data }) => {
-      setCities((data || []).map(c => c.name));
-    });
   }, [fetchItems]);
 
   const resetForm = () => {
@@ -192,13 +190,20 @@ const AdminPopupAds = () => {
             )}
           </div>
 
-          {/* City */}
+          {/* City / Region */}
           <div>
-            <label className="block text-xs font-bold text-foreground mb-1">المدينة *</label>
+            <label className="block text-xs font-bold text-foreground mb-1">الموقع *</label>
             <select value={form.city} onChange={(e) => setForm(f => ({ ...f, city: e.target.value }))} className={`${inputClass} appearance-none`}>
-              <option value="">اختر المدينة</option>
+              <option value="">اختر الموقع</option>
               <option value="all">جميع المدن</option>
-              {cities.map(c => <option key={c} value={c}>{c}</option>)}
+              {regions.map(r => (
+                <optgroup key={r.id} label={r.name}>
+                  <option value={`region:${r.name}`}>كل مدن {r.name}</option>
+                  {r.cities.map(c => (
+                    <option key={c.id} value={c.name}>{c.name}</option>
+                  ))}
+                </optgroup>
+              ))}
             </select>
           </div>
 
@@ -256,7 +261,7 @@ const AdminPopupAds = () => {
               <img src={item.image_url} alt="" className="w-20 h-20 rounded-xl object-cover shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-bold text-foreground">{item.city === "all" ? "جميع المدن" : item.city}</span>
+                  <span className="text-sm font-bold text-foreground">{item.city === "all" ? "جميع المدن" : item.city.startsWith("region:") ? `كل مدن ${item.city.replace("region:", "")}` : item.city}</span>
                   <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${item.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
                     {item.active ? "مفعّل" : "معطّل"}
                   </span>
