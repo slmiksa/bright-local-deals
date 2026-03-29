@@ -5,22 +5,42 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useCity } from "@/contexts/CityContext";
+import { useRegionsWithCities } from "@/hooks/useRegions";
 
 const GiveawaySection = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { city, selectionMode, regionCities } = useCity();
+  const { data: regions = [] } = useRegionsWithCities();
 
   const { data: giveaway } = useQuery({
-    queryKey: ["active_giveaway"],
+    queryKey: ["active_giveaway", city, selectionMode],
     queryFn: async () => {
       const { data } = await supabase
         .from("giveaways")
         .select("*")
         .eq("active", true)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return data;
+        .order("created_at", { ascending: false });
+
+      if (!data || data.length === 0) return null;
+
+      const userCities = selectionMode === "region" ? regionCities : [city];
+      const matching = data.filter((g: any) => {
+        const gCity = g.city || "all";
+        if (gCity === "all") return true;
+        if (gCity.startsWith("region:")) {
+          const rName = gCity.replace("region:", "");
+          const region = regions.find(r => r.name === rName);
+          if (!region) return false;
+          const rCityNames = region.cities.map(c => c.name);
+          return userCities.some(uc => rCityNames.includes(uc));
+        }
+        const gCities = gCity.split(",").map((c: string) => c.trim());
+        return userCities.some(uc => gCities.includes(uc));
+      });
+
+      return matching.length > 0 ? matching[0] : null;
     },
     staleTime: 1000 * 60 * 2,
   });

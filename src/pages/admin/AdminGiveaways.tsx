@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Gift, Trophy, Users, Trash2, Shuffle, Plus, Upload, Search } from "lucide-react";
+import AdminLocationPicker from "@/components/admin/AdminLocationPicker";
 
 const AdminGiveaways = () => {
   const { toast } = useToast();
@@ -17,7 +18,7 @@ const AdminGiveaways = () => {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "", prize: "", end_date: "", snapchat_url: "",
-    sponsor_name: "", sponsor_logo_url: "", sponsor_url: "",
+    sponsor_name: "", sponsor_logo_url: "", sponsor_url: "", city: "all",
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showEntries, setShowEntries] = useState<string | null>(null);
@@ -89,6 +90,7 @@ const AdminGiveaways = () => {
         sponsor_logo_url: logoUrl || null,
         sponsor_url: form.sponsor_url || null,
         sponsor_link_type: sponsorLinkType,
+        city: form.city || "all",
       };
 
       if (editId) {
@@ -154,7 +156,7 @@ const AdminGiveaways = () => {
   const resetForm = () => {
     setShowForm(false);
     setEditId(null);
-    setForm({ title: "", prize: "", end_date: "", snapchat_url: "", sponsor_name: "", sponsor_logo_url: "", sponsor_url: "" });
+    setForm({ title: "", prize: "", end_date: "", snapchat_url: "", sponsor_name: "", sponsor_logo_url: "", sponsor_url: "", city: "all" });
     setLogoFile(null);
     setSponsorLinkType("external");
     setAdSearch("");
@@ -172,6 +174,7 @@ const AdminGiveaways = () => {
       sponsor_name: g.sponsor_name || "",
       sponsor_logo_url: g.sponsor_logo_url || "",
       sponsor_url: url,
+      city: g.city || "all",
     });
     setShowForm(true);
   };
@@ -207,6 +210,9 @@ const AdminGiveaways = () => {
               <div className="space-y-1.5">
                 <Label>رابط سناب شات</Label>
                 <Input value={form.snapchat_url} onChange={e => setForm(f => ({ ...f, snapchat_url: e.target.value }))} placeholder="https://snapchat.com/..." dir="ltr" />
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <AdminLocationPicker value={form.city} onChange={(v) => setForm(f => ({ ...f, city: v }))} />
               </div>
             </div>
 
@@ -308,6 +314,7 @@ const AdminGiveaways = () => {
                   <p className="text-sm text-muted-foreground">الجائزة: {g.prize}</p>
                   <p className="text-xs text-muted-foreground">
                     الموعد: {new Date(g.end_date).toLocaleString("ar-SA")}
+                    {" · "}الموقع: {g.city === "all" ? "جميع المدن" : g.city?.startsWith("region:") ? `كل مدن ${g.city.replace("region:", "")}` : g.city?.includes(",") ? `${g.city.split(",").length} مدن محددة` : g.city || "جميع المدن"}
                   </p>
                   {g.sponsor_name && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">

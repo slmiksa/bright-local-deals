@@ -437,6 +437,7 @@ export type Database = {
       giveaways: {
         Row: {
           active: boolean
+          city: string
           created_at: string
           end_date: string
           id: string
@@ -451,6 +452,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          city?: string
           created_at?: string
           end_date: string
           id?: string
@@ -465,6 +467,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          city?: string
           created_at?: string
           end_date?: string
           id?: string

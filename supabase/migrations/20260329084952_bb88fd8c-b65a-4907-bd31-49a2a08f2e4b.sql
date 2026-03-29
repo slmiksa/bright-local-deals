@@ -1,0 +1,1 @@
+ALTER TABLE public.giveaways ADD COLUMN city text NOT NULL DEFAULT 'all';
