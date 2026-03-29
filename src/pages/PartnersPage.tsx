@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 type Partner = {
   id: string;
   name: string;
+  description: string;
   logo_url: string;
 };
 
@@ -48,11 +49,22 @@ const PartnersPage = () => {
         ) : partners.length === 0 ? (
           <p className="text-center text-muted-foreground text-sm py-8">لا يوجد شركاء حالياً</p>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
             {partners.map((partner) => (
-              <div key={partner.id} className="flex flex-col items-center gap-3 p-4 bg-card rounded-2xl border border-border">
-                <img src={partner.logo_url} alt={partner.name} className="w-20 h-20 rounded-xl object-contain bg-background p-2" />
-                <p className="text-[13px] font-bold text-foreground text-center leading-tight">{partner.name}</p>
+              <div key={partner.id} className="bg-card rounded-2xl border border-border overflow-hidden">
+                <div className="aspect-[16/9] w-full">
+                  <img
+                    src={partner.logo_url}
+                    alt={partner.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-4 text-right">
+                  <p className="text-[14px] font-bold text-foreground">{partner.name}</p>
+                  {partner.description && (
+                    <p className="text-[12px] text-muted-foreground mt-1 leading-relaxed whitespace-pre-line">{partner.description}</p>
+                  )}
+                </div>
               </div>
             ))}
           </div>
