@@ -27,7 +27,7 @@ const TopBar = () => {
             {/* Logo - center */}
             <div className="flex-1 flex flex-col items-center justify-center">
               <span className="text-[16px] font-black text-foreground leading-none">لمحة</span>
-              <span className="text-[10px] text-muted-foreground font-medium leading-none mt-0.5">lamha</span>
+              <span className="text-[10px] text-muted-foreground font-medium leading-none mt-0.5">Lamha Ads</span>
             </div>
 
             {/* Search - left side */}
