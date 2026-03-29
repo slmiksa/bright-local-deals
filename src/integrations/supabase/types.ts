@@ -495,6 +495,33 @@ export type Database = {
         }
         Relationships: []
       }
+      success_partners: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          logo_url: string
+          name: string
+          sort_order: number | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          logo_url: string
+          name: string
+          sort_order?: number | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          logo_url?: string
+          name?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       support_contacts: {
         Row: {
           active: boolean
