@@ -5,43 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Capacitor } from "@capacitor/core";
 
-type Partner = {
-  id: string;
-  name: string;
-  logo_url: string;
-  active: boolean;
-};
-
-const SuccessPartnersSection = () => {
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    supabase.from("success_partners").select("*").eq("active", true).order("sort_order").then(({ data }) => {
-      if (data) setPartners(data as Partner[]);
-    });
-  }, []);
-
-  if (partners.length === 0) return null;
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2 px-1">
-        <Handshake className="w-5 h-5 text-primary" />
-        <h3 className="text-[15px] font-bold text-foreground">شركاء النجاح</h3>
-      </div>
-      <div className="grid grid-cols-3 gap-3">
-        {partners.map((partner) => (
-          <div key={partner.id} className="flex flex-col items-center gap-2 p-3 bg-card rounded-2xl border border-border">
-            <img src={partner.logo_url} alt={partner.name} className="w-14 h-14 rounded-xl object-contain bg-background p-1" />
-            <p className="text-[11px] font-bold text-foreground text-center leading-tight">{partner.name}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 type SupportContact = {
   id: string;
   title: string;
@@ -132,8 +95,18 @@ const SupportPage = () => {
           </div>
         </button>
 
-        {/* Success Partners */}
-        <SuccessPartnersSection />
+        {/* Success Partners Button */}
+        <button
+          onClick={() => navigate("/partners")}
+          className="w-full flex items-center gap-4 p-4 bg-card rounded-2xl border border-border active:scale-[0.98] transition-transform">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-amber-500/10 text-amber-600">
+            <Handshake className="w-6 h-6" />
+          </div>
+          <div className="text-right flex-1">
+            <p className="text-[14px] font-bold text-foreground">شركاء النجاح</p>
+            <p className="text-[12px] text-muted-foreground">تعرّف على شركائنا في النجاح</p>
+          </div>
+        </button>
 
         {/* App Store Download - Web Only */}
         {!Capacitor.isNativePlatform() && (
