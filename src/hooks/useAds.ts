@@ -76,7 +76,7 @@ function mapDbAdToAd(dbAd: DbAd): Ad {
     featured: dbAd.featured || false,
     category: dbAd.category,
     city: dbAd.city,
-    displayCity: dbAd.display_city || dbAd.city,
+    displayCity: dbAd.display_city || "",
     phone: dbAd.phone || "",
     description: dbAd.description || "",
     lat: dbAd.lat || 0,
