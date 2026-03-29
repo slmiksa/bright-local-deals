@@ -1,9 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, Star, Sparkles, MapPin, Store, Tag, DollarSign, Clock, Image as ImageIcon, Play, Phone, Download } from "lucide-react";
+import { ArrowRight, Star, Sparkles, MapPin, Store, Tag, DollarSign, Clock, Image as ImageIcon, Play, Phone, Download, Map } from "lucide-react";
 import { useState, useCallback } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
+import { useRegionsWithCities } from "@/hooks/useRegions";
 
 const forceDownload = async (url: string, filename: string) => {
   try {
@@ -26,6 +27,7 @@ const AdminRequestDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const { data: regions = [] } = useRegionsWithCities();
 
   const { data: request, isLoading } = useQuery({
     queryKey: ["admin-request-detail", id],
@@ -96,15 +98,21 @@ const AdminRequestDetail = () => {
       </div>
 
       {/* Info cards */}
-      <div className="grid grid-cols-2 gap-3">
-        <InfoCard icon={Store} label="اسم المتجر" value={request.store_name} />
-        <InfoCard icon={Tag} label="نوع الإعلان" value={request.ad_type} />
-        <InfoCard icon={request.ad_tier === "متميز" ? Sparkles : Star} label="فئة الإعلان" value={request.ad_tier} />
-        <InfoCard icon={MapPin} label="المدينة" value={request.city} />
-        <InfoCard icon={Phone} label="رقم التواصل" value={(request as any).phone || "غير محدد"} />
-        <InfoCard icon={DollarSign} label="السعر" value={`${request.total_price} ريال`} highlight />
-        <InfoCard icon={Clock} label="الحالة" value={statusLabels[request.status] || request.status} />
-      </div>
+      {(() => {
+        const regionForCity = regions.find(r => r.cities.some(c => c.name === request.city));
+        return (
+          <div className="grid grid-cols-2 gap-3">
+            <InfoCard icon={Store} label="اسم المتجر" value={request.store_name} />
+            <InfoCard icon={Tag} label="نوع الإعلان" value={request.ad_type} />
+            <InfoCard icon={request.ad_tier === "متميز" ? Sparkles : Star} label="فئة الإعلان" value={request.ad_tier} />
+            <InfoCard icon={Map} label="المنطقة" value={regionForCity?.name || "غير محددة"} />
+            <InfoCard icon={MapPin} label="المدينة" value={request.city} />
+            <InfoCard icon={Phone} label="رقم التواصل" value={(request as any).phone || "غير محدد"} />
+            <InfoCard icon={DollarSign} label="السعر" value={`${request.total_price} ريال`} highlight />
+            <InfoCard icon={Clock} label="الحالة" value={statusLabels[request.status] || request.status} />
+          </div>
+        );
+      })()}
 
       {/* Download all button */}
       {images.length > 0 && (
