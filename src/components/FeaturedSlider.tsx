@@ -18,7 +18,7 @@ const FeaturedSlider = () => {
     firstMedia: ad.media?.[0] || null,
     title: ad.offer,
     subtitle: ad.shopName,
-    city: ad.city,
+    city: ad.displayCity || ad.city,
   }));
 
   const handleScroll = () => {
