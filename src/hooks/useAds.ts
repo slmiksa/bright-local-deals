@@ -82,7 +82,7 @@ function mapDbAdToAd(dbAd: DbAd): Ad {
   };
 }
 
-async function fetchAds(city?: string, category?: string, featured?: boolean): Promise<Ad[]> {
+async function fetchAds(opts?: { city?: string; cities?: string[]; category?: string; featured?: boolean }): Promise<Ad[]> {
   const now = new Date().toISOString();
   let query = supabase
     .from("ads")
@@ -94,9 +94,13 @@ async function fetchAds(city?: string, category?: string, featured?: boolean): P
   // Filter out expired ads: end_date is null (no expiry) or in the future
   query = query.or(`end_date.is.null,end_date.gte.${now}`);
 
-  if (city) query = query.eq("city", city);
-  if (category) query = query.eq("category", category);
-  if (featured) query = query.eq("featured", true);
+  if (opts?.cities && opts.cities.length > 0) {
+    query = query.in("city", opts.cities);
+  } else if (opts?.city) {
+    query = query.eq("city", opts.city);
+  }
+  if (opts?.category) query = query.eq("category", opts.category);
+  if (opts?.featured) query = query.eq("featured", true);
 
   const { data, error } = await query;
   if (error) throw error;
@@ -125,12 +129,16 @@ async function fetchCities(): Promise<string[]> {
 }
 
 // React Query hooks
-export function useAdsByCity(city: string, options?: { enabled?: boolean }) {
+export function useAdsByCity(city: string, options?: { enabled?: boolean; cities?: string[] }) {
+  const queryKey = options?.cities?.length
+    ? ["ads", "byRegionCities", ...options.cities]
+    : ["ads", "byCity", city];
+
   return useQuery({
-    queryKey: ["ads", "byCity", city],
+    queryKey,
     queryFn: async () => {
       const [ads, categoriesResult] = await Promise.all([
-        fetchAds(city),
+        fetchAds(options?.cities?.length ? { cities: options.cities } : { city }),
         supabase.from("categories").select("id, name").order("sort_order"),
       ]);
 
@@ -154,7 +162,7 @@ export function useAdsByCity(city: string, options?: { enabled?: boolean }) {
 
       return sections;
     },
-    enabled: (options?.enabled ?? true) && !!city,
+    enabled: (options?.enabled ?? true) && (!!city || (options?.cities?.length ?? 0) > 0),
     placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
@@ -163,22 +171,22 @@ export function useAdsByCity(city: string, options?: { enabled?: boolean }) {
   });
 }
 
-export function useFeaturedAds(city: string) {
+export function useFeaturedAds(city: string, cities?: string[]) {
   return useQuery({
-    queryKey: ["ads", "featured", city],
-    queryFn: () => fetchAds(city, undefined, true),
-    enabled: !!city,
+    queryKey: cities?.length ? ["ads", "featured", "region", ...cities] : ["ads", "featured", city],
+    queryFn: () => fetchAds(cities?.length ? { cities, featured: true } : { city, featured: true }),
+    enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
     refetchOnWindowFocus: false,
   });
 }
 
-export function useAdsByCategory(category: string, city: string) {
+export function useAdsByCategory(category: string, city: string, cities?: string[]) {
   return useQuery({
-    queryKey: ["ads", "category", category, city],
-    queryFn: () => fetchAds(city, category),
-    enabled: !!city,
+    queryKey: cities?.length ? ["ads", "category", category, "region", ...cities] : ["ads", "category", category, city],
+    queryFn: () => fetchAds(cities?.length ? { cities, category } : { city, category }),
+    enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
     refetchOnWindowFocus: false,
@@ -193,11 +201,11 @@ export function useAdById(id: number) {
   });
 }
 
-export function useEventAds(city: string) {
+export function useEventAds(city: string, cities?: string[]) {
   return useQuery({
-    queryKey: ["ads", "events", city],
-    queryFn: () => fetchAds(city, "events"),
-    enabled: !!city,
+    queryKey: cities?.length ? ["ads", "events", "region", ...cities] : ["ads", "events", city],
+    queryFn: () => fetchAds(cities?.length ? { cities, category: "events" } : { city, category: "events" }),
+    enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
     refetchOnWindowFocus: false,
