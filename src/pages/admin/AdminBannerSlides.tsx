@@ -277,7 +277,7 @@ const AdminBannerSlides = () => {
               <img src={item.image_url} alt="" className="w-24 h-16 rounded-xl object-cover shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-bold text-foreground">{item.city === "all" ? "جميع المدن" : item.city}</span>
+                  <span className="text-sm font-bold text-foreground">{item.city === "all" ? "جميع المدن" : item.city.startsWith("region:") ? `كل مدن ${item.city.replace("region:", "")}` : item.city}</span>
                   <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${item.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
                     {item.active ? "مفعّل" : "معطّل"}
                   </span>
