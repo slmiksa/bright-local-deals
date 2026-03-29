@@ -17,7 +17,8 @@ const FeaturedSlider = () => {
     image: ad.images[0] || null,
     firstMedia: ad.media?.[0] || null,
     title: ad.offer,
-    subtitle: ad.shopName
+    subtitle: ad.shopName,
+    city: ad.city,
   }));
 
   const handleScroll = () => {
