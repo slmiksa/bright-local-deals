@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef } from "react";
 import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlus, X, Camera, Loader2, CheckCircle, Mail, Video, Play } from "lucide-react";
+import LocationPicker from "@/components/LocationPicker";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { useCities } from "@/hooks/useAds";
@@ -81,6 +82,8 @@ const AddAdPage = () => {
   const [mainImage, setMainImage] = useState<{ file: File; preview: string } | null>(null);
   const [extraImages, setExtraImages] = useState<{ file: File; preview: string }[]>([]);
   const [videos, setVideos] = useState<{ file: File; preview: string }[]>([]);
+  const [mapLat, setMapLat] = useState<number | null>(null);
+  const [mapLng, setMapLng] = useState<number | null>(null);
   const mainInputRef = useRef<HTMLInputElement>(null);
   const extraInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -187,6 +190,8 @@ const AddAdPage = () => {
           phone,
           total_price: totalPrice ?? 0,
           email: wantsEmail ? email : null,
+          lat: mapLat,
+          lng: mapLng,
         } as any)
         .select("id, order_number")
         .single();
@@ -411,7 +416,19 @@ const AddAdPage = () => {
               {cities.map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
-            </select>
+          </select>
+          </div>
+
+          {/* Location picker */}
+          <div>
+            <label className="block text-[13px] font-bold text-foreground mb-1.5">
+              الموقع على الخريطة <span className="text-[11px] text-muted-foreground font-normal">(اختياري)</span>
+            </label>
+            <LocationPicker
+              lat={mapLat}
+              lng={mapLng}
+              onChange={(lat, lng) => { setMapLat(lat); setMapLng(lng); }}
+            />
           </div>
 
           {/* Main image */}
