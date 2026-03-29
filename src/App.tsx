@@ -39,6 +39,7 @@ import AdminRequestDetail from "./pages/admin/AdminRequestDetail";
 import AdminPopupAds from "./pages/admin/AdminPopupAds";
 import AdminBannerSlides from "./pages/admin/AdminBannerSlides";
 import AdminSupport from "./pages/admin/AdminSupport";
+import AdminPartners from "./pages/admin/AdminPartners";
 import PopupAd from "./components/PopupAd";
 import AppStoreBanner from "./components/AppStoreBanner";
 import ForceUpdateModal from "./components/ForceUpdateModal";
@@ -133,6 +134,7 @@ const App = () => {
                   <Route path="popup-ads" element={<AdminPopupAds />} />
                   <Route path="banner-slides" element={<AdminBannerSlides />} />
                   <Route path="support" element={<AdminSupport />} />
+                  <Route path="partners" element={<AdminPartners />} />
                   <Route path="app-version" element={<AdminAppVersion />} />
                   <Route path="giveaways" element={<AdminGiveaways />} />
                 </Route>
