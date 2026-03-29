@@ -1,0 +1,1 @@
+ALTER TABLE public.success_partners ADD COLUMN description text DEFAULT '';
