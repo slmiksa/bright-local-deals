@@ -12,39 +12,34 @@ const TopBar = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 max-w-[430px] mx-auto bg-primary border-b border-border" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-        <div className="px-5 py-3.5 flex items-center justify-between bg-card">
-          <button
-            onClick={() => setShowCities(true)}
-            className="flex items-center gap-2.5 active:opacity-70 transition-opacity">
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-              <MapPin className="w-[18px] h-[18px] text-primary-foreground" />
-            </div>
-            <div>
-              <p className="text-[11px] text-muted-foreground font-medium leading-none mb-0.5">موقعك الحالي</p>
-              <div className="flex items-center gap-1">
-                <h1 className="text-base font-bold text-foreground leading-tight">{city}</h1>
-                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-              </div>
-            </div>
-          </button>
+      <header className="fixed top-0 left-0 right-0 z-50 max-w-[430px] mx-auto bg-primary" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+        <div className="px-3 py-2.5">
+          <div className="flex items-center bg-card rounded-2xl shadow-sm px-3 py-2 gap-2">
+            {/* City selector - right side */}
+            <button
+              onClick={() => setShowCities(true)}
+              className="flex items-center gap-1.5 active:opacity-70 transition-opacity shrink-0">
+              <MapPin className="w-[18px] h-[18px] text-foreground" strokeWidth={2} />
+              <span className="text-[14px] font-bold text-foreground leading-tight">{city}</span>
+              <ChevronDown className="w-3 h-3 text-muted-foreground" />
+            </button>
 
-          <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center">
-            <span className="text-lg font-black text-foreground leading-none">لمحة</span>
-            <span className="text-[18px] leading-none mt-0.5">👓</span>
-          </div>
+            {/* Logo - center */}
+            <div className="flex-1 flex flex-col items-center justify-center">
+              <span className="text-[16px] font-black text-foreground leading-none">لمحة</span>
+              <span className="text-[10px] text-muted-foreground font-medium leading-none mt-0.5">lamha</span>
+            </div>
 
-          <div className="flex items-center gap-2">
+            {/* Search - left side */}
             <button
               onClick={() => navigate("/search")}
-              className="touch-target flex items-center justify-center w-10 h-10 rounded-xl bg-primary transition-colors active:opacity-80"
+              className="shrink-0 active:opacity-70 transition-opacity"
             >
-              <Search className="w-[18px] h-[18px] text-primary-foreground" />
+              <Search className="w-[18px] h-[18px] text-muted-foreground" strokeWidth={2} />
             </button>
           </div>
         </div>
       </header>
-
 
       {showCities && (
         <div className="fixed inset-0 z-[100]" onClick={() => setShowCities(false)}>
