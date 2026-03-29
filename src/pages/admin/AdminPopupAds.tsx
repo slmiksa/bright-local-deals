@@ -103,7 +103,9 @@ const AdminPopupAds = () => {
       imageUrl = urlData.publicUrl;
     }
 
-    const payload: Record<string, unknown> = {
+    const payload: {
+      city: string; link_url: string | null; link_type: string; active: boolean; image_url?: string;
+    } = {
       city: form.city,
       link_url: form.link_url.trim() || null,
       link_type: form.link_type,
@@ -122,8 +124,8 @@ const AdminPopupAds = () => {
       }
     } else {
       if (!imageUrl) { setSaving(false); return; }
-      payload.image_url = imageUrl;
-      const { error } = await supabase.from("popup_ads").insert(payload);
+      const insertPayload = { ...payload, image_url: imageUrl };
+      const { error } = await supabase.from("popup_ads").insert(insertPayload);
       if (error) {
         toast({ title: "خطأ", description: error.message, variant: "destructive" });
       } else {
