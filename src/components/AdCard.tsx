@@ -118,7 +118,7 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured, city, displ
         <div className="p-3 space-y-1.5">
           <div>
             <h3 className="font-bold text-sm text-foreground truncate leading-tight">{shopName}</h3>
-            {showCity && (displayCity || city) && (
+            {(displayCity || (showCity && city)) && (
               <p className="text-[11px] text-muted-foreground truncate flex items-center gap-0.5 mt-0.5">
                 <MapPin className="w-3 h-3 shrink-0 text-primary/60" />
                 {displayCity || city}
