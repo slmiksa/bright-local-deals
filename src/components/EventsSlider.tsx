@@ -3,7 +3,6 @@ import { ChevronLeft, PartyPopper } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEventAds } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
-import ImageLightbox from "./ImageLightbox";
 
 const EventsSlider = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
