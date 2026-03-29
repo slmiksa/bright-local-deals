@@ -148,6 +148,7 @@ async function fetchCities(): Promise<string[]> {
 
 // React Query hooks
 export function useAdsByCity(city: string, options?: { enabled?: boolean; cities?: string[] }) {
+  const { data: regions = [] } = useRegionsWithCities();
   const queryKey = options?.cities?.length
     ? ["ads", "byRegionCities", ...options.cities]
     : ["ads", "byCity", city];
@@ -156,7 +157,7 @@ export function useAdsByCity(city: string, options?: { enabled?: boolean; cities
     queryKey,
     queryFn: async () => {
       const [ads, categoriesResult] = await Promise.all([
-        fetchAds(options?.cities?.length ? { cities: options.cities } : { city }),
+        fetchAds(options?.cities?.length ? { cities: options.cities, regions } : { city, regions }),
         supabase.from("categories").select("id, name").order("sort_order"),
       ]);
 
@@ -190,9 +191,10 @@ export function useAdsByCity(city: string, options?: { enabled?: boolean; cities
 }
 
 export function useFeaturedAds(city: string, cities?: string[]) {
+  const { data: regions = [] } = useRegionsWithCities();
   return useQuery({
     queryKey: cities?.length ? ["ads", "featured", "region", ...cities] : ["ads", "featured", city],
-    queryFn: () => fetchAds(cities?.length ? { cities, featured: true } : { city, featured: true }),
+    queryFn: () => fetchAds(cities?.length ? { cities, featured: true, regions } : { city, featured: true, regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
@@ -201,9 +203,10 @@ export function useFeaturedAds(city: string, cities?: string[]) {
 }
 
 export function useAdsByCategory(category: string, city: string, cities?: string[]) {
+  const { data: regions = [] } = useRegionsWithCities();
   return useQuery({
     queryKey: cities?.length ? ["ads", "category", category, "region", ...cities] : ["ads", "category", category, city],
-    queryFn: () => fetchAds(cities?.length ? { cities, category } : { city, category }),
+    queryFn: () => fetchAds(cities?.length ? { cities, category, regions } : { city, category, regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
