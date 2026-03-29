@@ -61,9 +61,8 @@ const PopupAd = () => {
         const random = matching[Math.floor(Math.random() * matching.length)];
         setPopup(random as PopupAdData);
         setVisible(true);
-        // Mark as seen
         const updated = getSeenSet();
-        updated.add(city);
+        updated.add(seenKey);
         if ((random as any).city === "all") updated.add("__all__");
         sessionStorage.setItem(POPUP_SEEN_KEY, JSON.stringify([...updated]));
       }
@@ -71,7 +70,7 @@ const PopupAd = () => {
 
     const timer = setTimeout(fetchPopup, 800);
     return () => clearTimeout(timer);
-  }, [city]);
+  }, [city, selectionMode, regionCities, regions]);
 
   const handleClose = () => setVisible(false);
 
