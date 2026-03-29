@@ -9,7 +9,7 @@ export interface VideoAd {
   offer: string;
 }
 
-async function fetchVideoAds(city?: string): Promise<VideoAd[]> {
+async function fetchVideoAds(opts?: { city?: string; cities?: string[] }): Promise<VideoAd[]> {
   const now = new Date().toISOString();
   let query = supabase
     .from("ads")
@@ -19,7 +19,11 @@ async function fetchVideoAds(city?: string): Promise<VideoAd[]> {
     .or(`end_date.is.null,end_date.gte.${now}`)
     .order("created_at", { ascending: false });
 
-  if (city) query = query.eq("city", city);
+  if (opts?.cities && opts.cities.length > 0) {
+    query = query.in("city", opts.cities);
+  } else if (opts?.city) {
+    query = query.eq("city", opts.city);
+  }
 
   const { data, error } = await query;
   if (error) throw error;
@@ -42,11 +46,11 @@ async function fetchVideoAds(city?: string): Promise<VideoAd[]> {
   return results;
 }
 
-export function useVideoAds(city: string) {
+export function useVideoAds(city: string, cities?: string[]) {
   return useQuery({
-    queryKey: ["videoAds", city],
-    queryFn: () => fetchVideoAds(city),
-    enabled: !!city,
+    queryKey: cities?.length ? ["videoAds", "region", ...cities] : ["videoAds", city],
+    queryFn: () => fetchVideoAds(cities?.length ? { cities } : { city }),
+    enabled: !!city || (cities?.length ?? 0) > 0,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
     refetchOnWindowFocus: false,

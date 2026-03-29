@@ -44,8 +44,9 @@ const SHARE_DOMAIN = "https://lamha.trndsky.com";
 const GalleryPage = () => {
   const navigate = useNavigate();
   const { adId: paramAdId } = useParams<{ adId?: string }>();
-  const { city } = useCity();
-  const { data: videos = [], isLoading } = useVideoAds(city);
+  const { city, selectionMode, regionCities } = useCity();
+  const isRegionMode = selectionMode === "region";
+  const { data: videos = [], isLoading } = useVideoAds(isRegionMode ? "" : city, isRegionMode ? regionCities : undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
