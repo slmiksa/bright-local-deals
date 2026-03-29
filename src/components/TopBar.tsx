@@ -3,7 +3,6 @@ import { useCity } from "@/contexts/CityContext";
 import { useCities } from "@/hooks/useAds";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import lamhaLogo from "@/assets/lamha-logo.png";
 
 const TopBar = () => {
   const { city, setCity } = useCity();
