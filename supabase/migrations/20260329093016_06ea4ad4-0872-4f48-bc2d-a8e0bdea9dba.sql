@@ -1,0 +1,1 @@
+ALTER TABLE public.ads ADD COLUMN display_city text DEFAULT NULL;
