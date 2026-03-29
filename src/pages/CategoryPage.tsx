@@ -19,9 +19,10 @@ const categoryIcons: Record<string, React.ElementType> = {
 const CategoryPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { city } = useCity();
+  const { city, selectionMode, regionCities } = useCity();
+  const isRegionMode = selectionMode === "region";
 
-  const { data: ads = [], isLoading } = useAdsByCategory(id || "", city);
+  const { data: ads = [], isLoading } = useAdsByCategory(id || "", isRegionMode ? "" : city, isRegionMode ? regionCities : undefined);
   const { data: category } = useQuery({
     queryKey: ["category", id],
     queryFn: async () => {

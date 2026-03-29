@@ -5,8 +5,9 @@ import { useCity } from "@/contexts/CityContext";
 import PullToRefresh from "@/components/PullToRefresh";
 
 const FeaturedPage = () => {
-  const { city } = useCity();
-  const { data: featured = [], isLoading } = useFeaturedAds(city);
+  const { city, selectionMode, regionCities } = useCity();
+  const isRegionMode = selectionMode === "region";
+  const { data: featured = [], isLoading } = useFeaturedAds(isRegionMode ? "" : city, isRegionMode ? regionCities : undefined);
 
   return (
     <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto">

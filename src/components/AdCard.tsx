@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Phone, Images, Eye, Heart } from "lucide-react";
+import { Phone, Images, Eye, Heart, MapPin } from "lucide-react";
 import ImageLightbox from "./ImageLightbox";
 import VideoThumbnail from "./VideoThumbnail";
 import { useAdStats } from "@/hooks/useAdStats";
@@ -13,9 +13,11 @@ interface AdCardProps {
   shopName: string;
   offer: string;
   featured?: boolean;
+  city?: string;
+  showCity?: boolean;
 }
 
-const AdCard = ({ id, images, media = [], shopName, offer, featured }: AdCardProps) => {
+const AdCard = ({ id, images, media = [], shopName, offer, featured, city, showCity }: AdCardProps) => {
   const navigate = useNavigate();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [imgIndex, setImgIndex] = useState(0);
@@ -110,6 +112,11 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured }: AdCardPro
         </div>
         <div className="p-3">
           <h3 className="font-bold text-[13px] text-foreground truncate">{shopName}</h3>
+          {showCity && city && (
+            <p className="text-[10px] text-muted-foreground truncate flex items-center gap-0.5">
+              <MapPin className="w-2.5 h-2.5 inline-block" />{city}
+            </p>
+          )}
           <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{offer}</p>
           
           {/* Stats Row */}

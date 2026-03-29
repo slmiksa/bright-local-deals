@@ -5,9 +5,13 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 const SearchPage = () => {
-  const { city } = useCity();
+  const { city, selectionMode, regionCities } = useCity();
+  const isRegionMode = selectionMode === "region";
   const [query, setQuery] = useState("");
-  const { data: sections = [] } = useAdsByCity(city);
+  const { data: sections = [] } = useAdsByCity(
+    isRegionMode ? "" : city,
+    { cities: isRegionMode ? regionCities : undefined }
+  );
   const navigate = useNavigate();
 
   const allAdsInCity = useMemo(() => sections.flatMap((s) => s.ads), [sections]);

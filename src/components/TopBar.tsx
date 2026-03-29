@@ -1,14 +1,31 @@
-import { Search, MapPin, ChevronDown } from "lucide-react";
+import { Search, MapPin, ChevronDown, ChevronLeft } from "lucide-react";
 import { useCity } from "@/contexts/CityContext";
-import { useCities } from "@/hooks/useAds";
+import { useRegionsWithCities } from "@/hooks/useRegions";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const TopBar = () => {
-  const { city, setCity } = useCity();
-  const { data: cities = [], isLoading: citiesLoading } = useCities();
+  const { city, selectionMode, regionName, selectCity, selectRegion } = useCity();
+  const { data: regions = [], isLoading } = useRegionsWithCities();
   const [showCities, setShowCities] = useState(false);
+  const [expandedRegion, setExpandedRegion] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const displayName = selectionMode === "region" ? regionName : city;
+
+  const handleSelectCity = (cityName: string) => {
+    selectCity(cityName);
+    setShowCities(false);
+  };
+
+  const handleSelectRegion = (rId: string, rName: string) => {
+    selectRegion(rId, rName);
+    setShowCities(false);
+  };
+
+  const toggleRegion = (rId: string) => {
+    setExpandedRegion(expandedRegion === rId ? null : rId);
+  };
 
   return (
     <>
@@ -20,7 +37,7 @@ const TopBar = () => {
               onClick={() => setShowCities(true)}
               className="flex items-center gap-1.5 active:opacity-70 transition-opacity shrink-0">
               <MapPin className="w-[18px] h-[18px] text-foreground" strokeWidth={2} />
-              <span className="text-[14px] font-bold text-foreground leading-tight">{city}</span>
+              <span className="text-[14px] font-bold text-foreground leading-tight truncate max-w-[100px]">{displayName}</span>
               <ChevronDown className="w-3 h-3 text-muted-foreground" />
             </button>
 
@@ -51,28 +68,76 @@ const TopBar = () => {
           >
             <div className="w-10 h-1 bg-muted-foreground/30 rounded-full mx-auto mt-3" />
             <div className="px-5 py-4">
-              <h2 className="text-[16px] font-bold text-foreground mb-4">اختر مدينتك</h2>
-              <div className="space-y-1.5 max-h-[50vh] overflow-y-auto">
-                {citiesLoading ? (
+              <h2 className="text-[16px] font-bold text-foreground mb-4">اختر موقعك</h2>
+              <div className="space-y-1 max-h-[55vh] overflow-y-auto">
+                {isLoading ? (
                   <div className="text-center py-8">
                     <span className="animate-spin inline-block w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
                   </div>
-                ) : cities.length === 0 ? (
-                  <p className="text-center text-muted-foreground text-[14px] py-8">لا توجد مدن مسجلة</p>
+                ) : regions.length === 0 ? (
+                  <p className="text-center text-muted-foreground text-[14px] py-8">لا توجد مناطق مسجلة</p>
                 ) : (
-                  cities.map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => { setCity(c); setShowCities(false); }}
-                      className={`touch-target w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                        c === city ? "bg-primary/10 text-primary font-bold" : "text-foreground active:bg-secondary"
-                      }`}
-                    >
-                      <MapPin className={`w-4 h-4 ${c === city ? "text-primary" : "text-muted-foreground"}`} />
-                      <span className="text-[14px]">{c}</span>
-                      {c === city && <span className="mr-auto text-[11px] text-primary">✓ محدد</span>}
-                    </button>
-                  ))
+                  regions.map((region) => {
+                    const isExpanded = expandedRegion === region.id;
+                    const isRegionSelected = selectionMode === "region" && region.name === regionName;
+
+                    return (
+                      <div key={region.id}>
+                        {/* Region header */}
+                        <button
+                          onClick={() => toggleRegion(region.id)}
+                          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                            isRegionSelected ? "bg-primary/10" : "active:bg-secondary"
+                          }`}
+                        >
+                          <ChevronLeft className={`w-4 h-4 text-muted-foreground transition-transform ${isExpanded ? "-rotate-90" : ""}`} />
+                          <MapPin className={`w-4 h-4 ${isRegionSelected ? "text-primary" : "text-muted-foreground"}`} />
+                          <span className={`text-[14px] font-bold flex-1 text-right ${isRegionSelected ? "text-primary" : "text-foreground"}`}>
+                            {region.name}
+                          </span>
+                          {isRegionSelected && <span className="text-[11px] text-primary">✓</span>}
+                        </button>
+
+                        {/* Cities under region */}
+                        {isExpanded && (
+                          <div className="mr-6 space-y-0.5 mt-0.5 mb-1">
+                            {/* Select all cities in region */}
+                            <button
+                              onClick={() => handleSelectRegion(region.id, region.name)}
+                              className={`touch-target w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${
+                                isRegionSelected ? "bg-primary/10 text-primary font-bold" : "text-foreground active:bg-secondary"
+                              }`}
+                            >
+                              <span className="text-[13px]">🌐</span>
+                              <span className="text-[13px]">كل مدن المنطقة</span>
+                              {isRegionSelected && <span className="mr-auto text-[11px] text-primary">✓ محدد</span>}
+                            </button>
+
+                            {region.cities.map((c) => {
+                              const isCitySelected = selectionMode === "city" && c.name === city;
+                              return (
+                                <button
+                                  key={c.id}
+                                  onClick={() => handleSelectCity(c.name)}
+                                  className={`touch-target w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${
+                                    isCitySelected ? "bg-primary/10 text-primary font-bold" : "text-foreground active:bg-secondary"
+                                  }`}
+                                >
+                                  <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
+                                  <span className="text-[13px]">{c.name}</span>
+                                  {isCitySelected && <span className="mr-auto text-[11px] text-primary">✓ محدد</span>}
+                                </button>
+                              );
+                            })}
+
+                            {region.cities.length === 0 && (
+                              <p className="text-[12px] text-muted-foreground px-4 py-2">لا توجد مدن في هذه المنطقة</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
             </div>

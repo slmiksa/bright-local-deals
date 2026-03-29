@@ -8,8 +8,9 @@ const FeaturedSlider = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
-  const { city } = useCity();
-  const { data: featured = [] } = useFeaturedAds(city);
+  const { city, selectionMode, regionCities } = useCity();
+  const isRegionMode = selectionMode === "region";
+  const { data: featured = [] } = useFeaturedAds(isRegionMode ? "" : city, isRegionMode ? regionCities : undefined);
 
   const slides = featured.slice(0, 10).map((ad) => ({
     id: ad.id,

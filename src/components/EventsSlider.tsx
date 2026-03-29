@@ -11,9 +11,10 @@ const EventsSlider = () => {
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const navigate = useNavigate();
-  const { city } = useCity();
+  const { city, selectionMode, regionCities } = useCity();
+  const isRegionMode = selectionMode === "region";
 
-  const { data: events = [] } = useEventAds(city);
+  const { data: events = [] } = useEventAds(isRegionMode ? "" : city, isRegionMode ? regionCities : undefined);
 
   const handleScroll = () => {
     if (!scrollRef.current) return;

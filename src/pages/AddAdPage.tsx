@@ -3,7 +3,7 @@ import { Send, Store, PartyPopper, ChefHat, ArrowRight, Sparkles, Star, ImagePlu
 import LocationPicker from "@/components/LocationPicker";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-import { useCities } from "@/hooks/useAds";
+import { useRegionsWithCities } from "@/hooks/useRegions";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -36,7 +36,8 @@ const cardStyles = [
 
 const AddAdPage = () => {
   const navigate = useNavigate();
-  const { data: cities = [] } = useCities();
+  const { data: regions = [] } = useRegionsWithCities();
+  const [selectedRegionId, setSelectedRegionId] = useState("");
   const { data: pricingPlans = [], isLoading: pricingLoading } = useQuery({
     queryKey: ["ad-pricing"],
     queryFn: async () => {
@@ -410,14 +411,26 @@ const AddAdPage = () => {
           </div>
 
           <div>
-            <label className="block text-[13px] font-bold text-foreground mb-1.5">المدينة</label>
-            <select value={location} onChange={(e) => setLocation(e.target.value)} className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring appearance-none">
-              <option value="">اختر المدينة</option>
-              {cities.map((c) => (
-                <option key={c} value={c}>{c}</option>
+            <label className="block text-[13px] font-bold text-foreground mb-1.5">المنطقة</label>
+            <select value={selectedRegionId} onChange={(e) => { setSelectedRegionId(e.target.value); setLocation(""); }} className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring appearance-none">
+              <option value="">اختر المنطقة</option>
+              {regions.map((r) => (
+                <option key={r.id} value={r.id}>{r.name}</option>
               ))}
-          </select>
+            </select>
           </div>
+
+          {selectedRegionId && (
+            <div>
+              <label className="block text-[13px] font-bold text-foreground mb-1.5">المدينة</label>
+              <select value={location} onChange={(e) => setLocation(e.target.value)} className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring appearance-none">
+                <option value="">اختر المدينة</option>
+                {regions.find(r => r.id === selectedRegionId)?.cities.map((c) => (
+                  <option key={c.id} value={c.name}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Location picker */}
           <div>

@@ -12,11 +12,17 @@ import { useAdsByCity } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
 
 const Index = () => {
-  const { city } = useCity();
-  const { data: sections = [], isLoading } = useAdsByCity(city);
+  const { city, selectionMode, regionName, regionCities } = useCity();
+  const isRegionMode = selectionMode === "region";
+  const { data: sections = [], isLoading } = useAdsByCity(
+    isRegionMode ? "" : city,
+    { cities: isRegionMode ? regionCities : undefined }
+  );
+
+  const displayKey = isRegionMode ? regionName : city;
 
   return (
-    <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto relative" key={city}>
+    <PullToRefresh className="min-h-screen bg-background pb-28 max-w-[430px] mx-auto relative" key={displayKey}>
       <TopBar />
       <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
       <CountdownTimer />
@@ -27,11 +33,13 @@ const Index = () => {
       <EventsSlider />
       <CategoriesRow />
       {sections.filter(s => s.id !== "events").map((section) => (
-        <AdSection key={section.id} {...section} />
+        <AdSection key={section.id} {...section} showCity={isRegionMode} />
       ))}
       {!isLoading && sections.length === 0 && (
         <div className="text-center py-16">
-          <p className="text-muted-foreground text-[15px]">لا توجد إعلانات في {city} حالياً</p>
+          <p className="text-muted-foreground text-[15px]">
+            لا توجد إعلانات في {isRegionMode ? regionName : city} حالياً
+          </p>
         </div>
       )}
       <div className="h-8" />

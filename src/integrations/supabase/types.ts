@@ -371,22 +371,36 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_default: boolean
           name: string
+          region_id: string | null
           sort_order: number | null
         }
         Insert: {
           created_at?: string
           id?: string
+          is_default?: boolean
           name: string
+          region_id?: string | null
           sort_order?: number | null
         }
         Update: {
           created_at?: string
           id?: string
+          is_default?: boolean
           name?: string
+          region_id?: string | null
           sort_order?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "cities_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       giveaway_entries: {
         Row: {
@@ -492,6 +506,30 @@ export type Database = {
           image_url?: string
           link_type?: string
           link_url?: string | null
+        }
+        Relationships: []
+      }
+      regions: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          sort_order?: number | null
         }
         Relationships: []
       }
