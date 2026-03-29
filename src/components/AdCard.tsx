@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Phone, Images, Eye, Heart, MapPin } from "lucide-react";
+import { Images, Eye, Heart, MapPin, ChevronLeft } from "lucide-react";
 import ImageLightbox from "./ImageLightbox";
 import VideoThumbnail from "./VideoThumbnail";
 import { useAdStats } from "@/hooks/useAdStats";
@@ -24,7 +24,6 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured, city, showC
   const scrollRef = useRef<HTMLDivElement>(null);
   const { views, likes, liked, toggleLike } = useAdStats(id);
 
-  // Use media array if available, fallback to images
   const mediaItems = media.length > 0 ? media : images.map(url => ({ url, type: 'image' as const }));
   const lightboxImages = images.length > 0 ? images : mediaItems.filter(m => m.type === 'image').map(m => m.url);
 
@@ -63,10 +62,13 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured, city, showC
   return (
     <>
       <div
-        className={`bg-card rounded-2xl overflow-hidden shadow-card active:scale-[0.97] transition-transform ${
-          featured ? "gold-border" : ""
+        className={`bg-card rounded-2xl overflow-hidden transition-all duration-200 ${
+          featured
+            ? "gold-border shadow-[0_4px_24px_-4px_hsla(var(--gold)/0.2)]"
+            : "shadow-card hover:shadow-elevated"
         }`}
       >
+        {/* Image Section */}
         <div className="relative aspect-[4/3] overflow-hidden">
           {mediaItems.length > 1 ? (
             <div
@@ -86,62 +88,65 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured, city, showC
           )}
 
           {featured && (
-            <span className="absolute top-2 right-2 bg-gold text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-card pointer-events-none">
+            <span className="absolute top-2 right-2 bg-[hsl(var(--gold))] text-primary-foreground text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-md pointer-events-none flex items-center gap-1">
               ⭐ مميز
             </span>
           )}
 
           {mediaItems.length > 1 && (
             <>
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none">
+              <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none">
                 {mediaItems.map((_, i) => (
                   <div
                     key={i}
-                    className={`h-1 rounded-full transition-all ${
-                      i === imgIndex ? "w-3 bg-primary-foreground" : "w-1 bg-primary-foreground/50"
+                    className={`rounded-full transition-all duration-300 ${
+                      i === imgIndex ? "w-4 h-1.5 bg-primary-foreground" : "w-1.5 h-1.5 bg-primary-foreground/50"
                     }`}
                   />
                 ))}
               </div>
-              <div className="absolute top-2 left-2 bg-foreground/50 backdrop-blur-sm text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-0.5 pointer-events-none">
-                <Images className="w-2.5 h-2.5" />
+              <div className="absolute top-2 left-2 bg-foreground/60 backdrop-blur-md text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-lg flex items-center gap-1 pointer-events-none">
+                <Images className="w-3 h-3" />
                 {mediaItems.length}
               </div>
             </>
           )}
         </div>
-        <div className="p-3">
-          <h3 className="font-bold text-[13px] text-foreground truncate">{shopName}</h3>
-          {showCity && city && (
-            <p className="text-[10px] text-muted-foreground truncate flex items-center gap-0.5">
-              <MapPin className="w-2.5 h-2.5 inline-block" />{city}
-            </p>
-          )}
-          <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{offer}</p>
-          
-          {/* Stats Row */}
-          <div className="flex items-center justify-between mt-2">
+
+        {/* Content Section */}
+        <div className="p-3 space-y-1.5">
+          <div>
+            <h3 className="font-bold text-sm text-foreground truncate leading-tight">{shopName}</h3>
+            {showCity && city && (
+              <p className="text-[11px] text-muted-foreground truncate flex items-center gap-0.5 mt-0.5">
+                <MapPin className="w-3 h-3 shrink-0 text-primary/60" />
+                {city}
+              </p>
+            )}
+            <p className="text-[12px] text-muted-foreground mt-0.5 truncate leading-relaxed">{offer}</p>
+          </div>
+
+          {/* Stats + Like */}
+          <div className="flex items-center justify-between pt-1 border-t border-border/60">
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                 <Eye className="w-3.5 h-3.5" /> {views}
               </span>
-              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                <Heart className={`w-3.5 h-3.5 ${liked ? "fill-red-500 text-red-500" : ""}`} /> {likes}
-              </span>
+              <button
+                onClick={(e) => { e.stopPropagation(); toggleLike(); }}
+                className="flex items-center gap-1 text-[11px] text-muted-foreground active:scale-90 transition-transform"
+              >
+                <Heart className={`w-3.5 h-3.5 transition-colors ${liked ? "fill-destructive text-destructive" : ""}`} /> {likes}
+              </button>
             </div>
-            <button
-              onClick={(e) => { e.stopPropagation(); toggleLike(); }}
-              className="touch-target w-8 h-8 flex items-center justify-center rounded-full active:scale-90 transition-transform"
-            >
-              <Heart className={`w-4 h-4 transition-colors ${liked ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
-            </button>
           </div>
 
+          {/* CTA Button */}
           <button
-            className="touch-target mt-2 w-full flex items-center justify-center gap-1.5 bg-primary text-primary-foreground rounded-xl py-2.5 text-[12px] font-bold active:scale-[0.97] transition-transform"
+            className="w-full flex items-center justify-center gap-1.5 bg-primary text-primary-foreground rounded-xl py-2.5 text-[12px] font-bold active:scale-[0.97] transition-transform"
             onClick={() => navigate(`/ad/${id}`)}
           >
-            <Phone className="w-3.5 h-3.5" />
+            <ChevronLeft className="w-3.5 h-3.5" />
             تفاصيل
           </button>
         </div>
