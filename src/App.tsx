@@ -104,6 +104,7 @@ const App = () => {
             {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
             <BrowserRouter>
               <ScrollToTop />
+              <GoogleAnalytics />
               <PopupAd />
               <Routes>
                 {/* Public routes */}
