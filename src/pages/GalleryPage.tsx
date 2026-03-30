@@ -282,7 +282,7 @@ const GalleryPage = () => {
               loop
               muted
               playsInline
-              preload={isNearActive(idx) ? "auto" : "none"}
+              preload={isVeryNear(idx) ? "auto" : isNearActive(idx) ? "metadata" : "none"}
             />
 
             {/* Bottom overlay */}
