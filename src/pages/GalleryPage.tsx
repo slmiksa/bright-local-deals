@@ -140,11 +140,14 @@ const GalleryPage = () => {
       if (!vid) return;
       if (i === activeIndex) {
         vid.muted = isMuted;
-        vid.currentTime = 0;
         vid.play().catch(() => {});
       } else {
         vid.pause();
         vid.muted = true;
+        // Reset non-active videos so they start from beginning when swiped to
+        if (Math.abs(i - activeIndex) > 1) {
+          vid.currentTime = 0;
+        }
       }
     });
   }, [activeIndex, tripled, isMuted]);
