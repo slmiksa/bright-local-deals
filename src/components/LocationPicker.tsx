@@ -123,7 +123,7 @@ const LocationPicker = ({ lat, lng, onChange }: LocationPickerProps) => {
           options={{
             streetViewControl: false,
             mapTypeControl: false,
-            fullscreenControl: true,
+            fullscreenControl: false,
             zoomControl: true,
             maxZoom: 21,
             minZoom: 4,
