@@ -200,8 +200,9 @@ const GalleryPage = () => {
     }
   }, [shareUrl]);
 
-  // Check if video is near active (within 2) for src loading
-  const isNearActive = (idx: number) => Math.abs(idx - activeIndex) <= 2;
+  // Check if video is near active for preloading
+  const isNearActive = (idx: number) => Math.abs(idx - activeIndex) <= 3;
+  const isVeryNear = (idx: number) => Math.abs(idx - activeIndex) <= 1;
 
   if (isLoading) {
     return (
