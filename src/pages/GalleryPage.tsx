@@ -140,11 +140,14 @@ const GalleryPage = () => {
       if (!vid) return;
       if (i === activeIndex) {
         vid.muted = isMuted;
-        vid.currentTime = 0;
         vid.play().catch(() => {});
       } else {
         vid.pause();
         vid.muted = true;
+        // Reset non-active videos so they start from beginning when swiped to
+        if (Math.abs(i - activeIndex) > 1) {
+          vid.currentTime = 0;
+        }
       }
     });
   }, [activeIndex, tripled, isMuted]);
@@ -197,8 +200,9 @@ const GalleryPage = () => {
     }
   }, [shareUrl]);
 
-  // Check if video is near active (within 2) for src loading
-  const isNearActive = (idx: number) => Math.abs(idx - activeIndex) <= 2;
+  // Check if video is near active for preloading
+  const isNearActive = (idx: number) => Math.abs(idx - activeIndex) <= 3;
+  const isVeryNear = (idx: number) => Math.abs(idx - activeIndex) <= 1;
 
   if (isLoading) {
     return (
@@ -278,7 +282,7 @@ const GalleryPage = () => {
               loop
               muted
               playsInline
-              preload={isNearActive(idx) ? "auto" : "none"}
+              preload={isVeryNear(idx) ? "auto" : isNearActive(idx) ? "metadata" : "none"}
             />
 
             {/* Bottom overlay */}
