@@ -169,6 +169,7 @@ export type Database = {
         Row: {
           ad_id: number
           created_at: string
+          fake_views: number
           id: string
           likes: number | null
           updated_at: string
@@ -177,6 +178,7 @@ export type Database = {
         Insert: {
           ad_id: number
           created_at?: string
+          fake_views?: number
           id?: string
           likes?: number | null
           updated_at?: string
@@ -185,6 +187,7 @@ export type Database = {
         Update: {
           ad_id?: number
           created_at?: string
+          fake_views?: number
           id?: string
           likes?: number | null
           updated_at?: string
