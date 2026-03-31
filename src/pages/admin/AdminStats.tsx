@@ -116,7 +116,7 @@ const AdminStats = () => {
                 <th className="text-right p-3 font-bold text-foreground">وهمي</th>
                 <th className="text-right p-3 font-bold text-foreground">الإجمالي</th>
                 <th className="text-right p-3 font-bold text-foreground">الإعجابات</th>
-                <th className="text-right p-3 font-bold text-foreground min-w-[200px]">إضافة وهمي</th>
+                <th className="text-right p-3 font-bold text-foreground min-w-[280px]">تعديل وهمي</th>
               </tr>
             </thead>
             <tbody>
