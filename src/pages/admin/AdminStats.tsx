@@ -41,18 +41,37 @@ const AdminStats = () => {
     const amount = parseInt(fakeInputs[adId] || "0");
     if (!amount || amount <= 0) return;
     setUpdating(adId);
-
     const current = stats.find(s => s.ad_id === adId);
     const newFake = (current?.fake_views || 0) + amount;
-
     if (statId) {
       await supabase.from("ad_stats").update({ fake_views: newFake } as any).eq("id", statId);
     } else {
       await supabase.from("ad_stats").insert({ ad_id: adId, views: 0, likes: 0, fake_views: amount } as any);
     }
-
     toast.success(`تمت إضافة ${amount} مشاهدة وهمية`);
     setFakeInputs(prev => ({ ...prev, [adId]: "" }));
+    setUpdating(null);
+    fetchStats();
+  };
+
+  const handleReduceFakeViews = async (adId: number, statId?: string) => {
+    const amount = parseInt(fakeInputs[adId] || "0");
+    if (!amount || amount <= 0 || !statId) return;
+    setUpdating(adId);
+    const current = stats.find(s => s.ad_id === adId);
+    const newFake = Math.max(0, (current?.fake_views || 0) - amount);
+    await supabase.from("ad_stats").update({ fake_views: newFake } as any).eq("id", statId);
+    toast.success(`تم تنقيص ${amount} مشاهدة وهمية`);
+    setFakeInputs(prev => ({ ...prev, [adId]: "" }));
+    setUpdating(null);
+    fetchStats();
+  };
+
+  const handleClearFakeViews = async (adId: number, statId?: string) => {
+    if (!statId) return;
+    setUpdating(adId);
+    await supabase.from("ad_stats").update({ fake_views: 0 } as any).eq("id", statId);
+    toast.success("تم مسح المشاهدات الوهمية");
     setUpdating(null);
     fetchStats();
   };
