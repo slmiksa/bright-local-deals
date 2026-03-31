@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3, Eye, Heart, TrendingUp, Plus } from "lucide-react";
+import { BarChart3, Eye, Heart, TrendingUp, Plus, Minus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -41,18 +41,37 @@ const AdminStats = () => {
     const amount = parseInt(fakeInputs[adId] || "0");
     if (!amount || amount <= 0) return;
     setUpdating(adId);
-
     const current = stats.find(s => s.ad_id === adId);
     const newFake = (current?.fake_views || 0) + amount;
-
     if (statId) {
       await supabase.from("ad_stats").update({ fake_views: newFake } as any).eq("id", statId);
     } else {
       await supabase.from("ad_stats").insert({ ad_id: adId, views: 0, likes: 0, fake_views: amount } as any);
     }
-
     toast.success(`تمت إضافة ${amount} مشاهدة وهمية`);
     setFakeInputs(prev => ({ ...prev, [adId]: "" }));
+    setUpdating(null);
+    fetchStats();
+  };
+
+  const handleReduceFakeViews = async (adId: number, statId?: string) => {
+    const amount = parseInt(fakeInputs[adId] || "0");
+    if (!amount || amount <= 0 || !statId) return;
+    setUpdating(adId);
+    const current = stats.find(s => s.ad_id === adId);
+    const newFake = Math.max(0, (current?.fake_views || 0) - amount);
+    await supabase.from("ad_stats").update({ fake_views: newFake } as any).eq("id", statId);
+    toast.success(`تم تنقيص ${amount} مشاهدة وهمية`);
+    setFakeInputs(prev => ({ ...prev, [adId]: "" }));
+    setUpdating(null);
+    fetchStats();
+  };
+
+  const handleClearFakeViews = async (adId: number, statId?: string) => {
+    if (!statId) return;
+    setUpdating(adId);
+    await supabase.from("ad_stats").update({ fake_views: 0 } as any).eq("id", statId);
+    toast.success("تم مسح المشاهدات الوهمية");
     setUpdating(null);
     fetchStats();
   };
@@ -97,7 +116,7 @@ const AdminStats = () => {
                 <th className="text-right p-3 font-bold text-foreground">وهمي</th>
                 <th className="text-right p-3 font-bold text-foreground">الإجمالي</th>
                 <th className="text-right p-3 font-bold text-foreground">الإعجابات</th>
-                <th className="text-right p-3 font-bold text-foreground min-w-[200px]">إضافة وهمي</th>
+                <th className="text-right p-3 font-bold text-foreground min-w-[280px]">تعديل وهمي</th>
               </tr>
             </thead>
             <tbody>
@@ -117,24 +136,47 @@ const AdminStats = () => {
                       <span className="flex items-center gap-1"><Heart className="w-3.5 h-3.5" /> {s.likes.toLocaleString()}</span>
                     </td>
                     <td className="p-3">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <Input
                           type="number"
                           min="1"
                           placeholder="العدد"
                           value={fakeInputs[s.ad_id] || ""}
                           onChange={(e) => setFakeInputs(prev => ({ ...prev, [s.ad_id]: e.target.value }))}
-                          className="w-24 h-8 text-sm"
+                          className="w-20 h-8 text-sm"
                         />
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-8 px-3"
+                          className="h-8 px-2"
                           disabled={updating === s.ad_id}
                           onClick={() => handleAddFakeViews(s.ad_id, s.stat_id)}
+                          title="إضافة"
                         >
                           <Plus className="w-4 h-4" />
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 px-2"
+                          disabled={updating === s.ad_id || !fakeInputs[s.ad_id]}
+                          onClick={() => handleReduceFakeViews(s.ad_id, s.stat_id)}
+                          title="تنقيص"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </Button>
+                        {s.fake_views > 0 && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 px-2 text-destructive hover:text-destructive"
+                            disabled={updating === s.ad_id}
+                            onClick={() => handleClearFakeViews(s.ad_id, s.stat_id)}
+                            title="مسح الكل"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>
