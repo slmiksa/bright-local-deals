@@ -136,24 +136,47 @@ const AdminStats = () => {
                       <span className="flex items-center gap-1"><Heart className="w-3.5 h-3.5" /> {s.likes.toLocaleString()}</span>
                     </td>
                     <td className="p-3">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <Input
                           type="number"
                           min="1"
                           placeholder="العدد"
                           value={fakeInputs[s.ad_id] || ""}
                           onChange={(e) => setFakeInputs(prev => ({ ...prev, [s.ad_id]: e.target.value }))}
-                          className="w-24 h-8 text-sm"
+                          className="w-20 h-8 text-sm"
                         />
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-8 px-3"
+                          className="h-8 px-2"
                           disabled={updating === s.ad_id}
                           onClick={() => handleAddFakeViews(s.ad_id, s.stat_id)}
+                          title="إضافة"
                         >
                           <Plus className="w-4 h-4" />
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 px-2"
+                          disabled={updating === s.ad_id || !fakeInputs[s.ad_id]}
+                          onClick={() => handleReduceFakeViews(s.ad_id, s.stat_id)}
+                          title="تنقيص"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </Button>
+                        {s.fake_views > 0 && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 px-2 text-destructive hover:text-destructive"
+                            disabled={updating === s.ad_id}
+                            onClick={() => handleClearFakeViews(s.ad_id, s.stat_id)}
+                            title="مسح الكل"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>
