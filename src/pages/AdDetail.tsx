@@ -174,7 +174,7 @@ const AdDetail = () => {
         <div className="flex items-center gap-2 mt-2 text-muted-foreground"><Clock className="w-4 h-4 shrink-0" /><span className="text-[13px]">متاح الآن</span></div>
         <div className="mt-5 p-4 bg-card rounded-2xl shadow-card">
           <h3 className="font-bold text-[14px] text-foreground mb-2">نبذة</h3>
-          <p className="text-[13px] text-muted-foreground leading-relaxed">{ad.description}</p>
+          <p className="text-[13px] text-muted-foreground leading-relaxed whitespace-pre-line">{ad.description}</p>
         </div>
         <div className="mt-5 flex gap-3">
           <a href={`tel:${ad.phone}`} className="touch-target flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-2xl py-3.5 font-bold text-[14px] active:scale-[0.97] transition-transform shadow-elevated"><Phone className="w-5 h-5" /> اتصل الآن</a>
