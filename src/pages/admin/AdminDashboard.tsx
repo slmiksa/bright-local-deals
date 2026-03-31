@@ -11,9 +11,9 @@ const AdminDashboard = () => {
         supabase.from("ads").select("id", { count: "exact", head: true }),
         supabase.from("categories").select("id", { count: "exact", head: true }),
         supabase.from("cities").select("id", { count: "exact", head: true }),
-        supabase.from("ad_stats").select("views"),
+        supabase.from("ad_stats").select("views, fake_views"),
       ]);
-      const totalViews = (statsRes.data || []).reduce((sum, s) => sum + (s.views || 0), 0);
+      const totalViews = (statsRes.data || []).reduce((sum, s) => sum + (s.views || 0) + ((s as any).fake_views || 0), 0);
       setStats({
         ads: adsRes.count || 0,
         categories: catsRes.count || 0,
