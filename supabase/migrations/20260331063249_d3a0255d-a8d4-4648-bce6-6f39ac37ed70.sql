@@ -1,0 +1,1 @@
+ALTER TABLE public.ad_stats ADD COLUMN fake_views integer NOT NULL DEFAULT 0;

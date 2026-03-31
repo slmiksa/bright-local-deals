@@ -64,15 +64,16 @@ export function useAdStats(adId: number): AdStats & { toggleLike: () => void } {
     
     supabase
       .from("ad_stats")
-      .select("views, likes")
+      .select("views, likes, fake_views")
       .eq("ad_id", adId)
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled) return;
         if (data) {
+          const fakeViews = (data as any).fake_views || 0;
           setStats(prev => ({
             ...prev,
-            views: data.views || 0,
+            views: (data.views || 0) + fakeViews,
             likes: data.likes || 0,
           }));
         }
