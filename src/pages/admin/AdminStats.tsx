@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3, Eye, Heart, TrendingUp, Plus } from "lucide-react";
+import { BarChart3, Eye, Heart, TrendingUp, Plus, Minus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
