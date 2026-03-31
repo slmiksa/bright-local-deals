@@ -344,7 +344,7 @@ const AdminAds = () => {
               </div>
               <div>
                 <label className="block text-xs font-bold text-foreground mb-1">الوصف</label>
-                <textarea value={form.description} onChange={(e) => setForm(f => ({...f, description: e.target.value}))} rows={3} className="w-full px-3 py-2 rounded-xl bg-background text-foreground text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
+                <textarea value={form.description} onChange={(e) => setForm(f => ({...f, description: e.target.value}))} rows={4} className="w-full px-3 py-2 rounded-xl bg-background text-foreground text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 resize-y min-h-[80px]" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
