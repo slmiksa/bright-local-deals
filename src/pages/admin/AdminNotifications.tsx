@@ -67,7 +67,7 @@ const AdminNotifications = () => {
   const [manualSubtitle, setManualSubtitle] = useState("");
   const [manualTarget, setManualTarget] = useState("all");
   const [manualCity, setManualCity] = useState("");
-  const [sending, setSending] = useState(false);
+  const [manualLog, setManualLog] = useState<ManualNotification[]>([]);
 
   useEffect(() => {
     fetchData();
