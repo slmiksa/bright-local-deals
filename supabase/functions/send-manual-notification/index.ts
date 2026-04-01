@@ -194,9 +194,14 @@ Deno.serve(async (req) => {
           .select("token")
           .or(`city.eq.${city},region_id.eq.${cityData[0].region_id}`);
 
-        if (!tokens || tokens.length === 0) {
+      if (!tokens || tokens.length === 0) {
+          await supabase.from("manual_notifications").insert({
+            title, body, subtitle: subtitle || "",
+            target_mode: target_mode || "city", city,
+            sent_count: 0, total_count: 0,
+          });
           return new Response(
-            JSON.stringify({ success: true, sent: 0, message: "No tokens found for this city" }),
+            JSON.stringify({ success: true, sent: 0, total: 0, message: "No tokens found for this city" }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
