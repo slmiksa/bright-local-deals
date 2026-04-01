@@ -237,6 +237,12 @@ Deno.serve(async (req) => {
       if (ok) sentCount++;
     }
 
+    await supabase.from("manual_notifications").insert({
+      title, body, subtitle: subtitle || "",
+      target_mode: target_mode || "all", city: city || null,
+      sent_count: sentCount, total_count: allTokens.length,
+    });
+
     return new Response(
       JSON.stringify({ success: true, sent: sentCount, total: allTokens.length }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
