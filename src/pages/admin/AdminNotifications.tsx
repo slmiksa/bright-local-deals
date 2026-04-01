@@ -206,6 +206,13 @@ const AdminNotifications = () => {
         });
         setManualBody("");
         setManualSubtitle("");
+        // Refresh manual log
+        const { data: newLog } = await supabase
+          .from("manual_notifications")
+          .select("*")
+          .order("sent_at", { ascending: false })
+          .limit(50);
+        if (newLog) setManualLog(newLog as ManualNotification[]);
       }
     } catch (err: any) {
       toast({ title: "خطأ", description: err.message || "حدث خطأ", variant: "destructive" });
