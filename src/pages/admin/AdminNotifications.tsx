@@ -21,7 +21,9 @@ interface NotificationSetting {
   enabled: boolean;
   target_mode: string;
   hours_before: number;
+  notification_title: string;
   message_template: string;
+  notification_subtitle: string;
 }
 
 interface SentNotification {
