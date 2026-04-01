@@ -97,10 +97,14 @@ async function sendFCM(accessToken: string, token: string, title: string, body: 
           token,
           notification: { title, body },
           apns: {
-            payload: { aps: { sound: "default", badge: 1 } },
+            payload: {
+              aps: { sound: "default", badge: 1, "mutable-content": 1 },
+            },
+            fcm_options: {},
+            ...(subtitle ? { headers: { "apns-subtitle": subtitle } } : {}),
           },
           android: {
-            notification: { sound: "default" },
+            notification: { sound: "default", ...(subtitle ? { body: `${body}\n${subtitle}` } : {}) },
           },
         },
       }),
