@@ -126,7 +126,9 @@ const AdminNotifications = () => {
       enabled: s.enabled,
       target_mode: s.target_mode,
       hours_before: s.hours_before,
+      notification_title: s.notification_title,
       message_template: s.message_template,
+      notification_subtitle: s.notification_subtitle,
     }));
 
     const { error } = await supabase.from("notification_settings").upsert(rows, { onConflict: "category_id" });
