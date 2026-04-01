@@ -408,6 +408,36 @@ export type Database = {
           },
         ]
       }
+      device_tokens: {
+        Row: {
+          city: string | null
+          created_at: string
+          id: string
+          platform: string
+          region_id: string | null
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          id?: string
+          platform?: string
+          region_id?: string | null
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          id?: string
+          platform?: string
+          region_id?: string | null
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       giveaway_entries: {
         Row: {
           created_at: string
@@ -488,6 +518,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_settings: {
+        Row: {
+          category_id: string
+          created_at: string
+          enabled: boolean
+          hours_before: number
+          id: string
+          message_template: string | null
+          target_mode: string
+          updated_at: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          enabled?: boolean
+          hours_before?: number
+          id?: string
+          message_template?: string | null
+          target_mode?: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          enabled?: boolean
+          hours_before?: number
+          id?: string
+          message_template?: string | null
+          target_mode?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       popup_ads: {
         Row: {
           active: boolean
@@ -539,6 +602,30 @@ export type Database = {
           is_default?: boolean
           name?: string
           sort_order?: number | null
+        }
+        Relationships: []
+      }
+      sent_notifications: {
+        Row: {
+          ad_id: number
+          id: string
+          notification_type: string
+          sent_at: string
+          tokens_count: number | null
+        }
+        Insert: {
+          ad_id: number
+          id?: string
+          notification_type: string
+          sent_at?: string
+          tokens_count?: number | null
+        }
+        Update: {
+          ad_id?: number
+          id?: string
+          notification_type?: string
+          sent_at?: string
+          tokens_count?: number | null
         }
         Relationships: []
       }

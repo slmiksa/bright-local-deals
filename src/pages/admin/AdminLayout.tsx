@@ -34,6 +34,7 @@ import {
   Smartphone,
   Gift,
   Handshake,
+  Bell,
 } from "lucide-react";
 
 const menuItems = [
@@ -51,6 +52,7 @@ const menuItems = [
   { title: "شركاء النجاح", url: "/admin/partners", icon: Handshake },
   { title: "السحوبات", url: "/admin/giveaways", icon: Gift },
   { title: "تحديث التطبيق", url: "/admin/app-version", icon: Smartphone },
+  { title: "الإشعارات", url: "/admin/notifications", icon: Bell },
   { title: "الإحصائيات", url: "/admin/stats", icon: BarChart3 },
   { title: "الإعدادات", url: "/admin/settings", icon: Settings },
 ];

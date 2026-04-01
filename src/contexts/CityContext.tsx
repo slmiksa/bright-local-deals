@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode, startTransition } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { updateDeviceTokenLocation } from "@/lib/capacitor";
 
 export type SelectionMode = "city" | "region";
 
@@ -57,6 +58,7 @@ export const CityProvider = ({ children }: { children: ReactNode }) => {
       setRegionName("");
       setRegionCities([]);
     });
+    updateDeviceTokenLocation(cityName, null);
   };
 
   const selectRegion = (rId: string, rName: string) => {
@@ -70,6 +72,7 @@ export const CityProvider = ({ children }: { children: ReactNode }) => {
       setRegionName(rName);
       setCityState("");
     });
+    updateDeviceTokenLocation(null, rId);
   };
 
   // Fetch cities for selected region
