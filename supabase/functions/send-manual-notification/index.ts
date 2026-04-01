@@ -208,6 +208,12 @@ Deno.serve(async (req) => {
           if (ok) sentCount++;
         }
 
+        await supabase.from("manual_notifications").insert({
+          title, body, subtitle: subtitle || "",
+          target_mode: target_mode || "city", city,
+          sent_count: sentCount, total_count: tokens.length,
+        });
+
         return new Response(
           JSON.stringify({ success: true, sent: sentCount, total: tokens.length }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -230,6 +236,12 @@ Deno.serve(async (req) => {
       const ok = await sendFCM(accessToken, t.token, title, body, subtitle || undefined);
       if (ok) sentCount++;
     }
+
+    await supabase.from("manual_notifications").insert({
+      title, body, subtitle: subtitle || "",
+      target_mode: target_mode || "all", city: city || null,
+      sent_count: sentCount, total_count: allTokens.length,
+    });
 
     return new Response(
       JSON.stringify({ success: true, sent: sentCount, total: allTokens.length }),

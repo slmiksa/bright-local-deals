@@ -39,6 +39,18 @@ interface City {
   name: string;
 }
 
+interface ManualNotification {
+  id: string;
+  title: string;
+  body: string;
+  subtitle: string;
+  target_mode: string;
+  city: string | null;
+  sent_count: number;
+  total_count: number;
+  sent_at: string;
+}
+
 const AdminNotifications = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [settings, setSettings] = useState<Record<string, NotificationSetting>>({});
@@ -56,6 +68,7 @@ const AdminNotifications = () => {
   const [manualTarget, setManualTarget] = useState("all");
   const [manualCity, setManualCity] = useState("");
   const [sending, setSending] = useState(false);
+  const [manualLog, setManualLog] = useState<ManualNotification[]>([]);
 
   useEffect(() => {
     fetchData();
@@ -63,12 +76,13 @@ const AdminNotifications = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const [catRes, settingsRes, sentRes, tokensRes, citiesRes] = await Promise.all([
+    const [catRes, settingsRes, sentRes, tokensRes, citiesRes, manualRes] = await Promise.all([
       supabase.from("categories").select("id, name").order("sort_order"),
       supabase.from("notification_settings").select("*"),
       supabase.from("sent_notifications").select("*").order("sent_at", { ascending: false }).limit(50),
       supabase.from("device_tokens").select("id", { count: "exact", head: true }),
       supabase.from("cities").select("id, name").order("sort_order"),
+      supabase.from("manual_notifications").select("*").order("sent_at", { ascending: false }).limit(50),
     ]);
 
     if (catRes.data) setCategories(catRes.data);
@@ -98,6 +112,7 @@ const AdminNotifications = () => {
     setSettings(settingsMap);
 
     if (sentRes.data) setSentNotifications(sentRes.data as SentNotification[]);
+    if (manualRes.data) setManualLog(manualRes.data as ManualNotification[]);
     setTokensCount(tokensRes.count || 0);
     setLoading(false);
   };
@@ -191,6 +206,13 @@ const AdminNotifications = () => {
         });
         setManualBody("");
         setManualSubtitle("");
+        // Refresh manual log
+        const { data: newLog } = await supabase
+          .from("manual_notifications")
+          .select("*")
+          .order("sent_at", { ascending: false })
+          .limit(50);
+        if (newLog) setManualLog(newLog as ManualNotification[]);
       }
     } catch (err: any) {
       toast({ title: "خطأ", description: err.message || "حدث خطأ", variant: "destructive" });
@@ -296,7 +318,42 @@ const AdminNotifications = () => {
         </CardContent>
       </Card>
 
-      {/* Auto notification settings per category */}
+      {/* Manual notifications log */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <History className="w-4 h-4" />
+            سجل الإشعارات اليدوية (آخر 50)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {manualLog.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">لا توجد إشعارات يدوية مرسلة بعد</p>
+          ) : (
+            <div className="space-y-3 max-h-72 overflow-y-auto">
+              {manualLog.map((n) => (
+                <div key={n.id} className="border border-border rounded-lg p-3 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-sm">{n.title}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(n.sent_at).toLocaleString("ar-SA")}
+                    </span>
+                  </div>
+                  <p className="text-sm text-foreground">{n.body}</p>
+                  {n.subtitle && (
+                    <p className="text-xs text-muted-foreground">{n.subtitle}</p>
+                  )}
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
+                    <span>✅ {n.sent_count}/{n.total_count} جهاز</span>
+                    <span>🎯 {n.target_mode === "city" ? `مدينة: ${n.city}` : "الكل"}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <h2 className="text-lg font-semibold">الإشعارات التلقائية (حسب التصنيف)</h2>
       <div className="grid gap-4">
         {categories.map((cat) => {

@@ -518,6 +518,42 @@ export type Database = {
         }
         Relationships: []
       }
+      manual_notifications: {
+        Row: {
+          body: string
+          city: string | null
+          id: string
+          sent_at: string
+          sent_count: number | null
+          subtitle: string | null
+          target_mode: string
+          title: string
+          total_count: number | null
+        }
+        Insert: {
+          body: string
+          city?: string | null
+          id?: string
+          sent_at?: string
+          sent_count?: number | null
+          subtitle?: string | null
+          target_mode?: string
+          title: string
+          total_count?: number | null
+        }
+        Update: {
+          body?: string
+          city?: string | null
+          id?: string
+          sent_at?: string
+          sent_count?: number | null
+          subtitle?: string | null
+          target_mode?: string
+          title?: string
+          total_count?: number | null
+        }
+        Relationships: []
+      }
       notification_settings: {
         Row: {
           category_id: string
