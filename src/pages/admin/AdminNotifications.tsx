@@ -112,6 +112,7 @@ const AdminNotifications = () => {
     setSettings(settingsMap);
 
     if (sentRes.data) setSentNotifications(sentRes.data as SentNotification[]);
+    if (manualRes.data) setManualLog(manualRes.data as ManualNotification[]);
     setTokensCount(tokensRes.count || 0);
     setLoading(false);
   };
