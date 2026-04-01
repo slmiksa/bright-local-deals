@@ -74,7 +74,7 @@ const AdminNotifications = () => {
             target_mode: "city",
             hours_before: 24,
             notification_title: "لمحة",
-            message_template: "🔔 آخر فرصة! عرض {shop_name} ينتهي قريباً",
+            message_template: "🔔 آخر فرصة! {offer} ينتهي قريباً",
             notification_subtitle: "",
           };
         }
