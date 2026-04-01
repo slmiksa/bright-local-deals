@@ -191,7 +191,7 @@ Deno.serve(async (req) => {
 
             const replaceVars = (t: string) => (t || "").replace("{shop_name}", ad.shop_name).replace("{offer}", ad.offer).replace("{city}", ad.city);
             const msgTitle = replaceVars(setting.notification_title || "لمحة");
-            const msgBody = replaceVars(setting.message_template || "🔔 عرض {shop_name} ينتهي قريباً");
+            const msgBody = replaceVars(setting.message_template || "🔔 {offer} ينتهي قريباً");
             const msgSubtitle = replaceVars(setting.notification_subtitle || "");
 
             let sentCount = 0;
