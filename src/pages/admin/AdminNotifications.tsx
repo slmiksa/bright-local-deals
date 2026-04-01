@@ -104,7 +104,9 @@ const AdminNotifications = () => {
         enabled: setting.enabled,
         target_mode: setting.target_mode,
         hours_before: setting.hours_before,
+        notification_title: setting.notification_title,
         message_template: setting.message_template,
+        notification_subtitle: setting.notification_subtitle,
       },
       { onConflict: "category_id" }
     );
