@@ -39,6 +39,18 @@ interface City {
   name: string;
 }
 
+interface ManualNotification {
+  id: string;
+  title: string;
+  body: string;
+  subtitle: string;
+  target_mode: string;
+  city: string | null;
+  sent_count: number;
+  total_count: number;
+  sent_at: string;
+}
+
 const AdminNotifications = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [settings, setSettings] = useState<Record<string, NotificationSetting>>({});
