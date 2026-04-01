@@ -80,7 +80,7 @@ async function getAccessToken(): Promise<string> {
 
 // --- FCM v1 Send ---
 
-async function sendFCM(accessToken: string, token: string, title: string, body: string) {
+async function sendFCM(accessToken: string, token: string, title: string, body: string, subtitle?: string) {
   const sa = JSON.parse(FIREBASE_SA_JSON);
   const projectId = sa.project_id;
 
