@@ -218,17 +218,35 @@ const AdminNotifications = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>قالب الرسالة</Label>
+                    <Label>عنوان الإشعار</Label>
+                    <Input
+                      value={s.notification_title}
+                      onChange={(e) => updateSetting(cat.id, "notification_title", e.target.value)}
+                      placeholder="لمحة"
+                      className="text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>نص الإشعار (الرئيسي)</Label>
                     <Textarea
                       value={s.message_template}
                       onChange={(e) => updateSetting(cat.id, "message_template", e.target.value)}
                       placeholder="🔔 آخر فرصة! عرض {shop_name} ينتهي قريباً"
                       className="text-sm"
                     />
-                    <p className="text-xs text-muted-foreground">
-                      المتغيرات المتاحة: {"{shop_name}"} - {"{offer}"} - {"{city}"}
-                    </p>
                   </div>
+                  <div className="space-y-2">
+                    <Label>النص الفرعي (أسفل الإشعار)</Label>
+                    <Input
+                      value={s.notification_subtitle}
+                      onChange={(e) => updateSetting(cat.id, "notification_subtitle", e.target.value)}
+                      placeholder="لا تفوّت الفرصة!"
+                      className="text-sm"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    المتغيرات المتاحة: {"{shop_name}"} - {"{offer}"} - {"{city}"}
+                  </p>
                   <Button size="sm" variant="outline" onClick={() => saveSetting(cat.id)} disabled={saving}>
                     <Save className="w-3 h-3 ml-1" />
                     حفظ هذا التصنيف
