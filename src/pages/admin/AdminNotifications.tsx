@@ -75,12 +75,13 @@ const AdminNotifications = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const [catRes, settingsRes, sentRes, tokensRes, citiesRes] = await Promise.all([
+    const [catRes, settingsRes, sentRes, tokensRes, citiesRes, manualRes] = await Promise.all([
       supabase.from("categories").select("id, name").order("sort_order"),
       supabase.from("notification_settings").select("*"),
       supabase.from("sent_notifications").select("*").order("sent_at", { ascending: false }).limit(50),
       supabase.from("device_tokens").select("id", { count: "exact", head: true }),
       supabase.from("cities").select("id, name").order("sort_order"),
+      supabase.from("manual_notifications").select("*").order("sent_at", { ascending: false }).limit(50),
     ]);
 
     if (catRes.data) setCategories(catRes.data);
