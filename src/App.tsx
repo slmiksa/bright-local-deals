@@ -142,6 +142,7 @@ const App = () => {
                   <Route path="partners" element={<AdminPartners />} />
                   <Route path="app-version" element={<AdminAppVersion />} />
                   <Route path="giveaways" element={<AdminGiveaways />} />
+                  <Route path="notifications" element={<AdminNotifications />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />
