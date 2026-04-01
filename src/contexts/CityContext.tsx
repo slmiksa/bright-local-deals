@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode, startTransition } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { updateDeviceTokenLocation } from "@/lib/capacitor";
 
 export type SelectionMode = "city" | "region";
 
