@@ -34,6 +34,7 @@ import {
   Smartphone,
   Gift,
   Handshake,
+  Bell,
 } from "lucide-react";
 
 const menuItems = [
