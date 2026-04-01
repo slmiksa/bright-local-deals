@@ -58,6 +58,7 @@ export const CityProvider = ({ children }: { children: ReactNode }) => {
       setRegionName("");
       setRegionCities([]);
     });
+    updateDeviceTokenLocation(cityName, null);
   };
 
   const selectRegion = (rId: string, rName: string) => {
