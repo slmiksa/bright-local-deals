@@ -318,7 +318,42 @@ const AdminNotifications = () => {
         </CardContent>
       </Card>
 
-      {/* Auto notification settings per category */}
+      {/* Manual notifications log */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <History className="w-4 h-4" />
+            سجل الإشعارات اليدوية (آخر 50)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {manualLog.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">لا توجد إشعارات يدوية مرسلة بعد</p>
+          ) : (
+            <div className="space-y-3 max-h-72 overflow-y-auto">
+              {manualLog.map((n) => (
+                <div key={n.id} className="border border-border rounded-lg p-3 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-sm">{n.title}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(n.sent_at).toLocaleString("ar-SA")}
+                    </span>
+                  </div>
+                  <p className="text-sm text-foreground">{n.body}</p>
+                  {n.subtitle && (
+                    <p className="text-xs text-muted-foreground">{n.subtitle}</p>
+                  )}
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
+                    <span>✅ {n.sent_count}/{n.total_count} جهاز</span>
+                    <span>🎯 {n.target_mode === "city" ? `مدينة: ${n.city}` : "الكل"}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <h2 className="text-lg font-semibold">الإشعارات التلقائية (حسب التصنيف)</h2>
       <div className="grid gap-4">
         {categories.map((cat) => {
