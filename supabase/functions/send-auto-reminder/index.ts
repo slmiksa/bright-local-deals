@@ -189,15 +189,14 @@ Deno.serve(async (req) => {
 
             if (!tokens || tokens.length === 0) continue;
 
-            // Build message from template
-            const msgBody = (setting.message_template || "🔔 عرض {shop_name} ينتهي قريباً")
-              .replace("{shop_name}", ad.shop_name)
-              .replace("{offer}", ad.offer)
-              .replace("{city}", ad.city);
+            const replaceVars = (t: string) => (t || "").replace("{shop_name}", ad.shop_name).replace("{offer}", ad.offer).replace("{city}", ad.city);
+            const msgTitle = replaceVars(setting.notification_title || "لمحة");
+            const msgBody = replaceVars(setting.message_template || "🔔 عرض {shop_name} ينتهي قريباً");
+            const msgSubtitle = replaceVars(setting.notification_subtitle || "");
 
             let sentCount = 0;
             for (const t of tokens) {
-              const ok = await sendFCM(accessToken, t.token, "لمحة", msgBody);
+              const ok = await sendFCM(accessToken, t.token, msgTitle, msgBody, msgSubtitle || undefined);
               if (ok) sentCount++;
             }
 
