@@ -526,6 +526,8 @@ export type Database = {
           hours_before: number
           id: string
           message_template: string | null
+          notification_subtitle: string | null
+          notification_title: string
           target_mode: string
           updated_at: string
         }
@@ -536,6 +538,8 @@ export type Database = {
           hours_before?: number
           id?: string
           message_template?: string | null
+          notification_subtitle?: string | null
+          notification_title?: string
           target_mode?: string
           updated_at?: string
         }
@@ -546,6 +550,8 @@ export type Database = {
           hours_before?: number
           id?: string
           message_template?: string | null
+          notification_subtitle?: string | null
+          notification_title?: string
           target_mode?: string
           updated_at?: string
         }
