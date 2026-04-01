@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Bell, Save, History } from "lucide-react";
+import { Bell, Save, History, Send } from "lucide-react";
 
 interface Category {
   id: string;
@@ -34,6 +34,11 @@ interface SentNotification {
   tokens_count: number;
 }
 
+interface City {
+  id: string;
+  name: string;
+}
+
 const AdminNotifications = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [settings, setSettings] = useState<Record<string, NotificationSetting>>({});
@@ -43,20 +48,31 @@ const AdminNotifications = () => {
   const [tokensCount, setTokensCount] = useState(0);
   const { toast } = useToast();
 
+  // Manual send state
+  const [cities, setCities] = useState<City[]>([]);
+  const [manualTitle, setManualTitle] = useState("لمحة");
+  const [manualBody, setManualBody] = useState("");
+  const [manualSubtitle, setManualSubtitle] = useState("");
+  const [manualTarget, setManualTarget] = useState("all");
+  const [manualCity, setManualCity] = useState("");
+  const [sending, setSending] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
     setLoading(true);
-    const [catRes, settingsRes, sentRes, tokensRes] = await Promise.all([
+    const [catRes, settingsRes, sentRes, tokensRes, citiesRes] = await Promise.all([
       supabase.from("categories").select("id, name").order("sort_order"),
       supabase.from("notification_settings").select("*"),
       supabase.from("sent_notifications").select("*").order("sent_at", { ascending: false }).limit(50),
       supabase.from("device_tokens").select("id", { count: "exact", head: true }),
+      supabase.from("cities").select("id, name").order("sort_order"),
     ]);
 
     if (catRes.data) setCategories(catRes.data);
+    if (citiesRes.data) setCities(citiesRes.data);
 
     const settingsMap: Record<string, NotificationSetting> = {};
     if (settingsRes.data) {
@@ -64,7 +80,6 @@ const AdminNotifications = () => {
         settingsMap[s.category_id] = s as NotificationSetting;
       }
     }
-    // Fill defaults for categories without settings
     if (catRes.data) {
       for (const cat of catRes.data) {
         if (!settingsMap[cat.id]) {
@@ -97,7 +112,6 @@ const AdminNotifications = () => {
   const saveSetting = async (categoryId: string) => {
     setSaving(true);
     const setting = settings[categoryId];
-
     const { error } = await supabase.from("notification_settings").upsert(
       {
         category_id: categoryId,
@@ -141,6 +155,49 @@ const AdminNotifications = () => {
     setSaving(false);
   };
 
+  const sendManualNotification = async () => {
+    if (!manualBody.trim()) {
+      toast({ title: "خطأ", description: "يرجى كتابة نص الإشعار", variant: "destructive" });
+      return;
+    }
+    if (manualTarget === "city" && !manualCity) {
+      toast({ title: "خطأ", description: "يرجى اختيار المدينة", variant: "destructive" });
+      return;
+    }
+
+    setSending(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const res = await supabase.functions.invoke("send-manual-notification", {
+        body: {
+          title: manualTitle,
+          body: manualBody,
+          subtitle: manualSubtitle || undefined,
+          target_mode: manualTarget,
+          city: manualTarget === "city" ? manualCity : undefined,
+        },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.error) {
+        toast({ title: "خطأ", description: res.error.message || "فشل الإرسال", variant: "destructive" });
+      } else {
+        const result = res.data;
+        toast({
+          title: "✅ تم الإرسال",
+          description: `تم إرسال الإشعار إلى ${result.sent} جهاز من أصل ${result.total || result.sent}`,
+        });
+        setManualBody("");
+        setManualSubtitle("");
+      }
+    } catch (err: any) {
+      toast({ title: "خطأ", description: err.message || "حدث خطأ", variant: "destructive" });
+    }
+    setSending(false);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -155,7 +212,7 @@ const AdminNotifications = () => {
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Bell className="w-6 h-6" />
-            إدارة الإشعارات التلقائية
+            إدارة الإشعارات
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             أجهزة مسجّلة: <span className="font-bold text-foreground">{tokensCount}</span>
@@ -167,6 +224,80 @@ const AdminNotifications = () => {
         </Button>
       </div>
 
+      {/* Manual Notification Section */}
+      <Card className="border-primary/30 bg-primary/5">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Send className="w-4 h-4" />
+            إرسال إشعار يدوي
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>الاستهداف</Label>
+              <Select value={manualTarget} onValueChange={setManualTarget}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">جميع المستخدمين</SelectItem>
+                  <SelectItem value="city">مدينة محددة</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {manualTarget === "city" && (
+              <div className="space-y-2">
+                <Label>المدينة</Label>
+                <Select value={manualCity} onValueChange={setManualCity}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر المدينة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cities.map((c) => (
+                      <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label>عنوان الإشعار</Label>
+            <Input
+              value={manualTitle}
+              onChange={(e) => setManualTitle(e.target.value)}
+              placeholder="لمحة"
+              className="text-sm"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>نص الإشعار (الرئيسي)</Label>
+            <Textarea
+              value={manualBody}
+              onChange={(e) => setManualBody(e.target.value)}
+              placeholder="اكتب نص الإشعار هنا..."
+              className="text-sm"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>النص الفرعي (اختياري)</Label>
+            <Input
+              value={manualSubtitle}
+              onChange={(e) => setManualSubtitle(e.target.value)}
+              placeholder="نص فرعي يظهر أسفل العنوان"
+              className="text-sm"
+            />
+          </div>
+          <Button onClick={sendManualNotification} disabled={sending} className="w-full">
+            <Send className="w-4 h-4 ml-2" />
+            {sending ? "جاري الإرسال..." : "إرسال الإشعار الآن"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Auto notification settings per category */}
+      <h2 className="text-lg font-semibold">الإشعارات التلقائية (حسب التصنيف)</h2>
       <div className="grid gap-4">
         {categories.map((cat) => {
           const s = settings[cat.id];
@@ -231,7 +362,7 @@ const AdminNotifications = () => {
                     <Textarea
                       value={s.message_template}
                       onChange={(e) => updateSetting(cat.id, "message_template", e.target.value)}
-                      placeholder="🔔 آخر فرصة! عرض {shop_name} ينتهي قريباً"
+                      placeholder="🔔 آخر فرصة! {offer} ينتهي قريباً"
                       className="text-sm"
                     />
                   </div>
