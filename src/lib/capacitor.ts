@@ -39,15 +39,26 @@ const upsertDeviceToken = async (token: string) => {
   const regionId = localStorage.getItem('lamha_region_id') || null;
 
   try {
-    await supabase.from('device_tokens').upsert(
-      {
-        token,
-        platform,
-        city,
-        region_id: regionId,
-      },
-      { onConflict: 'token' }
-    );
+    const payload = {
+      token,
+      platform,
+      city,
+      region_id: regionId,
+    };
+
+    const { data: existingRows, error: lookupError } = await supabase
+      .from('device_tokens')
+      .select('id')
+      .eq('token', token)
+      .limit(1);
+
+    if (lookupError) throw lookupError;
+
+    const { error } = existingRows && existingRows.length > 0
+      ? await supabase.from('device_tokens').update(payload).eq('token', token)
+      : await supabase.from('device_tokens').insert(payload);
+
+    if (error) throw error;
   } catch (e) {
     console.log('Failed to upsert device token:', e);
   }
