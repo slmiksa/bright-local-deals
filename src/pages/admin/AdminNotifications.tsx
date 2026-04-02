@@ -171,7 +171,11 @@ const AdminNotifications = () => {
   };
 
   const sendManualNotification = async () => {
-    if (!manualBody.trim()) {
+    const title = manualTitle.trim() || "لمحة";
+    const body = manualBody.trim();
+    const subtitle = manualSubtitle.trim();
+
+    if (!body) {
       toast({ title: "خطأ", description: "يرجى كتابة نص الإشعار", variant: "destructive" });
       return;
     }
@@ -182,18 +186,14 @@ const AdminNotifications = () => {
 
     setSending(true);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-
       const res = await supabase.functions.invoke("send-manual-notification", {
         body: {
-          title: manualTitle,
-          body: manualBody,
-          subtitle: manualSubtitle || undefined,
+          title,
+          body,
+          subtitle: subtitle || undefined,
           target_mode: manualTarget,
           city: manualTarget === "city" ? manualCity : undefined,
         },
-        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (res.error) {
@@ -202,17 +202,11 @@ const AdminNotifications = () => {
         const result = res.data;
         toast({
           title: "✅ تم الإرسال",
-          description: `تم إرسال الإشعار إلى ${result.sent} جهاز من أصل ${result.total || result.sent}`,
+          description: result.message || `تم إرسال الإشعار إلى ${result.sent} جهاز من أصل ${result.total || result.sent}`,
         });
         setManualBody("");
         setManualSubtitle("");
-        // Refresh manual log
-        const { data: newLog } = await supabase
-          .from("manual_notifications")
-          .select("*")
-          .order("sent_at", { ascending: false })
-          .limit(50);
-        if (newLog) setManualLog(newLog as ManualNotification[]);
+        await fetchData();
       }
     } catch (err: any) {
       toast({ title: "خطأ", description: err.message || "حدث خطأ", variant: "destructive" });
