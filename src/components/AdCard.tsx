@@ -55,7 +55,7 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured, city, displ
         alt={`${shopName} ${i + 1}`}
         className="w-full h-full object-cover shrink-0 snap-center cursor-pointer"
         loading="lazy"
-        onClick={() => { setImgIndex(i); setLightboxOpen(true); }}
+        onClick={() => navigate(`/ad/${id}`)}
       />
     );
   };
