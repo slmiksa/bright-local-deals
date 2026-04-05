@@ -139,7 +139,15 @@ const AdDetail = () => {
                 </div>
                 <div className="flex gap-2 overflow-x-auto hide-scrollbar">
                   {videoMedia.map((m, i) => (
-                    <div key={i} className="shrink-0 w-44 rounded-2xl overflow-hidden bg-foreground/5 border border-border">
+                    <div key={i} className="shrink-0 w-44 rounded-2xl overflow-hidden bg-foreground/5 border border-border cursor-pointer"
+                      onClick={(e) => {
+                        const video = e.currentTarget.querySelector('video');
+                        if (video) {
+                          video.requestFullscreen?.();
+                          video.play();
+                        }
+                      }}
+                    >
                       <video
                         src={m.url + "#t=0.5"}
                         className="w-full aspect-square object-cover"
