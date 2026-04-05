@@ -141,10 +141,14 @@ const AdDetail = () => {
                   {videoMedia.map((m, i) => (
                     <div key={i} className="shrink-0 w-44 rounded-2xl overflow-hidden bg-foreground/5 border border-border cursor-pointer"
                       onClick={(e) => {
-                        const video = e.currentTarget.querySelector('video');
+                        const video = e.currentTarget.querySelector('video') as any;
                         if (video) {
-                          video.requestFullscreen?.();
                           video.play();
+                          if (video.webkitEnterFullscreen) {
+                            video.webkitEnterFullscreen();
+                          } else if (video.requestFullscreen) {
+                            video.requestFullscreen();
+                          }
                         }
                       }}
                     >
