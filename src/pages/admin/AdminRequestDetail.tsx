@@ -102,7 +102,7 @@ const AdminRequestDetail = () => {
         const regionForCity = regions.find(r => r.cities.some(c => c.name === request.city));
         return (
           <div className="grid grid-cols-2 gap-3">
-            <InfoCard icon={Store} label="اسم المتجر" value={request.store_name} />
+            <InfoCard icon={Store} label="اسم المتجر" value={request.store_name} copyable />
             <InfoCard icon={Tag} label="نوع الإعلان" value={request.ad_type} />
             <InfoCard icon={request.ad_tier === "متميز" ? Sparkles : Star} label="فئة الإعلان" value={request.ad_tier} />
             <InfoCard icon={Map} label="المنطقة" value={regionForCity?.name || "غير محددة"} />
