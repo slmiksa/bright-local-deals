@@ -35,7 +35,7 @@ serve(async (req) => {
   }
 
   try {
-    const { orderNumber, adType, adTier, storeName, city, totalPrice, phone, customerEmail } = await req.json();
+    const { orderNumber, adType, adTier, storeName, description, city, totalPrice, phone, customerEmail } = await req.json();
 
     const adminEmail = "nsaihost@gmail.com";
     const priceDisplay = totalPrice === 0 ? "مجاني" : `${totalPrice} ريال`;
