@@ -107,7 +107,7 @@ const AdminRequestDetail = () => {
             <InfoCard icon={request.ad_tier === "متميز" ? Sparkles : Star} label="فئة الإعلان" value={request.ad_tier} />
             <InfoCard icon={Map} label="المنطقة" value={regionForCity?.name || "غير محددة"} />
             <InfoCard icon={MapPin} label="المدينة" value={request.city} />
-            <InfoCard icon={Phone} label="رقم التواصل" value={(request as any).phone || "غير محدد"} />
+            <InfoCard icon={Phone} label="رقم التواصل" value={(request as any).phone || "غير محدد"} copyable />
             <InfoCard icon={DollarSign} label="السعر" value={`${request.total_price} ريال`} highlight />
             <InfoCard icon={Clock} label="الحالة" value={statusLabels[request.status] || request.status} />
           </div>
