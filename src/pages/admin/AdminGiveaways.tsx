@@ -26,6 +26,7 @@ const AdminGiveaways = () => {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "", prize: "", end_date: "", snapchat_url: "",
     sponsor_name: "", sponsor_logo_url: "", sponsor_url: "", city: "all",
