@@ -49,12 +49,12 @@ const AdminRequests = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("ad_requests").delete().eq("id", id);
+      const { error } = await supabase.from("ad_requests").update({ status: "deleted" }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-ad-requests"] });
-      toast({ title: "تم حذف الطلب" });
+      toast({ title: "تم نقل الطلب إلى المحذوفة" });
     },
   });
 
