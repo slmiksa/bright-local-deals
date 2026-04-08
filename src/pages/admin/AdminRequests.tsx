@@ -26,6 +26,7 @@ const tabConfig = [
   { value: "pending", label: "قيد المراجعة", icon: Clock },
   { value: "approved", label: "مقبولة", icon: CheckCircle },
   { value: "rejected", label: "مرفوضة", icon: XCircle },
+  { value: "deleted", label: "محذوفة", icon: Trash2 },
 ];
 
 const AdminRequests = () => {
