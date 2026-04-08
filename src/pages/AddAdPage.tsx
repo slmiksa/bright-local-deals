@@ -192,6 +192,7 @@ const AddAdPage = () => {
           phone,
           total_price: totalPrice ?? 0,
           email: wantsEmail ? email : null,
+          description: description || null,
           lat: mapLat,
           lng: mapLng,
         } as any)
