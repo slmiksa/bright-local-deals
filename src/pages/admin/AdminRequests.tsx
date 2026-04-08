@@ -20,6 +20,7 @@ const statusMap: Record<string, { label: string; color: string; icon: typeof Clo
   pending: { label: "قيد المراجعة", color: "text-yellow-600 bg-yellow-50 border-yellow-200", icon: Clock },
   approved: { label: "مقبول", color: "text-green-600 bg-green-50 border-green-200", icon: CheckCircle },
   rejected: { label: "مرفوض", color: "text-red-600 bg-red-50 border-red-200", icon: XCircle },
+  deleted: { label: "محذوف", color: "text-gray-500 bg-gray-50 border-gray-200", icon: Trash2 },
 };
 
 const tabConfig = [
