@@ -71,6 +71,7 @@ const AddAdPage = () => {
   const adTypes = useMemo(() => pricingPlans.map((plan) => plan.name), [pricingPlans]);
   const [adType, setAdType] = useState("");
   const [storeName, setStoreName] = useState("");
+  const [description, setDescription] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [adTier, setAdTier] = useState<"عادي" | "متميز">("عادي");
