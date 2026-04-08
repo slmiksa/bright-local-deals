@@ -242,14 +242,31 @@ const AdminRequestDetail = () => {
   );
 };
 
-function InfoCard({ icon: Icon, label, value, highlight }: { icon: any; label: string; value: string; highlight?: boolean }) {
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+  return (
+    <button onClick={handleCopy} className="p-1.5 rounded-lg hover:bg-muted transition-colors" title="نسخ">
+      {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
+    </button>
+  );
+}
+
+function InfoCard({ icon: Icon, label, value, highlight, copyable }: { icon: any; label: string; value: string; highlight?: boolean; copyable?: boolean }) {
   return (
     <div className="bg-card border border-border rounded-xl p-3">
       <div className="flex items-center gap-1.5 mb-1">
         <Icon className="w-3.5 h-3.5 text-muted-foreground" />
         <span className="text-[11px] text-muted-foreground">{label}</span>
       </div>
-      <p className={`text-[14px] font-bold ${highlight ? "text-primary" : "text-foreground"}`}>{value}</p>
+      <div className="flex items-center justify-between">
+        <p className={`text-[14px] font-bold ${highlight ? "text-primary" : "text-foreground"}`}>{value}</p>
+        {copyable && <CopyButton text={value} />}
+      </div>
     </div>
   );
 }
