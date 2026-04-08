@@ -408,6 +408,17 @@ const AddAdPage = () => {
           </div>
 
           <div>
+            <label className="block text-[13px] font-bold text-foreground mb-1.5">نبذة عن الإعلان <span className="text-[11px] text-muted-foreground font-normal">(اختياري)</span></label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="اكتب نبذة مختصرة عن إعلانك..."
+              rows={3}
+              className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground placeholder:text-muted-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+            />
+          </div>
+
+          <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">رقم التواصل <span className="text-destructive">*</span></label>
             <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="05XXXXXXXX" required dir="ltr" className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground placeholder:text-muted-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring text-left" />
           </div>
