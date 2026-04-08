@@ -117,7 +117,10 @@ const AdminRequestDetail = () => {
       {/* Description */}
       {(request as any).description && (
         <div className="bg-card border border-border rounded-xl p-4">
-          <h2 className="text-[13px] font-bold text-foreground mb-2">نبذة عن الإعلان</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-[13px] font-bold text-foreground">نبذة عن الإعلان</h2>
+            <CopyButton text={(request as any).description} />
+          </div>
           <p className="text-[13px] text-muted-foreground whitespace-pre-line leading-relaxed">{(request as any).description}</p>
         </div>
       )}
