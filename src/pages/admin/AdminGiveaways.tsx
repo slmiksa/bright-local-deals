@@ -415,6 +415,30 @@ const AdminGiveaways = () => {
           </div>
         )}
       </div>
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent dir="rtl" className="max-w-[340px] rounded-2xl p-6">
+          <AlertDialogHeader className="text-center sm:text-center">
+            <div className="mx-auto mb-3 w-14 h-14 rounded-full flex items-center justify-center bg-destructive/10">
+              <Trash2 className="w-7 h-7 text-destructive" />
+            </div>
+            <AlertDialogTitle className="text-[17px]">تأكيد حذف السحب</AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] leading-relaxed">
+              هل أنت متأكد من حذف هذا السحب؟ سيتم حذف جميع بيانات المشاركين أيضاً ولا يمكن التراجع.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex flex-col gap-2 mt-4">
+            <AlertDialogAction
+              className="w-full rounded-xl py-3 text-[14px] font-bold bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => { if (deleteId) deleteMutation.mutate(deleteId); setDeleteId(null); }}
+            >
+              نعم، احذف
+            </AlertDialogAction>
+            <AlertDialogCancel className="w-full rounded-xl py-3 text-[14px] font-bold mt-0">
+              لا، إلغاء
+            </AlertDialogCancel>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
