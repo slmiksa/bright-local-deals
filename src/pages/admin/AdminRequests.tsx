@@ -185,7 +185,7 @@ const AdminRequests = () => {
       </div>
 
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="w-full grid grid-cols-3 bg-muted/50 rounded-xl p-1 h-auto">
+        <TabsList className="w-full grid grid-cols-4 bg-muted/50 rounded-xl p-1 h-auto">
           {tabConfig.map((tab) => {
             const count = grouped[tab.value as keyof typeof grouped]?.length || 0;
             const TabIcon = tab.icon;
