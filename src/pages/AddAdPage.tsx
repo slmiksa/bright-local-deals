@@ -250,6 +250,7 @@ const AddAdPage = () => {
             adType,
             adTier,
             storeName,
+            description: description || null,
             city: location,
             totalPrice,
             phone,

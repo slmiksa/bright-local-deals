@@ -120,6 +120,7 @@ serve(async (req) => {
           ${row("🏪 اسم المتجر", storeName)}
           ${row("📋 نوع الإعلان", adType)}
           ${row("⭐ الفئة", tierDisplay)}
+          ${description ? row("📝 النبذة", description) : ""}
           ${row("📍 المدينة", city)}
           ${row("📞 رقم التواصل", phone || "غير محدد")}
           ${row("📧 البريد الإلكتروني", customerEmail)}
