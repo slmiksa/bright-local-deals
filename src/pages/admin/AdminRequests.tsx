@@ -20,12 +20,14 @@ const statusMap: Record<string, { label: string; color: string; icon: typeof Clo
   pending: { label: "قيد المراجعة", color: "text-yellow-600 bg-yellow-50 border-yellow-200", icon: Clock },
   approved: { label: "مقبول", color: "text-green-600 bg-green-50 border-green-200", icon: CheckCircle },
   rejected: { label: "مرفوض", color: "text-red-600 bg-red-50 border-red-200", icon: XCircle },
+  deleted: { label: "محذوف", color: "text-gray-500 bg-gray-50 border-gray-200", icon: Trash2 },
 };
 
 const tabConfig = [
   { value: "pending", label: "قيد المراجعة", icon: Clock },
   { value: "approved", label: "مقبولة", icon: CheckCircle },
   { value: "rejected", label: "مرفوضة", icon: XCircle },
+  { value: "deleted", label: "محذوفة", icon: Trash2 },
 ];
 
 const AdminRequests = () => {
@@ -48,12 +50,12 @@ const AdminRequests = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("ad_requests").delete().eq("id", id);
+      const { error } = await supabase.from("ad_requests").update({ status: "deleted" }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-ad-requests"] });
-      toast({ title: "تم حذف الطلب" });
+      toast({ title: "تم نقل الطلب إلى المحذوفة" });
     },
   });
 
@@ -98,6 +100,7 @@ const AdminRequests = () => {
     pending: requests.filter((r) => r.status === "pending"),
     approved: requests.filter((r) => r.status === "approved"),
     rejected: requests.filter((r) => r.status === "rejected"),
+    deleted: requests.filter((r) => r.status === "deleted"),
   };
 
   const renderRequestCard = (req: (typeof requests)[0]) => {
@@ -183,7 +186,7 @@ const AdminRequests = () => {
       </div>
 
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="w-full grid grid-cols-3 bg-muted/50 rounded-xl p-1 h-auto">
+        <TabsList className="w-full grid grid-cols-4 bg-muted/50 rounded-xl p-1 h-auto">
           {tabConfig.map((tab) => {
             const count = grouped[tab.value as keyof typeof grouped]?.length || 0;
             const TabIcon = tab.icon;
