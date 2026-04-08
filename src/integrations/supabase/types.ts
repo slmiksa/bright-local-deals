@@ -123,6 +123,7 @@ export type Database = {
           ad_type: string
           city: string
           created_at: string
+          description: string | null
           email: string | null
           id: string
           lat: number | null
@@ -138,6 +139,7 @@ export type Database = {
           ad_type: string
           city: string
           created_at?: string
+          description?: string | null
           email?: string | null
           id?: string
           lat?: number | null
@@ -153,6 +155,7 @@ export type Database = {
           ad_type?: string
           city?: string
           created_at?: string
+          description?: string | null
           email?: string | null
           id?: string
           lat?: number | null

@@ -114,6 +114,14 @@ const AdminRequestDetail = () => {
         );
       })()}
 
+      {/* Description */}
+      {(request as any).description && (
+        <div className="bg-card border border-border rounded-xl p-4">
+          <h2 className="text-[13px] font-bold text-foreground mb-2">نبذة عن الإعلان</h2>
+          <p className="text-[13px] text-muted-foreground whitespace-pre-line leading-relaxed">{(request as any).description}</p>
+        </div>
+      )}
+
       {/* Download all button */}
       {images.length > 0 && (
         <div className="flex items-center justify-between">

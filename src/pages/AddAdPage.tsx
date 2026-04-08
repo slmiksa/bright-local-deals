@@ -71,6 +71,7 @@ const AddAdPage = () => {
   const adTypes = useMemo(() => pricingPlans.map((plan) => plan.name), [pricingPlans]);
   const [adType, setAdType] = useState("");
   const [storeName, setStoreName] = useState("");
+  const [description, setDescription] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [adTier, setAdTier] = useState<"عادي" | "متميز">("عادي");
@@ -191,6 +192,7 @@ const AddAdPage = () => {
           phone,
           total_price: totalPrice ?? 0,
           email: wantsEmail ? email : null,
+          description: description || null,
           lat: mapLat,
           lng: mapLng,
         } as any)
@@ -248,6 +250,7 @@ const AddAdPage = () => {
             adType,
             adTier,
             storeName,
+            description: description || null,
             city: location,
             totalPrice,
             phone,
@@ -404,6 +407,17 @@ const AddAdPage = () => {
           <div>
             <label className="block text-[13px] font-bold text-foreground mb-1.5">اسم المتجر / النشاط</label>
             <input type="text" value={storeName} onChange={(e) => setStoreName(e.target.value)} placeholder="مثال: كافيه الديوان" className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground placeholder:text-muted-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring" />
+          </div>
+
+          <div>
+            <label className="block text-[13px] font-bold text-foreground mb-1.5">نبذة عن الإعلان <span className="text-[11px] text-muted-foreground font-normal">(اختياري)</span></label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="اكتب نبذة مختصرة عن إعلانك..."
+              rows={3}
+              className="w-full bg-card rounded-xl px-4 py-3 text-[14px] text-foreground placeholder:text-muted-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+            />
           </div>
 
           <div>

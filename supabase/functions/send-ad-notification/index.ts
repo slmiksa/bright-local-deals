@@ -35,7 +35,7 @@ serve(async (req) => {
   }
 
   try {
-    const { orderNumber, adType, adTier, storeName, city, totalPrice, phone, customerEmail } = await req.json();
+    const { orderNumber, adType, adTier, storeName, description, city, totalPrice, phone, customerEmail } = await req.json();
 
     const adminEmail = "nsaihost@gmail.com";
     const priceDisplay = totalPrice === 0 ? "مجاني" : `${totalPrice} ريال`;
@@ -63,6 +63,7 @@ serve(async (req) => {
           ${row("🏪 اسم المتجر", storeName)}
           ${row("📋 نوع الإعلان", adType)}
           ${row("⭐ الفئة", tierDisplay)}
+          ${description ? row("📝 النبذة", description) : ""}
           ${row("📍 المدينة", city)}
           ${row("📞 رقم التواصل", phone || "غير محدد")}
           ${row("📧 إيميل العميل", customerEmail || "لم يحدد")}
@@ -119,6 +120,7 @@ serve(async (req) => {
           ${row("🏪 اسم المتجر", storeName)}
           ${row("📋 نوع الإعلان", adType)}
           ${row("⭐ الفئة", tierDisplay)}
+          ${description ? row("📝 النبذة", description) : ""}
           ${row("📍 المدينة", city)}
           ${row("📞 رقم التواصل", phone || "غير محدد")}
           ${row("📧 البريد الإلكتروني", customerEmail)}
