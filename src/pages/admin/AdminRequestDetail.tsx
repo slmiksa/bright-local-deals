@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, Star, Sparkles, MapPin, Store, Tag, DollarSign, Clock, Image as ImageIcon, Play, Phone, Download, Map } from "lucide-react";
+import { ArrowRight, Star, Sparkles, MapPin, Store, Tag, DollarSign, Clock, Image as ImageIcon, Play, Phone, Download, Map, Copy, Check } from "lucide-react";
 import { useState, useCallback } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { useRegionsWithCities } from "@/hooks/useRegions";
@@ -102,12 +102,12 @@ const AdminRequestDetail = () => {
         const regionForCity = regions.find(r => r.cities.some(c => c.name === request.city));
         return (
           <div className="grid grid-cols-2 gap-3">
-            <InfoCard icon={Store} label="اسم المتجر" value={request.store_name} />
+            <InfoCard icon={Store} label="اسم المتجر" value={request.store_name} copyable />
             <InfoCard icon={Tag} label="نوع الإعلان" value={request.ad_type} />
             <InfoCard icon={request.ad_tier === "متميز" ? Sparkles : Star} label="فئة الإعلان" value={request.ad_tier} />
             <InfoCard icon={Map} label="المنطقة" value={regionForCity?.name || "غير محددة"} />
             <InfoCard icon={MapPin} label="المدينة" value={request.city} />
-            <InfoCard icon={Phone} label="رقم التواصل" value={(request as any).phone || "غير محدد"} />
+            <InfoCard icon={Phone} label="رقم التواصل" value={(request as any).phone || "غير محدد"} copyable />
             <InfoCard icon={DollarSign} label="السعر" value={`${request.total_price} ريال`} highlight />
             <InfoCard icon={Clock} label="الحالة" value={statusLabels[request.status] || request.status} />
           </div>
@@ -117,7 +117,10 @@ const AdminRequestDetail = () => {
       {/* Description */}
       {(request as any).description && (
         <div className="bg-card border border-border rounded-xl p-4">
-          <h2 className="text-[13px] font-bold text-foreground mb-2">نبذة عن الإعلان</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-[13px] font-bold text-foreground">نبذة عن الإعلان</h2>
+            <CopyButton text={(request as any).description} />
+          </div>
           <p className="text-[13px] text-muted-foreground whitespace-pre-line leading-relaxed">{(request as any).description}</p>
         </div>
       )}
@@ -239,14 +242,31 @@ const AdminRequestDetail = () => {
   );
 };
 
-function InfoCard({ icon: Icon, label, value, highlight }: { icon: any; label: string; value: string; highlight?: boolean }) {
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+  return (
+    <button onClick={handleCopy} className="p-1.5 rounded-lg hover:bg-muted transition-colors" title="نسخ">
+      {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
+    </button>
+  );
+}
+
+function InfoCard({ icon: Icon, label, value, highlight, copyable }: { icon: any; label: string; value: string; highlight?: boolean; copyable?: boolean }) {
   return (
     <div className="bg-card border border-border rounded-xl p-3">
       <div className="flex items-center gap-1.5 mb-1">
         <Icon className="w-3.5 h-3.5 text-muted-foreground" />
         <span className="text-[11px] text-muted-foreground">{label}</span>
       </div>
-      <p className={`text-[14px] font-bold ${highlight ? "text-primary" : "text-foreground"}`}>{value}</p>
+      <div className="flex items-center justify-between">
+        <p className={`text-[14px] font-bold ${highlight ? "text-primary" : "text-foreground"}`}>{value}</p>
+        {copyable && <CopyButton text={value} />}
+      </div>
     </div>
   );
 }
