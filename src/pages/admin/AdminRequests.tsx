@@ -99,6 +99,7 @@ const AdminRequests = () => {
     pending: requests.filter((r) => r.status === "pending"),
     approved: requests.filter((r) => r.status === "approved"),
     rejected: requests.filter((r) => r.status === "rejected"),
+    deleted: requests.filter((r) => r.status === "deleted"),
   };
 
   const renderRequestCard = (req: (typeof requests)[0]) => {
