@@ -2,8 +2,12 @@ import { useState, useCallback, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+import PageTransition from "@/components/PageTransition";
+import { localStoragePersister } from "@/lib/queryPersister";
 import { CityProvider } from "@/contexts/CityContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -58,8 +62,9 @@ const queryClient = new QueryClient({
       retry: 2,
       retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
       staleTime: 1000 * 60 * 10,
-      gcTime: 1000 * 60 * 30,
+      gcTime: 1000 * 60 * 60 * 24,
       refetchOnWindowFocus: false,
+      networkMode: "offlineFirst",
     },
   },
 });
@@ -97,7 +102,7 @@ const App = () => {
 
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
+      <PersistQueryClientProvider client={queryClient} persistOptions={{ persister: localStoragePersister, maxAge: 1000 * 60 * 60 * 24 }}>
         <TooltipProvider>
           <AuthProvider>
           <CityProvider>
@@ -111,18 +116,18 @@ const App = () => {
               <PopupAd />
               <Routes>
                 {/* Public routes */}
-                <Route path="/" element={<Index />} />
-                <Route path="/ad/:id" element={<AdDetail />} />
-                <Route path="/categories" element={<CategoriesPage />} />
-                <Route path="/category/:id" element={<CategoryPage />} />
-                <Route path="/gallery" element={<GalleryPage />} />
-                <Route path="/gallery/:adId" element={<GalleryPage />} />
-                <Route path="/add" element={<AddAdPage />} />
-                <Route path="/support" element={<SupportPage />} />
-                <Route path="/partners" element={<PartnersPage />} />
-                <Route path="/privacy" element={<TermsPage />} />
-                <Route path="/featured" element={<FeaturedPage />} />
-                <Route path="/search" element={<SearchPage />} />
+                <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+                <Route path="/ad/:id" element={<PageTransition><AdDetail /></PageTransition>} />
+                <Route path="/categories" element={<PageTransition><CategoriesPage /></PageTransition>} />
+                <Route path="/category/:id" element={<PageTransition><CategoryPage /></PageTransition>} />
+                <Route path="/gallery" element={<PageTransition><GalleryPage /></PageTransition>} />
+                <Route path="/gallery/:adId" element={<PageTransition><GalleryPage /></PageTransition>} />
+                <Route path="/add" element={<PageTransition><AddAdPage /></PageTransition>} />
+                <Route path="/support" element={<PageTransition><SupportPage /></PageTransition>} />
+                <Route path="/partners" element={<PageTransition><PartnersPage /></PageTransition>} />
+                <Route path="/privacy" element={<PageTransition><TermsPage /></PageTransition>} />
+                <Route path="/featured" element={<PageTransition><FeaturedPage /></PageTransition>} />
+                <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
 
                 {/* Admin routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
@@ -155,7 +160,7 @@ const App = () => {
           </CityProvider>
           </AuthProvider>
         </TooltipProvider>
-      </QueryClientProvider>
+      </PersistQueryClientProvider>
     </ErrorBoundary>
   );
 };
