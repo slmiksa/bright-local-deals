@@ -115,18 +115,18 @@ const App = () => {
               <PopupAd />
               <Routes>
                 {/* Public routes */}
-                <Route path="/" element={<Index />} />
-                <Route path="/ad/:id" element={<AdDetail />} />
-                <Route path="/categories" element={<CategoriesPage />} />
-                <Route path="/category/:id" element={<CategoryPage />} />
-                <Route path="/gallery" element={<GalleryPage />} />
-                <Route path="/gallery/:adId" element={<GalleryPage />} />
-                <Route path="/add" element={<AddAdPage />} />
-                <Route path="/support" element={<SupportPage />} />
-                <Route path="/partners" element={<PartnersPage />} />
-                <Route path="/privacy" element={<TermsPage />} />
-                <Route path="/featured" element={<FeaturedPage />} />
-                <Route path="/search" element={<SearchPage />} />
+                <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+                <Route path="/ad/:id" element={<PageTransition><AdDetail /></PageTransition>} />
+                <Route path="/categories" element={<PageTransition><CategoriesPage /></PageTransition>} />
+                <Route path="/category/:id" element={<PageTransition><CategoryPage /></PageTransition>} />
+                <Route path="/gallery" element={<PageTransition><GalleryPage /></PageTransition>} />
+                <Route path="/gallery/:adId" element={<PageTransition><GalleryPage /></PageTransition>} />
+                <Route path="/add" element={<PageTransition><AddAdPage /></PageTransition>} />
+                <Route path="/support" element={<PageTransition><SupportPage /></PageTransition>} />
+                <Route path="/partners" element={<PageTransition><PartnersPage /></PageTransition>} />
+                <Route path="/privacy" element={<PageTransition><TermsPage /></PageTransition>} />
+                <Route path="/featured" element={<PageTransition><FeaturedPage /></PageTransition>} />
+                <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
 
                 {/* Admin routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
