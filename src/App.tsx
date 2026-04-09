@@ -159,7 +159,7 @@ const App = () => {
           </CityProvider>
           </AuthProvider>
         </TooltipProvider>
-      </QueryClientProvider>
+      </PersistQueryClientProvider>
     </ErrorBoundary>
   );
 };
