@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Images, Eye, Heart, MapPin, ChevronLeft } from "lucide-react";
 import ImageLightbox from "./ImageLightbox";
 import VideoThumbnail from "./VideoThumbnail";
@@ -20,6 +20,7 @@ interface AdCardProps {
 
 const AdCard = ({ id, images, media = [], shopName, offer, featured, city, displayCity, showCity }: AdCardProps) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [imgIndex, setImgIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -36,6 +37,19 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured, city, displ
     setImgIndex(Math.abs(index));
   };
 
+  const openAd = () => {
+    try {
+      const raw = sessionStorage.getItem("lamha_scroll_positions") || "{}";
+      const positions = JSON.parse(raw) as Record<string, number>;
+      positions[pathname] = window.scrollY || 0;
+      sessionStorage.setItem("lamha_scroll_positions", JSON.stringify(positions));
+    } catch {
+      // Ignore storage errors
+    }
+
+    navigate(`/ad/${id}`);
+  };
+
   const renderMediaItem = (m: AdMedia, i: number) => {
     if (m.type === 'video') {
       return (
@@ -44,7 +58,7 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured, city, displ
           src={m.url}
           alt={`${shopName} فيديو`}
           className="w-full h-full shrink-0 snap-center"
-          onClick={() => navigate(`/ad/${id}`)}
+          onClick={openAd}
         />
       );
     }
@@ -55,7 +69,7 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured, city, displ
         alt={`${shopName} ${i + 1}`}
         className="w-full h-full object-cover shrink-0 snap-center cursor-pointer"
         loading="lazy"
-        onClick={() => navigate(`/ad/${id}`)}
+        onClick={openAd}
       />
     );
   };
@@ -145,7 +159,7 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured, city, displ
           {/* CTA Button */}
           <button
             className="w-full flex items-center justify-center gap-1.5 bg-primary text-primary-foreground rounded-xl py-2.5 text-[12px] font-bold active:scale-[0.97] transition-transform"
-            onClick={() => navigate(`/ad/${id}`)}
+            onClick={openAd}
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             تفاصيل
