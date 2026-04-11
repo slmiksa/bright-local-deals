@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AdStats {
@@ -6,6 +7,8 @@ interface AdStats {
   likes: number;
   liked: boolean;
 }
+
+const getStatsQueryKey = (adId: number) => ["ad_stats", adId] as const;
 
 function getLikedAds(): number[] {
   try {
@@ -50,52 +53,48 @@ export async function recordView(adId: number) {
 }
 
 export function useAdStats(adId: number): AdStats & { toggleLike: () => void } {
-  const [stats, setStats] = useState<AdStats>({
-    views: 0,
-    likes: 0,
-    liked: getLikedAds().includes(adId),
+  const queryClient = useQueryClient();
+  const liked = getLikedAds().includes(adId);
+
+  const { data } = useQuery({
+    queryKey: getStatsQueryKey(adId),
+    enabled: adId > 0,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("ad_stats")
+        .select("views, likes, fake_views")
+        .eq("ad_id", adId)
+        .maybeSingle();
+
+      const fakeViews = (data as any)?.fake_views || 0;
+
+      return {
+        views: (data?.views || 0) + fakeViews,
+        likes: data?.likes || 0,
+      };
+    },
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 60 * 24,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
-  const [fetched, setFetched] = useState(false);
 
-  // Fetch real stats from DB
-  useEffect(() => {
-    if (!adId || fetched) return;
-    let cancelled = false;
-    
-    supabase
-      .from("ad_stats")
-      .select("views, likes, fake_views")
-      .eq("ad_id", adId)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (cancelled) return;
-        if (data) {
-          const fakeViews = (data as any).fake_views || 0;
-          setStats(prev => ({
-            ...prev,
-            views: (data.views || 0) + fakeViews,
-            likes: data.likes || 0,
-          }));
-        }
-        setFetched(true);
-      });
-
-    return () => { cancelled = true; };
-  }, [adId, fetched]);
+  const stats: AdStats = {
+    views: data?.views || 0,
+    likes: data?.likes || 0,
+    liked,
+  };
 
   const toggleLike = useCallback(async () => {
     const likedAds = getLikedAds();
     const currentlyLiked = likedAds.includes(adId);
     const newLiked = !currentlyLiked;
 
-    // Update local state immediately (optimistic)
-    setStats(prev => ({
-      ...prev,
-      liked: newLiked,
-      likes: newLiked ? prev.likes + 1 : Math.max(0, prev.likes - 1),
+    queryClient.setQueryData(getStatsQueryKey(adId), (prev?: { views: number; likes: number }) => ({
+      views: prev?.views || 0,
+      likes: newLiked ? (prev?.likes || 0) + 1 : Math.max(0, (prev?.likes || 0) - 1),
     }));
 
-    // Update localStorage
     if (newLiked) {
       likedAds.push(adId);
     } else {
@@ -104,7 +103,6 @@ export function useAdStats(adId: number): AdStats & { toggleLike: () => void } {
     }
     localStorage.setItem("lamha_liked", JSON.stringify(likedAds));
 
-    // Update DB
     const { data: existing } = await supabase
       .from("ad_stats")
       .select("id, likes")
@@ -124,7 +122,7 @@ export function useAdStats(adId: number): AdStats & { toggleLike: () => void } {
         .from("ad_stats")
         .insert({ ad_id: adId, views: 0, likes: newLiked ? 1 : 0 });
     }
-  }, [adId]);
+  }, [adId, queryClient]);
 
   return { ...stats, toggleLike };
 }
