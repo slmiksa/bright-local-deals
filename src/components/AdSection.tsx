@@ -1,3 +1,4 @@
+import { useCallback, useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AdCard from "./AdCard";
 import PlaceholderAdCard from "./PlaceholderAdCard";
@@ -10,11 +11,43 @@ interface AdSectionProps {
   title: string;
   ads: Ad[];
   showCity?: boolean;
+  scrollContextKey?: string;
 }
 
-const AdSection = ({ id, title, ads, showCity }: AdSectionProps) => {
+const AdSection = ({ id, title, ads, showCity, scrollContextKey = "default" }: AdSectionProps) => {
   const navigate = useNavigate();
   const Icon = getCategoryIcon(id);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const storageKey = `lamha_section_scroll:${scrollContextKey}:${id}`;
+
+  const handleScroll = useCallback(() => {
+    if (!scrollRef.current) return;
+
+    try {
+      sessionStorage.setItem(storageKey, String(scrollRef.current.scrollLeft));
+    } catch {
+      // Ignore storage errors
+    }
+  }, [storageKey]);
+
+  useLayoutEffect(() => {
+    if (!scrollRef.current) return;
+
+    let rafId = 0;
+
+    rafId = requestAnimationFrame(() => {
+      try {
+        const saved = Number(sessionStorage.getItem(storageKey) || "0");
+        if (!Number.isNaN(saved) && scrollRef.current) {
+          scrollRef.current.scrollLeft = saved;
+        }
+      } catch {
+        // Ignore storage errors
+      }
+    });
+
+    return () => cancelAnimationFrame(rafId);
+  }, [ads.length, storageKey]);
 
   return (
     <section id={id} className="pt-7">
@@ -34,6 +67,8 @@ const AdSection = ({ id, title, ads, showCity }: AdSectionProps) => {
         </button>
       </div>
       <div
+        ref={scrollRef}
+        onScroll={handleScroll}
         className="flex gap-3 overflow-x-auto px-5 hide-scrollbar"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
