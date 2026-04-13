@@ -31,7 +31,7 @@ const Index = () => {
       <ComingSoonSection />
       <FeaturedSlider />
       <EventsSlider />
-      <CategoriesRow />
+      {/* CategoriesRow hidden from home – accessible via bottom tab */}
       {sections.filter(s => s.id !== "events").map((section) => (
         <AdSection key={section.id} {...section} showCity={isRegionMode} scrollContextKey={displayKey || "all"} />
       ))}
