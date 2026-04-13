@@ -101,7 +101,7 @@ const AdDetail = () => {
             {imageMedia.length > 0 && (
               <>
                 <div className="relative aspect-[16/10] overflow-hidden">
-                  <div ref={scrollRef} onScroll={handleScroll} className="flex w-full h-full overflow-x-auto snap-x snap-mandatory hide-scrollbar" dir="ltr" style={{ WebkitOverflowScrolling: 'touch', scrollBehavior: 'auto' }}>
+                  <div ref={scrollRef} onScroll={handleScroll} className="flex w-full h-full overflow-x-auto snap-x snap-mandatory hide-scrollbar" dir="ltr">
                     {imageMedia.map((m, i) => (
                       <img key={i} src={m.url} alt={`${ad.shopName} ${i + 1}`} className="w-full h-full object-cover shrink-0 snap-center cursor-pointer" onClick={() => { setLightboxIndex(i); setLightboxOpen(true); }} />
                     ))}
