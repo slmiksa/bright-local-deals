@@ -33,7 +33,7 @@ const Index = () => {
       <EventsSlider />
       <CategoriesRow />
       {sections.filter(s => s.id !== "events").map((section) => (
-        <AdSection key={section.id} {...section} showCity={isRegionMode} />
+        <AdSection key={section.id} {...section} showCity={isRegionMode} scrollContextKey={displayKey || "all"} />
       ))}
       {!isLoading && sections.length === 0 && (
         <div className="text-center py-16">
