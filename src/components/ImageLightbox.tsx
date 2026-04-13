@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 
 interface ImageLightboxProps {
   images: string[];
@@ -15,12 +16,12 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
   const [current, setCurrent] = useState(initialIndex);
   const [scale, setScale] = useState(1);
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
-  
+
   // Swipe state
   const [swipeX, setSwipeX] = useState(0);
   const [isSwipingHorizontal, setIsSwipingHorizontal] = useState(false);
   const [swipeTransition, setSwipeTransition] = useState(false);
-  
+
   // Dismiss state
   const [dismissY, setDismissY] = useState(0);
   const [isDismissing, setIsDismissing] = useState(false);
@@ -29,10 +30,19 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
   const containerRef = useRef<HTMLDivElement>(null);
   const lastTap = useRef(0);
   const gestureDecided = useRef(false);
-  
+
   // Velocity tracking
   const velocityRef = useRef({ x: 0, y: 0, lastX: 0, lastY: 0, lastTime: 0 });
-  
+
+  // Zoom pan tracking
+  const panRef = useRef({ startX: 0, startY: 0, startTx: 0, startTy: 0, active: false });
+  const scaleRef = useRef(1);
+  const translateRef = useRef({ x: 0, y: 0 });
+
+  // Keep refs in sync
+  useEffect(() => { scaleRef.current = scale; }, [scale]);
+  useEffect(() => { translateRef.current = translate; }, [translate]);
+
   const touchRef = useRef<{
     startX: number;
     startY: number;
@@ -65,7 +75,9 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
 
   useEffect(() => {
     setScale(1);
+    scaleRef.current = 1;
     setTranslate({ x: 0, y: 0 });
+    translateRef.current = { x: 0, y: 0 };
     setSwipeX(0);
     setIsSwipingHorizontal(false);
   }, [current]);
@@ -76,6 +88,11 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
   const getDistance = (t1: React.Touch, t2: React.Touch) =>
     Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
 
+  const getMidpoint = (t1: React.Touch, t2: React.Touch) => ({
+    x: (t1.clientX + t2.clientX) / 2,
+    y: (t1.clientY + t2.clientY) / 2,
+  });
+
   const handleTouchStart = (e: React.TouchEvent) => {
     setSwipeTransition(false);
     setDismissTransition(false);
@@ -85,12 +102,16 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
       e.preventDefault();
       touchRef.current.scaling = true;
       touchRef.current.dist = getDistance(e.touches[0], e.touches[1]);
+      touchRef.current.moved = true;
       return;
     }
 
+    const x = e.touches[0].clientX;
+    const y = e.touches[0].clientY;
+
     touchRef.current = {
-      startX: e.touches[0].clientX,
-      startY: e.touches[0].clientY,
+      startX: x,
+      startY: y,
       dist: 0,
       scaling: false,
       moved: false,
@@ -99,20 +120,41 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
 
     velocityRef.current = {
       x: 0, y: 0,
-      lastX: e.touches[0].clientX,
-      lastY: e.touches[0].clientY,
+      lastX: x,
+      lastY: y,
       lastTime: Date.now(),
     };
+
+    // Setup zoom pan
+    if (scaleRef.current > 1) {
+      panRef.current = {
+        startX: x,
+        startY: y,
+        startTx: translateRef.current.x,
+        startTy: translateRef.current.y,
+        active: false,
+      };
+    }
 
     // Double tap
     const now = Date.now();
     if (now - lastTap.current < 280) {
       e.preventDefault();
-      if (scale > 1) {
+      if (scaleRef.current > 1) {
         setScale(1);
         setTranslate({ x: 0, y: 0 });
       } else {
         setScale(2.5);
+        // Center zoom on tap point
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (rect) {
+          const cx = rect.width / 2;
+          const cy = rect.height / 2;
+          setTranslate({
+            x: (cx - x) * 1.5,
+            y: (cy - y) * 1.5,
+          });
+        }
       }
       touchRef.current.moved = true;
       gestureDecided.current = true;
@@ -126,48 +168,59 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
       e.preventDefault();
       const newDist = getDistance(e.touches[0], e.touches[1]);
       const ratio = newDist / touchRef.current.dist;
-      setScale(s => Math.min(5, Math.max(1, s * ratio)));
+      const newScale = Math.min(5, Math.max(1, scaleRef.current * ratio));
+      setScale(newScale);
       touchRef.current.dist = newDist;
       touchRef.current.moved = true;
+
+      if (newScale <= 1) {
+        setTranslate({ x: 0, y: 0 });
+      }
       return;
     }
 
     if (e.touches.length !== 1) return;
 
-    const dx = e.touches[0].clientX - touchRef.current.startX;
-    const dy = e.touches[0].clientY - touchRef.current.startY;
-    const absDx = Math.abs(dx);
-    const absDy = Math.abs(dy);
+    const x = e.touches[0].clientX;
+    const y = e.touches[0].clientY;
 
-    // Track velocity with exponential smoothing
+    // Track velocity
     const now = Date.now();
     const dt = now - velocityRef.current.lastTime;
     if (dt > 0) {
-      const vx = (e.touches[0].clientX - velocityRef.current.lastX) / dt;
-      const vy = (e.touches[0].clientY - velocityRef.current.lastY) / dt;
+      const vx = (x - velocityRef.current.lastX) / dt;
+      const vy = (y - velocityRef.current.lastY) / dt;
       velocityRef.current.x = vx * 0.7 + velocityRef.current.x * 0.3;
       velocityRef.current.y = vy * 0.7 + velocityRef.current.y * 0.3;
-      velocityRef.current.lastX = e.touches[0].clientX;
-      velocityRef.current.lastY = e.touches[0].clientY;
+      velocityRef.current.lastX = x;
+      velocityRef.current.lastY = y;
       velocityRef.current.lastTime = now;
     }
 
-    // Zoomed pan
-    if (scale > 1) {
+    // Zoomed pan - direct position tracking
+    if (scaleRef.current > 1) {
       e.preventDefault();
-      const moveDx = e.touches[0].clientX - velocityRef.current.lastX + (e.touches[0].clientX - velocityRef.current.lastX);
-      setTranslate(t => ({
-        x: t.x + (e.touches[0].clientX - (velocityRef.current.lastX - (e.touches[0].clientX - velocityRef.current.lastX))),
-        y: t.y + (e.touches[0].clientY - (velocityRef.current.lastY - (e.touches[0].clientY - velocityRef.current.lastY))),
-      }));
-      // Simpler approach for zoomed panning
-      const panDx = e.touches[0].clientX - touchRef.current.startX;
-      const panDy = e.touches[0].clientY - touchRef.current.startY;
-      if (!touchRef.current.moved && (Math.abs(panDx) > 4 || Math.abs(panDy) > 4)) {
+      const dx = x - panRef.current.startX;
+      const dy = y - panRef.current.startY;
+
+      if (!panRef.current.active && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
+        panRef.current.active = true;
         touchRef.current.moved = true;
+      }
+
+      if (panRef.current.active) {
+        setTranslate({
+          x: panRef.current.startTx + dx,
+          y: panRef.current.startTy + dy,
+        });
       }
       return;
     }
+
+    const dx = x - touchRef.current.startX;
+    const dy = y - touchRef.current.startY;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
 
     // Decide gesture direction
     if (!gestureDecided.current && (absDx > 8 || absDy > 8)) {
@@ -189,10 +242,9 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
     if (isDismissing) {
       setDismissY(dy);
     } else if (isSwipingHorizontal) {
-      // Add rubber-band effect at edges
       let adjustedDx = dx;
       if ((current === 0 && dx > 0) || (current === images.length - 1 && dx < 0)) {
-        adjustedDx = dx * 0.3; // rubber band
+        adjustedDx = dx * 0.3;
       }
       setSwipeX(adjustedDx);
     }
@@ -202,10 +254,16 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
     // Pinch end
     if (touchRef.current.scaling && e.touches.length < 2) {
       touchRef.current.scaling = false;
-      if (scale <= 1) {
+      if (scaleRef.current <= 1) {
         setScale(1);
         setTranslate({ x: 0, y: 0 });
       }
+      return;
+    }
+
+    // Zoom pan end - clamp position
+    if (scaleRef.current > 1) {
+      panRef.current.active = false;
       return;
     }
 
@@ -226,9 +284,9 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
     if (isSwipingHorizontal && images.length > 1) {
       const velocity = velocityRef.current.x;
       const shouldSwipe = Math.abs(swipeX) > SWIPE_DISTANCE_THRESHOLD || Math.abs(velocity) > SWIPE_VELOCITY_THRESHOLD;
-      
+
       setSwipeTransition(true);
-      
+
       if (shouldSwipe && (swipeX > 0 || velocity > SWIPE_VELOCITY_THRESHOLD)) {
         if (current > 0) {
           setSwipeX(window.innerWidth);
@@ -246,7 +304,7 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
       } else {
         setSwipeX(0);
       }
-      
+
       setIsSwipingHorizontal(false);
       return;
     }
@@ -259,47 +317,6 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
       else if (tapX < screenW * 0.35) prev();
     }
   };
-
-  // Zoomed panning - track position directly
-  const panStartRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
-
-  const handleZoomTouchStart = (startX: number, startY: number) => {
-    panStartRef.current = { x: startX, y: startY, tx: translate.x, ty: translate.y };
-  };
-
-  useEffect(() => {
-    if (scale > 1) {
-      const onStart = (e: TouchEvent) => {
-        if (e.touches.length === 1) {
-          panStartRef.current = {
-            x: e.touches[0].clientX,
-            y: e.touches[0].clientY,
-            tx: translate.x,
-            ty: translate.y,
-          };
-        }
-      };
-      const onMove = (e: TouchEvent) => {
-        if (e.touches.length === 1 && scale > 1) {
-          const dx = e.touches[0].clientX - panStartRef.current.x;
-          const dy = e.touches[0].clientY - panStartRef.current.y;
-          setTranslate({
-            x: panStartRef.current.tx + dx,
-            y: panStartRef.current.ty + dy,
-          });
-        }
-      };
-      const el = containerRef.current;
-      if (el) {
-        el.addEventListener("touchstart", onStart, { passive: true });
-        el.addEventListener("touchmove", onMove, { passive: false });
-        return () => {
-          el.removeEventListener("touchstart", onStart);
-          el.removeEventListener("touchmove", onMove);
-        };
-      }
-    }
-  }, [scale, translate.x, translate.y]);
 
   const dismissProgress = Math.min(Math.abs(dismissY) / DISMISS_THRESHOLD, 1);
   const bgOpacity = 0.95 - dismissProgress * 0.5;
@@ -322,15 +339,16 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
     if (dismissTransition) return "transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
     if (swipeTransition) return "transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
     if (isDismissing || isSwipingHorizontal) return "none";
+    if (scale > 1 && panRef.current.active) return "none";
     return "transform 0.2s ease-out";
   };
 
   return createPortal(
     <div
       ref={containerRef}
-      onTouchStart={scale <= 1 ? handleTouchStart : undefined}
-      onTouchMove={scale <= 1 ? handleTouchMove : undefined}
-      onTouchEnd={scale <= 1 ? handleTouchEnd : undefined}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       style={{
         position: "fixed",
         top: 0,
@@ -348,6 +366,30 @@ const ImageLightbox = ({ images, initialIndex = 0, onClose }: ImageLightboxProps
         overflow: "hidden",
       }}
     >
+      {/* Close button - always visible */}
+      <button
+        onClick={(e) => { e.stopPropagation(); handleClose(); }}
+        style={{
+          position: "absolute",
+          top: 16,
+          left: 16,
+          zIndex: 10,
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          backdropFilter: "blur(8px)",
+          border: "none",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          WebkitTapHighlightColor: "transparent",
+        }}
+      >
+        <X color="white" size={20} />
+      </button>
+
       <img
         src={images[current]}
         alt={`صورة ${current + 1}`}
