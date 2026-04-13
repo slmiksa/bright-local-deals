@@ -36,7 +36,7 @@ const TopBar = () => {
             <button
               onClick={() => setShowCities(true)}
               className="flex items-center gap-1.5 active:opacity-70 transition-opacity shrink-0">
-              <MapPin className="w-[18px] h-[18px] text-primary animate-pulse" strokeWidth={2} />
+              <MapPin className="w-[18px] h-[18px] text-foreground" strokeWidth={2} />
               <span className="text-[14px] font-bold text-foreground leading-tight truncate max-w-[100px]">{displayName}</span>
               <ChevronDown className="w-3 h-3 text-muted-foreground" />
             </button>
