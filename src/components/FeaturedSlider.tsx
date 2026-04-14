@@ -1,8 +1,10 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback, useLayoutEffect } from "react";
 import { Eye, Sparkles, ChevronLeft, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useFeaturedAds } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
+
+const STORAGE_KEY = "lamha_featured_scroll";
 
 const FeaturedSlider = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -21,14 +23,34 @@ const FeaturedSlider = () => {
     city: ad.displayCity || ad.city,
   }));
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
     const el = scrollRef.current;
     const scrollRight = el.scrollWidth - el.clientWidth - el.scrollLeft;
     const cardWidth = el.clientWidth * 0.88 + 16;
     const index = Math.round(scrollRight / cardWidth);
     setActiveIndex(slides.length - 1 - index);
-  };
+    try { sessionStorage.setItem(STORAGE_KEY, String(el.scrollLeft)); } catch {}
+  }, [slides.length]);
+
+  useLayoutEffect(() => {
+    if (!scrollRef.current || slides.length === 0) return;
+    const raf = requestAnimationFrame(() => {
+      try {
+        const saved = Number(sessionStorage.getItem(STORAGE_KEY) || "0");
+        if (!Number.isNaN(saved) && scrollRef.current) {
+          scrollRef.current.scrollLeft = saved;
+          // Update active index after restore
+          const el = scrollRef.current;
+          const scrollRight = el.scrollWidth - el.clientWidth - el.scrollLeft;
+          const cardWidth = el.clientWidth * 0.88 + 16;
+          const idx = Math.round(scrollRight / cardWidth);
+          setActiveIndex(slides.length - 1 - idx);
+        }
+      } catch {}
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [slides.length]);
 
   if (slides.length === 0) return null;
 
