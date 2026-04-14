@@ -31,22 +31,23 @@ const AdSection = ({ id, title, ads, showCity, scrollContextKey = "default" }: A
   }, [storageKey]);
 
   useLayoutEffect(() => {
-    if (!scrollRef.current) return;
-
-    let rafId = 0;
-
-    rafId = requestAnimationFrame(() => {
+    if (!scrollRef.current || ads.length === 0) return;
+    let attempts = 0;
+    const maxAttempts = 10;
+    const tryRestore = () => {
+      attempts++;
       try {
         const saved = Number(sessionStorage.getItem(storageKey) || "0");
-        if (!Number.isNaN(saved) && scrollRef.current) {
+        if (!Number.isNaN(saved) && saved > 0 && scrollRef.current) {
           scrollRef.current.scrollLeft = saved;
+          if (Math.abs(scrollRef.current.scrollLeft - saved) > 5 && attempts < maxAttempts) {
+            setTimeout(tryRestore, 50);
+            return;
+          }
         }
-      } catch {
-        // Ignore storage errors
-      }
-    });
-
-    return () => cancelAnimationFrame(rafId);
+      } catch {}
+    };
+    requestAnimationFrame(tryRestore);
   }, [ads.length, storageKey]);
 
   return (

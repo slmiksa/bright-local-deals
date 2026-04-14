@@ -35,12 +35,19 @@ const FeaturedSlider = () => {
 
   useLayoutEffect(() => {
     if (!scrollRef.current || slides.length === 0) return;
-    const raf = requestAnimationFrame(() => {
+    let attempts = 0;
+    const maxAttempts = 10;
+    const tryRestore = () => {
+      attempts++;
       try {
         const saved = Number(sessionStorage.getItem(STORAGE_KEY) || "0");
-        if (!Number.isNaN(saved) && scrollRef.current) {
+        if (!Number.isNaN(saved) && saved > 0 && scrollRef.current) {
           scrollRef.current.scrollLeft = saved;
-          // Update active index after restore
+          // Verify it actually scrolled (content may not be rendered yet)
+          if (Math.abs(scrollRef.current.scrollLeft - saved) > 5 && attempts < maxAttempts) {
+            setTimeout(tryRestore, 50);
+            return;
+          }
           const el = scrollRef.current;
           const scrollRight = el.scrollWidth - el.clientWidth - el.scrollLeft;
           const cardWidth = el.clientWidth * 0.88 + 16;
@@ -48,8 +55,8 @@ const FeaturedSlider = () => {
           setActiveIndex(slides.length - 1 - idx);
         }
       } catch {}
-    });
-    return () => cancelAnimationFrame(raf);
+    };
+    requestAnimationFrame(tryRestore);
   }, [slides.length]);
 
   if (slides.length === 0) return null;
