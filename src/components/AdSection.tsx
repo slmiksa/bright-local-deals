@@ -5,6 +5,7 @@ import PlaceholderAdCard from "./PlaceholderAdCard";
 import { ChevronLeft } from "lucide-react";
 import { Ad } from "@/hooks/useAds";
 import { getCategoryIcon } from "@/lib/categoryIcons";
+import { restoreHorizontalScrollState, saveHorizontalScrollState } from "@/lib/horizontalScrollPersistence";
 
 interface AdSectionProps {
   id: string;
@@ -23,31 +24,21 @@ const AdSection = ({ id, title, ads, showCity, scrollContextKey = "default" }: A
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
 
-    try {
-      sessionStorage.setItem(storageKey, String(scrollRef.current.scrollLeft));
-    } catch {
-      // Ignore storage errors
-    }
+    saveHorizontalScrollState(storageKey, scrollRef.current);
+  }, [storageKey]);
+
+  const persistCurrentPosition = useCallback((adId: number) => {
+    if (!scrollRef.current) return;
+    saveHorizontalScrollState(storageKey, scrollRef.current, adId);
   }, [storageKey]);
 
   useLayoutEffect(() => {
     if (!scrollRef.current || ads.length === 0) return;
-    let attempts = 0;
-    const maxAttempts = 10;
-    const tryRestore = () => {
-      attempts++;
-      try {
-        const saved = Number(sessionStorage.getItem(storageKey) || "0");
-        if (!Number.isNaN(saved) && saved > 0 && scrollRef.current) {
-          scrollRef.current.scrollLeft = saved;
-          if (Math.abs(scrollRef.current.scrollLeft - saved) > 5 && attempts < maxAttempts) {
-            setTimeout(tryRestore, 50);
-            return;
-          }
-        }
-      } catch {}
-    };
-    requestAnimationFrame(tryRestore);
+
+    return restoreHorizontalScrollState({
+      storageKey,
+      container: scrollRef.current,
+    });
   }, [ads.length, storageKey]);
 
   return (
@@ -74,8 +65,8 @@ const AdSection = ({ id, title, ads, showCity, scrollContextKey = "default" }: A
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         {ads.slice(0, 10).map((ad) => (
-          <div key={ad.id} className="shrink-0 w-[44%]">
-            <AdCard {...ad} showCity={showCity} />
+          <div key={ad.id} className="shrink-0 w-[44%]" data-scroll-card="true" data-ad-id={ad.id}>
+            <AdCard {...ad} showCity={showCity} onOpen={() => persistCurrentPosition(ad.id)} />
           </div>
         ))}
         <div className="shrink-0 w-[44%]">

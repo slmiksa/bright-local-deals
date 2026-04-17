@@ -16,9 +16,10 @@ interface AdCardProps {
   city?: string;
   displayCity?: string;
   showCity?: boolean;
+  onOpen?: () => void;
 }
 
-const AdCard = ({ id, images, media = [], shopName, offer, featured, city, displayCity, showCity }: AdCardProps) => {
+const AdCard = ({ id, images, media = [], shopName, offer, featured, city, displayCity, showCity, onOpen }: AdCardProps) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -38,6 +39,8 @@ const AdCard = ({ id, images, media = [], shopName, offer, featured, city, displ
   };
 
   const openAd = () => {
+    onOpen?.();
+
     try {
       const raw = sessionStorage.getItem("lamha_scroll_positions") || "{}";
       const positions = JSON.parse(raw) as Record<string, number>;

@@ -1,8 +1,11 @@
-import { useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { ChevronLeft, PartyPopper } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEventAds } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
+import { getCenteredCardIndex, restoreHorizontalScrollState, saveHorizontalScrollState } from "@/lib/horizontalScrollPersistence";
+
+const STORAGE_KEY = "lamha_events_scroll";
 
 const EventsSlider = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -13,14 +16,27 @@ const EventsSlider = () => {
 
   const { data: events = [] } = useEventAds(isRegionMode ? "" : city, isRegionMode ? regionCities : undefined);
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
     const el = scrollRef.current;
-    const scrollRight = el.scrollWidth - el.clientWidth - el.scrollLeft;
-    const cardWidth = el.clientWidth * 0.48 + 12;
-    const index = Math.round(scrollRight / cardWidth);
-    setActiveIndex(events.length - 1 - index);
-  };
+    setActiveIndex(getCenteredCardIndex(el));
+    saveHorizontalScrollState(STORAGE_KEY, el);
+  }, []);
+
+  const persistCurrentPosition = useCallback((adId: number) => {
+    if (!scrollRef.current) return;
+    saveHorizontalScrollState(STORAGE_KEY, scrollRef.current, adId);
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!scrollRef.current || events.length === 0) return;
+
+    return restoreHorizontalScrollState({
+      storageKey: STORAGE_KEY,
+      container: scrollRef.current,
+      onRestored: setActiveIndex,
+    });
+  }, [events.length]);
 
 
   if (events.length === 0) return null;
@@ -49,9 +65,14 @@ const EventsSlider = () => {
         {events.map((ad) =>
           <div
             key={ad.id}
+            data-scroll-card="true"
+            data-ad-id={ad.id}
             className="snap-center shrink-0 w-[45%] rounded-2xl overflow-hidden relative cursor-pointer active:scale-[0.97] transition-transform"
             style={{ aspectRatio: "9/16" }}
-            onClick={() => navigate(`/ad/${ad.id}`)}>
+            onClick={() => {
+              persistCurrentPosition(ad.id);
+              navigate(`/ad/${ad.id}`);
+            }}>
             <img src={ad.images[0]} alt={ad.shopName} className="w-full h-full object-cover" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
             <div className="absolute bottom-0 right-0 left-0 p-3 space-y-1.5">
@@ -66,7 +87,7 @@ const EventsSlider = () => {
               <h3 className="text-white text-[12px] font-bold leading-snug line-clamp-2 drop-shadow-md">{ad.offer}</h3>
               <button
                 className="w-full flex items-center justify-center gap-1 bg-white/90 backdrop-blur-sm text-foreground rounded-lg py-1.5 text-[11px] font-bold active:scale-[0.95] transition-transform"
-                onClick={(e) => { e.stopPropagation(); navigate(`/ad/${ad.id}`); }}>
+                onClick={(e) => { e.stopPropagation(); persistCurrentPosition(ad.id); navigate(`/ad/${ad.id}`); }}>
                 <ChevronLeft className="w-3 h-3" />
                 تفاصيل
               </button>
