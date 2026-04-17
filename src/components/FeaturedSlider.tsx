@@ -3,6 +3,7 @@ import { Eye, Sparkles, ChevronLeft, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useFeaturedAds } from "@/hooks/useAds";
 import { useCity } from "@/contexts/CityContext";
+import { getCenteredCardIndex, restoreHorizontalScrollState, saveHorizontalScrollState } from "@/lib/horizontalScrollPersistence";
 
 const STORAGE_KEY = "lamha_featured_scroll";
 
@@ -26,37 +27,23 @@ const FeaturedSlider = () => {
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
     const el = scrollRef.current;
-    const scrollRight = el.scrollWidth - el.clientWidth - el.scrollLeft;
-    const cardWidth = el.clientWidth * 0.88 + 16;
-    const index = Math.round(scrollRight / cardWidth);
-    setActiveIndex(slides.length - 1 - index);
-    try { sessionStorage.setItem(STORAGE_KEY, String(el.scrollLeft)); } catch {}
-  }, [slides.length]);
+    setActiveIndex(getCenteredCardIndex(el));
+    saveHorizontalScrollState(STORAGE_KEY, el);
+  }, []);
+
+  const persistCurrentPosition = useCallback((adId: number) => {
+    if (!scrollRef.current) return;
+    saveHorizontalScrollState(STORAGE_KEY, scrollRef.current, adId);
+  }, []);
 
   useLayoutEffect(() => {
     if (!scrollRef.current || slides.length === 0) return;
-    let attempts = 0;
-    const maxAttempts = 10;
-    const tryRestore = () => {
-      attempts++;
-      try {
-        const saved = Number(sessionStorage.getItem(STORAGE_KEY) || "0");
-        if (!Number.isNaN(saved) && saved > 0 && scrollRef.current) {
-          scrollRef.current.scrollLeft = saved;
-          // Verify it actually scrolled (content may not be rendered yet)
-          if (Math.abs(scrollRef.current.scrollLeft - saved) > 5 && attempts < maxAttempts) {
-            setTimeout(tryRestore, 50);
-            return;
-          }
-          const el = scrollRef.current;
-          const scrollRight = el.scrollWidth - el.clientWidth - el.scrollLeft;
-          const cardWidth = el.clientWidth * 0.88 + 16;
-          const idx = Math.round(scrollRight / cardWidth);
-          setActiveIndex(slides.length - 1 - idx);
-        }
-      } catch {}
-    };
-    requestAnimationFrame(tryRestore);
+
+    return restoreHorizontalScrollState({
+      storageKey: STORAGE_KEY,
+      container: scrollRef.current,
+      onRestored: setActiveIndex,
+    });
   }, [slides.length]);
 
   if (slides.length === 0) return null;
@@ -88,9 +75,14 @@ const FeaturedSlider = () => {
         {slides.map((slide) =>
           <div
             key={slide.id}
+            data-scroll-card="true"
+            data-ad-id={slide.id}
             className="snap-center shrink-0 w-[88%] rounded-3xl overflow-hidden relative cursor-pointer group"
             style={{ aspectRatio: "3/4" }}
-            onClick={() => navigate(`/ad/${slide.id}`)}>
+            onClick={() => {
+              persistCurrentPosition(slide.id);
+              navigate(`/ad/${slide.id}`);
+            }}>
             {slide.firstMedia?.type === 'video' ? (
               <>
                 <video
