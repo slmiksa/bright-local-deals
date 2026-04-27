@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images, Eye, Heart, Play, Copy, X, Link, CheckCircle2, Video, Image as ImageIcon, Globe } from "lucide-react";
 import { useAdById } from "@/hooks/useAds";
 import { useState, useRef, useEffect } from "react";
@@ -15,6 +15,9 @@ const getAdUrl = (adId: number) => `${APP_BASE_URL}/ad/${adId}`;
 const AdDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  // عند فتح الرابط مباشرة (من خارج التطبيق) يكون location.key === "default"
+  const canGoBack = location.key !== "default";
   const adId = Number(id) || 0;
   const { data: ad, isLoading } = useAdById(adId);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -84,7 +87,7 @@ const AdDetail = () => {
       {/* Header */}
       <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
         <div className="px-4 py-3 flex items-center justify-between">
-          <button onClick={() => window.history.length > 1 ? navigate(-1) : navigate("/")} className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors">
+          <button onClick={() => canGoBack ? navigate(-1) : navigate("/")} className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors">
             <ArrowRight className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="text-[15px] font-bold text-foreground">{ad.shopName}</h1>
