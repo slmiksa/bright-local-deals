@@ -87,7 +87,7 @@ const AdDetail = () => {
       {/* Header */}
       <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border safe-top">
         <div className="px-4 py-3 flex items-center justify-between">
-          <button onClick={() => window.history.length > 1 ? navigate(-1) : navigate("/")} className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors">
+          <button onClick={() => canGoBack ? navigate(-1) : navigate("/")} className="touch-target w-10 h-10 rounded-xl bg-secondary flex items-center justify-center active:bg-muted transition-colors">
             <ArrowRight className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="text-[15px] font-bold text-foreground">{ad.shopName}</h1>
