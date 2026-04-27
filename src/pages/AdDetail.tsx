@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { ArrowRight, Phone, MapPin, Clock, Star, Share2, Images, Eye, Heart, Play, Copy, X, Link, CheckCircle2, Video, Image as ImageIcon, Globe } from "lucide-react";
 import { useAdById } from "@/hooks/useAds";
 import { useState, useRef, useEffect } from "react";
