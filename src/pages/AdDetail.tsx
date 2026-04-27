@@ -15,6 +15,9 @@ const getAdUrl = (adId: number) => `${APP_BASE_URL}/ad/${adId}`;
 const AdDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  // عند فتح الرابط مباشرة (من خارج التطبيق) يكون location.key === "default"
+  const canGoBack = location.key !== "default";
   const adId = Number(id) || 0;
   const { data: ad, isLoading } = useAdById(adId);
   const [lightboxOpen, setLightboxOpen] = useState(false);
