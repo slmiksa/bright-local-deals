@@ -73,10 +73,11 @@ export function useAdStats(adId: number): AdStats & { toggleLike: () => void } {
         likes: data?.likes || 0,
       };
     },
-    staleTime: 1000 * 60 * 10,
+    staleTime: 0,
     gcTime: 1000 * 60 * 60 * 24,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 
   const stats: AdStats = {
