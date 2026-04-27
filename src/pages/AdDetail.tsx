@@ -171,16 +171,16 @@ const AdDetail = () => {
 
       {/* Info */}
       <div className="px-5 pt-5">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-foreground">{ad.shopName}</h2>
-          <button onClick={toggleLike} className="touch-target w-10 h-10 rounded-full bg-secondary flex items-center justify-center active:scale-90 transition-transform">
-            <Heart className={`w-5 h-5 transition-colors ${liked ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
-          </button>
-        </div>
+        <h2 className="text-xl font-bold text-foreground">{ad.shopName}</h2>
         <p className="text-primary font-semibold text-[14px] mt-1">{ad.offer}</p>
         <div className="flex items-center gap-4 mt-3">
           <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground bg-secondary px-3 py-1.5 rounded-xl"><Eye className="w-4 h-4" /> {views} مشاهدة</span>
-          <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground bg-secondary px-3 py-1.5 rounded-xl"><Heart className={`w-4 h-4 ${liked ? "fill-red-500 text-red-500" : ""}`} /> {likes} إعجاب</span>
+          <button
+            onClick={toggleLike}
+            className="flex items-center gap-1.5 text-[13px] text-muted-foreground bg-secondary px-3 py-1.5 rounded-xl active:scale-95 transition-transform"
+          >
+            <Heart className={`w-4 h-4 transition-colors ${liked ? "fill-red-500 text-red-500" : ""}`} /> {likes} إعجاب
+          </button>
         </div>
         <div className="flex items-center gap-2 mt-3 text-muted-foreground"><MapPin className="w-4 h-4 shrink-0" /><span className="text-[13px]">{ad.address}</span></div>
         <div className="flex items-center gap-2 mt-2 text-muted-foreground"><Clock className="w-4 h-4 shrink-0" /><span className="text-[13px]">متاح الآن</span></div>
