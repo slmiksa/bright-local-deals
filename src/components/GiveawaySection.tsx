@@ -42,7 +42,10 @@ const GiveawaySection = () => {
 
       return matching.length > 0 ? matching[0] : null;
     },
-    staleTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30, // 30s — show new/updated giveaways quickly
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 
   const [name, setName] = useState("");
