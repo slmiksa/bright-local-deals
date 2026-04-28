@@ -187,11 +187,10 @@ export function useAdsByCity(city: string, options?: { enabled?: boolean; cities
     },
     enabled: (options?.enabled ?? true) && (!!city || (options?.cities?.length ?? 0) > 0),
     placeholderData: keepPreviousData,
-    staleTime: 0,
+    staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }
 
@@ -201,11 +200,9 @@ export function useFeaturedAds(city: string, cities?: string[]) {
     queryKey: cities?.length ? ["ads", "featured", "region", regions.length, ...cities] : ["ads", "featured", city, regions.length],
     queryFn: () => fetchAds(cities?.length ? { cities, featured: true, regions } : { city, featured: true, regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
-    staleTime: 0,
+    staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -215,11 +212,9 @@ export function useAdsByCategory(category: string, city: string, cities?: string
     queryKey: cities?.length ? ["ads", "category", category, "region", regions.length, ...cities] : ["ads", "category", category, city, regions.length],
     queryFn: () => fetchAds(cities?.length ? { cities, category, regions } : { city, category, regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
-    staleTime: 0,
+    staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -228,11 +223,6 @@ export function useAdById(id: number) {
     queryKey: ["ads", "detail", id],
     queryFn: () => fetchAdById(id),
     enabled: id > 0,
-    staleTime: 0,
-    gcTime: 1000 * 60 * 60,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
   });
 }
 
@@ -242,11 +232,9 @@ export function useEventAds(city: string, cities?: string[]) {
     queryKey: cities?.length ? ["ads", "events", "region", regions.length, ...cities] : ["ads", "events", city, regions.length],
     queryFn: () => fetchAds(cities?.length ? { cities, category: "events", regions } : { city, category: "events", regions }),
     enabled: !!city || (cities?.length ?? 0) > 0,
-    staleTime: 0,
+    staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -254,10 +242,7 @@ export function useCities() {
   return useQuery({
     queryKey: ["cities"],
     queryFn: fetchCities,
-    staleTime: 0,
-    gcTime: 1000 * 60 * 10,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
+    staleTime: 1000 * 60 * 60,
+    gcTime: 1000 * 60 * 60 * 24,
   });
 }

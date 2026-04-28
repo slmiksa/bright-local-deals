@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useLayoutEffect, useMemo } from "react";
+import { useRef, useState, useCallback, useLayoutEffect } from "react";
 import { Eye, Sparkles, ChevronLeft, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useFeaturedAds } from "@/hooks/useAds";
@@ -9,7 +9,6 @@ const STORAGE_KEY = "lamha_featured_scroll";
 
 const FeaturedSlider = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const restoredRef = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
   const { city, selectionMode, regionCities } = useCity();
@@ -24,13 +23,11 @@ const FeaturedSlider = () => {
     subtitle: ad.shopName,
     city: ad.displayCity || ad.city,
   }));
-  const slidesSignature = useMemo(() => slides.map((slide) => slide.id).join("|"), [slides]);
 
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
     const el = scrollRef.current;
     setActiveIndex(getCenteredCardIndex(el));
-    if (!restoredRef.current) return;
     saveHorizontalScrollState(STORAGE_KEY, el);
   }, []);
 
@@ -41,20 +38,13 @@ const FeaturedSlider = () => {
 
   useLayoutEffect(() => {
     if (!scrollRef.current || slides.length === 0) return;
-    restoredRef.current = false;
 
     return restoreHorizontalScrollState({
       storageKey: STORAGE_KEY,
       container: scrollRef.current,
-      maxAttempts: 24,
-      onRestored: (index) => {
-        setActiveIndex(index);
-        window.setTimeout(() => {
-          restoredRef.current = true;
-        }, 0);
-      },
+      onRestored: setActiveIndex,
     });
-  }, [slides.length, slidesSignature]);
+  }, [slides.length]);
 
   if (slides.length === 0) return null;
 

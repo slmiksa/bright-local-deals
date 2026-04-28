@@ -34,11 +34,7 @@ export function useRegionsWithCities() {
           .map((c) => ({ id: c.id, name: c.name, sort_order: c.sort_order, is_default: c.is_default })),
       }));
     },
-    // Always refresh region/city list so admin edits (rename, add, delete) appear immediately
-    staleTime: 0,
-    gcTime: 1000 * 60 * 10,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
+    staleTime: 1000 * 60 * 60,
+    gcTime: 1000 * 60 * 60 * 24,
   });
 }
