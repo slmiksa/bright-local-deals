@@ -223,6 +223,11 @@ export function useAdById(id: number) {
     queryKey: ["ads", "detail", id],
     queryFn: () => fetchAdById(id),
     enabled: id > 0,
+    staleTime: 1000 * 30, // 30s — reflect admin edits (website btn, etc.) quickly
+    gcTime: 1000 * 60 * 60 * 24,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 }
 
@@ -242,7 +247,10 @@ export function useCities() {
   return useQuery({
     queryKey: ["cities"],
     queryFn: fetchCities,
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 30, // 30s — reflect admin city renames quickly
     gcTime: 1000 * 60 * 60 * 24,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 }
