@@ -1,15 +1,7 @@
-import { motion } from "framer-motion";
 import { ReactNode } from "react";
 
-const PageTransition = ({ children }: { children: ReactNode }) => (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    transition={{ duration: 0.15, ease: "easeOut" }}
-  >
-    {children}
-  </motion.div>
-);
+// Native-feel: instant page swap, zero animation delay.
+// Removed framer-motion fade to eliminate the "web" feeling on ad open/back.
+const PageTransition = ({ children }: { children: ReactNode }) => <>{children}</>;
 
 export default PageTransition;
