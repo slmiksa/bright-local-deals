@@ -42,8 +42,8 @@ const GiveawaySection = () => {
 
       return matching.length > 0 ? matching[0] : null;
     },
-    staleTime: 1000 * 30, // 30s — show new/updated giveaways quickly
-    refetchOnMount: true,
+    staleTime: 0, // instant — new/updated giveaways reflect immediately
+    refetchOnMount: "always",
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
