@@ -223,7 +223,7 @@ export function useAdById(id: number) {
     queryKey: ["ads", "detail", id],
     queryFn: () => fetchAdById(id),
     enabled: id > 0,
-    staleTime: 1000 * 30, // 30s — reflect admin edits (website btn, etc.) quickly
+    staleTime: 0, // instant — admin edits (website btn, etc.) reflect immediately
     gcTime: 1000 * 60 * 60 * 24,
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
@@ -247,9 +247,9 @@ export function useCities() {
   return useQuery({
     queryKey: ["cities"],
     queryFn: fetchCities,
-    staleTime: 1000 * 30, // 30s — reflect admin city renames quickly
+    staleTime: 0, // instant — admin city renames reflect immediately
     gcTime: 1000 * 60 * 60 * 24,
-    refetchOnMount: true,
+    refetchOnMount: "always",
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });

@@ -34,9 +34,9 @@ export function useRegionsWithCities() {
           .map((c) => ({ id: c.id, name: c.name, sort_order: c.sort_order, is_default: c.is_default })),
       }));
     },
-    staleTime: 1000 * 30, // 30s — reflect admin renames quickly
+    staleTime: 0, // instant — admin renames reflect immediately
     gcTime: 1000 * 60 * 60 * 24,
-    refetchOnMount: true,
+    refetchOnMount: "always",
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
