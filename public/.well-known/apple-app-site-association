@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["7X8S9DG2DC.com.trndsky.lamha"],
+        "components": [
+          { "/": "/ad/*" },
+          { "/": "/gallery/*" }
+        ]
+      }
+    ]
+  }
+}
